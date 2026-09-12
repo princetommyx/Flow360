@@ -1,0 +1,307 @@
+import type { IconName } from '@/components/shared/icon';
+import type { PermissionKey } from '@/lib/permissions';
+
+export type NavItem = {
+  label: string;
+  href: string;
+  icon: IconName;
+  /** The item is hidden unless the member holds this permission. */
+  permission?: PermissionKey;
+  /** Extra keywords surfaced by the command palette. */
+  keywords?: string[];
+};
+
+export type NavGroup = {
+  label: string;
+  items: NavItem[];
+};
+
+export const NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Overview',
+    items: [
+      {
+        label: 'Dashboard',
+        href: '/dashboard',
+        icon: 'dashboard',
+        permission: 'dashboard.view',
+        keywords: ['home', 'overview', 'metrics'],
+      },
+    ],
+  },
+  {
+    label: 'Sales',
+    items: [
+      {
+        label: 'Invoices',
+        href: '/invoices',
+        icon: 'invoice',
+        permission: 'invoices.view',
+        keywords: ['bill customer', 'receivables'],
+      },
+      {
+        label: 'Quotations',
+        href: '/quotations',
+        icon: 'quotation',
+        permission: 'quotations.view',
+        keywords: ['estimate', 'proposal', 'quote'],
+      },
+      {
+        label: 'Customers',
+        href: '/customers',
+        icon: 'customers',
+        permission: 'customers.view',
+        keywords: ['clients', 'crm', 'accounts'],
+      },
+      {
+        label: 'Payments',
+        href: '/payments',
+        icon: 'payments',
+        permission: 'payments.view',
+        keywords: ['receipts', 'collections'],
+      },
+    ],
+  },
+  {
+    label: 'Purchases',
+    items: [
+      {
+        label: 'Purchase orders',
+        href: '/purchase-orders',
+        icon: 'purchaseOrder',
+        permission: 'purchases.view',
+        keywords: ['po', 'procurement'],
+      },
+      {
+        label: 'Suppliers',
+        href: '/suppliers',
+        icon: 'suppliers',
+        permission: 'suppliers.view',
+        keywords: ['vendors'],
+      },
+      {
+        label: 'Bills',
+        href: '/bills',
+        icon: 'bills',
+        permission: 'bills.view',
+        keywords: ['payables', 'supplier invoice'],
+      },
+    ],
+  },
+  {
+    label: 'Products',
+    items: [
+      {
+        label: 'Products',
+        href: '/products',
+        icon: 'products',
+        permission: 'products.view',
+        keywords: ['items', 'services', 'catalogue'],
+      },
+      {
+        label: 'Categories',
+        href: '/categories',
+        icon: 'categories',
+        permission: 'products.view',
+      },
+      {
+        label: 'Inventory',
+        href: '/inventory',
+        icon: 'inventory',
+        permission: 'inventory.view',
+        keywords: ['stock', 'warehouse'],
+      },
+      {
+        label: 'Stock adjustments',
+        href: '/stock-adjustments',
+        icon: 'stockAdjustment',
+        permission: 'inventory.view',
+        keywords: ['stock in', 'stock out', 'count'],
+      },
+    ],
+  },
+  {
+    label: 'Finance',
+    items: [
+      {
+        label: 'Expenses',
+        href: '/expenses',
+        icon: 'expenses',
+        permission: 'expenses.view',
+        keywords: ['spend', 'costs'],
+      },
+      {
+        label: 'Income',
+        href: '/income',
+        icon: 'income',
+        permission: 'transactions.view',
+        keywords: ['revenue', 'earnings'],
+      },
+      {
+        label: 'Accounts',
+        href: '/accounts',
+        icon: 'accounts',
+        permission: 'accounts.view',
+        keywords: ['bank', 'cash', 'balances'],
+      },
+      {
+        label: 'Transactions',
+        href: '/transactions',
+        icon: 'transactions',
+        permission: 'transactions.view',
+        keywords: ['ledger', 'movements'],
+      },
+    ],
+  },
+  {
+    label: 'People',
+    items: [
+      {
+        label: 'Employees',
+        href: '/employees',
+        icon: 'employees',
+        permission: 'employees.view',
+        keywords: ['staff', 'team', 'hr'],
+      },
+      {
+        label: 'Payroll',
+        href: '/payroll',
+        icon: 'payroll',
+        permission: 'payroll.view',
+        keywords: ['salary', 'wages', 'payslip'],
+      },
+      {
+        label: 'Attendance',
+        href: '/attendance',
+        icon: 'attendance',
+        permission: 'attendance.view',
+        keywords: ['clock in', 'timekeeping'],
+      },
+    ],
+  },
+  {
+    label: 'Projects',
+    items: [
+      {
+        label: 'Projects',
+        href: '/projects',
+        icon: 'projects',
+        permission: 'projects.view',
+        keywords: ['jobs', 'engagements'],
+      },
+      {
+        label: 'Tasks',
+        href: '/tasks',
+        icon: 'tasks',
+        permission: 'tasks.view',
+        keywords: ['todo', 'work items'],
+      },
+      {
+        label: 'Timesheets',
+        href: '/timesheets',
+        icon: 'timesheets',
+        permission: 'timesheets.view',
+        keywords: ['hours', 'time tracking'],
+      },
+    ],
+  },
+  {
+    label: 'Reports',
+    items: [
+      {
+        label: 'Sales reports',
+        href: '/reports/sales',
+        icon: 'reportSales',
+        permission: 'reports.view',
+      },
+      {
+        label: 'Expense reports',
+        href: '/reports/expenses',
+        icon: 'reportExpenses',
+        permission: 'reports.view',
+      },
+      {
+        label: 'Inventory reports',
+        href: '/reports/inventory',
+        icon: 'reportInventory',
+        permission: 'reports.view',
+      },
+      {
+        label: 'Financial reports',
+        href: '/reports/financial',
+        icon: 'reportFinancial',
+        permission: 'reports.view',
+        keywords: ['profit and loss', 'p&l'],
+      },
+    ],
+  },
+  {
+    label: 'Settings',
+    items: [
+      {
+        label: 'Company',
+        href: '/settings/company',
+        icon: 'company',
+        permission: 'settings.view',
+        keywords: ['organisation', 'branches', 'branding'],
+      },
+      {
+        label: 'Users',
+        href: '/settings/users',
+        icon: 'customers',
+        permission: 'users.view',
+        keywords: ['team members', 'invite'],
+      },
+      {
+        label: 'Roles & permissions',
+        href: '/settings/roles',
+        icon: 'roles',
+        permission: 'users.view',
+        keywords: ['access control', 'rbac'],
+      },
+      {
+        label: 'Invoice settings',
+        href: '/settings/invoicing',
+        icon: 'invoiceSettings',
+        permission: 'settings.view',
+        keywords: ['numbering', 'terms'],
+      },
+      {
+        label: 'Tax settings',
+        href: '/settings/tax',
+        icon: 'tax',
+        permission: 'settings.view',
+        keywords: ['vat', 'gst', 'rates'],
+      },
+      {
+        label: 'Notifications',
+        href: '/settings/notifications',
+        icon: 'bell',
+        permission: 'settings.view',
+      },
+    ],
+  },
+];
+
+/** Extra destinations that belong in search but not in the sidebar. */
+export const EXTRA_SEARCH_TARGETS: NavItem[] = [
+  { label: 'My profile', href: '/settings/profile', icon: 'settings' },
+  { label: 'Notification inbox', href: '/notifications', icon: 'bell' },
+  { label: 'Payment methods', href: '/payments', icon: 'card' },
+  { label: 'Business health', href: '/dashboard', icon: 'gauge' },
+];
+
+export function filterNavByPermissions(
+  groups: NavGroup[],
+  can: (permission?: PermissionKey) => boolean,
+): NavGroup[] {
+  return groups
+    .map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) }))
+    .filter((group) => group.items.length > 0);
+}
+
+/** Longest-prefix match so `/invoices/abc` highlights `Invoices`. */
+export function isActivePath(pathname: string, href: string) {
+  if (href === '/dashboard') return pathname === '/dashboard';
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
