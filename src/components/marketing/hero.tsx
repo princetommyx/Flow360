@@ -77,18 +77,18 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
               {brand.name} workspace
             </p>
 
-            <h1 className="mt-5 text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-[3.4rem]">
+            <h1 className="motion-safe:reveal-mask mt-5 text-balance text-[2.5rem] font-semibold leading-[1.05] tracking-[-0.035em] sm:text-5xl lg:text-[3.4rem]">
               Your whole company,
               <br className="hidden sm:block" /> on one system.
             </h1>
 
-            <p className="mt-5 max-w-xl text-pretty text-[15.5px] leading-relaxed text-white/70 md:text-[17px]">
+            <p className="motion-safe:reveal-mask-delayed mt-5 max-w-xl text-pretty text-[15.5px] leading-relaxed text-white/70 md:text-[17px]">
               {brand.name} runs sales, purchasing, stock, money and people from a
               single set of records — so the number you see in a report is the
               same number the work actually produced.
             </p>
 
-            <ul className="mt-7 grid gap-2.5">
+            <ul className="stagger mt-7 grid gap-2.5">
               {PROMISES.map((promise) => (
                 <li key={promise} className="flex items-start gap-2.5">
                   <span

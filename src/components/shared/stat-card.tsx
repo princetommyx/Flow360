@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 type StatCardProps = {
   label: string;
-  value: string;
+  value: React.ReactNode;
   icon?: LucideIcon;
   change?: number | null;
   /** For costs, a rise is bad — flips the colour of the delta chip. */

@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { PageHeader } from '@/components/shared/page-header';
 import { ExportButton } from '@/components/shared/export-button';
-import { formatCurrency } from '@/lib/money';
+import { CountUp } from '@/components/shared/count-up';
 import { parseListQuery, type SearchParams } from '@/lib/query';
 import { hasPermission } from '@/lib/permissions';
 import { requirePermission } from '@/server/tenant';
@@ -65,20 +65,20 @@ export default async function InvoicesPage({
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <p className="text-[12.5px] font-medium text-muted-foreground">
             Invoiced (matching this view)
           </p>
           <p className="mt-2 text-2xl font-semibold tracking-[-0.02em] tabular">
-            {formatCurrency(summary.invoiced, { currency })}
+            <CountUp value={summary.invoiced} kind="currency" currency={currency} decimals={2} />
           </p>
         </Card>
-        <Card className="p-5">
+        <Card className="hover-lift p-5">
           <p className="text-[12.5px] font-medium text-muted-foreground">
             Outstanding (matching this view)
           </p>
           <p className="mt-2 text-2xl font-semibold tracking-[-0.02em] tabular">
-            {formatCurrency(summary.outstanding, { currency })}
+            <CountUp value={summary.outstanding} kind="currency" currency={currency} decimals={2} />
           </p>
         </Card>
       </div>

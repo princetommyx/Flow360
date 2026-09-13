@@ -28,6 +28,7 @@ import { DetailList } from '@/components/shared/detail-list';
 import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatCard } from '@/components/shared/stat-card';
+import { CountUp } from '@/components/shared/count-up';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { TabNav } from '@/components/shared/tab-nav';
 import { db } from '@/lib/db';
@@ -139,10 +140,10 @@ export default async function CustomerDetailPage({
         </Alert>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Total invoiced"
-          value={formatCurrency(summary.totalInvoiced, { currency })}
+          value={<CountUp value={summary.totalInvoiced} kind="currency" currency={currency} decimals={2} />}
           icon={FileText}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -152,7 +153,7 @@ export default async function CustomerDetailPage({
         />
         <StatCard
           label="Total paid"
-          value={formatCurrency(summary.totalPaid, { currency })}
+          value={<CountUp value={summary.totalPaid} kind="currency" currency={currency} decimals={2} />}
           icon={HandCoins}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -162,7 +163,7 @@ export default async function CustomerDetailPage({
         />
         <StatCard
           label="Outstanding"
-          value={formatCurrency(summary.outstanding, { currency })}
+          value={<CountUp value={summary.outstanding} kind="currency" currency={currency} decimals={2} />}
           icon={Coins}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -174,7 +175,7 @@ export default async function CustomerDetailPage({
         />
         <StatCard
           label="Open quotations"
-          value={String(summary.openQuotations)}
+          value={<CountUp value={summary.openQuotations} />}
           icon={ReceiptText}
           footer={
             <span className="text-[11.5px] text-muted-foreground">

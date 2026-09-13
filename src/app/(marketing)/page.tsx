@@ -154,11 +154,13 @@ export default function LandingPage() {
       {/* Features */}
       <section id="features" className="scroll-mt-20 border-b border-border py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
+          <Reveal>
           <SectionHeading
             eyebrow="What you get"
             title="The operational core, not another dashboard"
             lead="Each module writes to the same records, so the work you do in one place shows up correctly everywhere else."
           />
+          </Reveal>
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature, index) => {
@@ -186,11 +188,13 @@ export default function LandingPage() {
       {/* Modules */}
       <section id="modules" className="scroll-mt-20 border-b border-border bg-surface-subtle py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
+          <Reveal>
           <SectionHeading
             eyebrow="Modules"
             title="Twenty modules that already know about each other"
             lead="Turn on what you need today and switch the rest on later — nothing has to be configured twice."
           />
+          </Reveal>
 
           <ul className="stagger mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {MODULES.map((module) => {
@@ -255,11 +259,13 @@ export default function LandingPage() {
       <section className="border-b border-border bg-surface-subtle py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <SectionHeading
-              eyebrow="Why teams switch"
-              title="Less admin, fewer surprises"
-              lead="The cost of scattered tools is not the subscriptions — it is the hours spent reconciling them and the decisions made on stale numbers."
-            />
+            <Reveal>
+              <SectionHeading
+                eyebrow="Why teams switch"
+                title="Less admin, fewer surprises"
+                lead="The cost of scattered tools is not the subscriptions — it is the hours spent reconciling them and the decisions made on stale numbers."
+              />
+            </Reveal>
 
             <ul className="stagger grid gap-3 sm:grid-cols-2">
               {BENEFITS.map((benefit) => (
