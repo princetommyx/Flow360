@@ -152,6 +152,10 @@ async function main() {
       postalCode: '94107',
       industry: 'Commercial interiors',
       plan: 'business',
+      // Mid-trial, so the demo shows the ordinary countdown rather than a
+      // freshly provisioned workspace with a full month still to run.
+      subscriptionStatus: 'trialing',
+      trialEndsAt: addDays(now, 18),
     },
   });
 
@@ -175,6 +179,13 @@ async function main() {
       email: 'hello@harbourfitouts.example',
     }),
   );
+  // The second tenant is near the end of its trial, so the warning banner and
+  // the "ending soon" sidebar card are both reachable from demo data.
+  await db.organization.update({
+    where: { id: second.organizationId },
+    data: { subscriptionStatus: 'trialing', trialEndsAt: addDays(now, 4) },
+  });
+
   await db.customer.create({
     data: {
       organizationId: second.organizationId,

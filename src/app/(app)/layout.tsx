@@ -2,6 +2,7 @@ import { db } from '@/lib/db';
 import { AppHeader } from '@/components/layout/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { BrandStyle } from '@/components/brand/brand-style';
+import { TrialBanner } from '@/components/billing/trial-banner';
 import { NAV_GROUPS, filterNavByPermissions } from '@/lib/navigation';
 import { hasPermission, type PermissionKey } from '@/lib/permissions';
 import { requireTenant } from '@/server/tenant';
@@ -72,6 +73,7 @@ export default async function AppLayout({
           />
 
           <main className="mx-auto w-full max-w-[95rem] px-4 py-6 md:px-6 md:py-8">
+            <TrialBanner organization={context.organization} />
             {children}
           </main>
         </div>

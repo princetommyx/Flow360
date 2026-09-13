@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Bell, CheckCheck } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -67,15 +68,20 @@ export function NotificationsMenu({
             <Button
               variant="ghost"
               size="sm"
-              disabled={pending}
+              loading={pending}
               onClick={() =>
                 startTransition(async () => {
-                  await markAllNotificationsRead();
+                  const result = await markAllNotificationsRead();
                   router.refresh();
+                  toast.success(
+                    result.count === 1
+                      ? '1 notification marked as read'
+                      : `${result.count} notifications marked as read`,
+                  );
                 })
               }
             >
-              <CheckCheck /> Mark all read
+              {pending ? null : <CheckCheck />} Mark all read
             </Button>
           ) : null}
         </div>

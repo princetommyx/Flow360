@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { COUNTRY_CODES } from '@/lib/config/countries';
+import { PLAN_IDS } from '@/lib/config/plans';
 
 const password = z
   .string()
@@ -41,6 +42,12 @@ export const registerSchema = z
     email: z.string().trim().toLowerCase().email('Enter a valid email address'),
     password,
     confirmPassword: z.string(),
+    /**
+     * Plan the visitor clicked on the pricing page. It is recorded as an
+     * intention only — the trial is the same on every plan and nothing is
+     * charged, so an absent or unknown value simply means "not stated yet".
+     */
+    plan: z.enum(PLAN_IDS).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Passwords do not match',

@@ -22,10 +22,11 @@ export async function markNotificationRead(id: string) {
   return { ok: true as const };
 }
 
+/** Returns how many were still unread, so the caller can say what it did. */
 export async function markAllNotificationsRead() {
   const { organization, user } = await requireTenant();
 
-  await db.notification.updateMany({
+  const { count } = await db.notification.updateMany({
     where: {
       organizationId: organization.id,
       OR: [{ userId: user.id }, { userId: null }],
@@ -35,5 +36,5 @@ export async function markAllNotificationsRead() {
   });
 
   revalidatePath('/', 'layout');
-  return { ok: true as const };
+  return { ok: true as const, count };
 }

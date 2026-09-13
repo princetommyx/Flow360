@@ -15,6 +15,7 @@ import {
 import { Logo } from '@/components/brand/logo';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { CompanySwitcher } from '@/components/layout/company-switcher';
+import { TrialCard } from '@/components/billing/trial-status';
 import type { NavGroup } from '@/lib/navigation';
 import type { OrganizationSummary } from '@/server/tenant';
 
@@ -57,6 +58,7 @@ export function MobileSidebar({
         </div>
         <div className="flex-1 overflow-y-auto scrollbar-thin">
           <SidebarNav groups={navGroups} onNavigate={() => setOpen(false)} />
+          <TrialCard organization={organization} className="mx-3 mb-4 mt-2" />
         </div>
       </SheetContent>
     </Sheet>

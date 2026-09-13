@@ -29,6 +29,9 @@ export type OrganizationSummary = {
   logoUrl: string | null;
   currency: string;
   plan: string;
+  /** ISO string so the summary stays plain when it crosses to a client. */
+  trialEndsAt: string | null;
+  subscriptionStatus: string;
 };
 
 export type TenantContext = {
@@ -70,6 +73,8 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
           logoUrl: true,
           currency: true,
           plan: true,
+          trialEndsAt: true,
+          subscriptionStatus: true,
           isActive: true,
           deletedAt: true,
         },
@@ -111,6 +116,8 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
     logoUrl: org.logoUrl,
     currency: org.currency,
     plan: org.plan,
+    trialEndsAt: org.trialEndsAt?.toISOString() ?? null,
+    subscriptionStatus: org.subscriptionStatus,
   });
 
   return {

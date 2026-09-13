@@ -19,6 +19,8 @@ const COLUMNS = [
     links: [
       { label: 'FAQ', href: '/#faq' },
       { label: 'Contact', href: `mailto:${brand.supportEmail}` },
+      { label: 'Terms of use', href: '/terms' },
+      { label: 'Privacy notice', href: '/privacy' },
     ],
   },
   {

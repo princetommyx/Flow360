@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { Loader2, Search, SlidersHorizontal, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -99,16 +99,26 @@ export function DataTableToolbar({
     >
       <div className="flex flex-1 flex-wrap items-center gap-2">
         <div className="relative min-w-0 flex-1 sm:max-w-xs">
-          <Search
-            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-            aria-hidden
-          />
+          {/* The magnifier becomes a spinner while the new page is fetched,
+              so a slow filter reads as working rather than as nothing. */}
+          {isPending ? (
+            <Loader2
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 animate-spin text-primary"
+              aria-hidden
+            />
+          ) : (
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
+          )}
           <Input
             value={term}
             onChange={(event) => setTerm(event.target.value)}
             placeholder={searchPlaceholder}
             aria-label={searchPlaceholder}
-            className={cn('pl-9', isPending && 'opacity-80')}
+            aria-busy={isPending}
+            className="pl-9"
           />
         </div>
 
