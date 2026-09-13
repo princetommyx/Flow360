@@ -12,7 +12,7 @@ const ThemeContext = React.createContext<ThemeContextValue>({
   toggle: () => {},
 });
 
-const STORAGE_KEY = 'nextora.theme';
+const STORAGE_KEY = 'flow360.theme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // `ThemeScript` has already applied the class before paint, so the initial

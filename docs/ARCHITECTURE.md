@@ -1,4 +1,4 @@
-# Nextora360 — architecture
+# Flow360 — architecture
 
 A multi-tenant ERP/CRM for small and mid-sized businesses. This document is the
 map: what the layers are, where a given concern lives, and the rules that keep

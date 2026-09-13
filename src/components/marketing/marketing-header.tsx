@@ -9,6 +9,7 @@ import { Logo } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 
 const LINKS = [
+  { label: 'Take a look', href: '/#inside' },
   { label: 'Features', href: '/#features' },
   { label: 'Modules', href: '/#modules' },
   { label: 'How it works', href: '/#how-it-works' },

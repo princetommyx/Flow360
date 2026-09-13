@@ -1,4 +1,4 @@
-# Nextora360
+# Flow360
 
 Multi-tenant ERP/CRM for SMEs. Read `docs/ARCHITECTURE.md` first — it explains
 the layers and the rules below in full.

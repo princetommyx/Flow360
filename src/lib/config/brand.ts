@@ -57,18 +57,18 @@ const env = (key: string, fallback: string) =>
   (process.env[key] ?? '').trim() || fallback;
 
 export const brand: BrandConfig = {
-  name: env('NEXT_PUBLIC_BRAND_NAME', 'Nextora360'),
-  shortName: env('NEXT_PUBLIC_BRAND_SHORT_NAME', 'Nextora'),
+  name: env('NEXT_PUBLIC_BRAND_NAME', 'Flow360'),
+  shortName: env('NEXT_PUBLIC_BRAND_SHORT_NAME', 'Flow'),
   tagline: env(
     'NEXT_PUBLIC_BRAND_TAGLINE',
-    'Run your entire business from one place',
+    'Your whole company, on one system',
   ),
   description: env(
     'NEXT_PUBLIC_BRAND_DESCRIPTION',
-    'Manage sales, invoices, customers, inventory, expenses and operations from one powerful business platform.',
+    'Run sales, purchasing, stock, money and people from a single set of records — so every report reflects the work your team actually did.',
   ),
-  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'nextora360.app'),
-  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@nextora360.app'),
+  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'flow360.app'),
+  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@flow360.app'),
   colors: {
     primary: env('NEXT_PUBLIC_BRAND_PRIMARY', '#4f46e5'),
     secondary: env('NEXT_PUBLIC_BRAND_SECONDARY', '#0d9488'),
@@ -103,7 +103,7 @@ export const numbering: DocumentNumberingConfig = {
 
 /** Marketing-side company facts, kept out of components. */
 export const company = {
-  legalName: env('NEXT_PUBLIC_COMPANY_LEGAL_NAME', 'Nextora Software Ltd.'),
+  legalName: env('NEXT_PUBLIC_COMPANY_LEGAL_NAME', 'Flow360 Software Ltd.'),
   addressLine1: env('NEXT_PUBLIC_COMPANY_ADDRESS_1', '400 Market Street'),
   addressLine2: env('NEXT_PUBLIC_COMPANY_ADDRESS_2', 'Suite 1200'),
   city: env('NEXT_PUBLIC_COMPANY_CITY', 'San Francisco'),

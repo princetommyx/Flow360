@@ -188,8 +188,12 @@ function bucketFor(range: DateRange): 'day' | 'week' | 'month' {
 export async function getRevenueTrend(
   organizationId: string,
   range: DateRange,
+  now: Date = new Date(),
 ): Promise<TrendPoint[]> {
   const bucket = bucketFor(range);
+  // A period that has not finished yet would otherwise plot a long flat tail of
+  // zeroes for days that simply have not happened.
+  const to = range.to > now ? now : range.to;
 
   const [revenueRows, expenseRows] = await Promise.all([
     db.$queryRaw<Array<{ bucket: Date; total: string }>>`
@@ -198,7 +202,7 @@ export async function getRevenueTrend(
       WHERE "organizationId" = ${organizationId}
         AND "deletedAt" IS NULL
         AND "status" = ANY(${[...COUNTED_INVOICE_STATUSES]}::"InvoiceStatus"[])
-        AND "issueDate" BETWEEN ${range.from} AND ${range.to}
+        AND "issueDate" BETWEEN ${range.from} AND ${to}
       GROUP BY 1
       ORDER BY 1
     `,
@@ -208,7 +212,7 @@ export async function getRevenueTrend(
       WHERE "organizationId" = ${organizationId}
         AND "deletedAt" IS NULL
         AND "status" <> 'REJECTED'
-        AND "spentAt" BETWEEN ${range.from} AND ${range.to}
+        AND "spentAt" BETWEEN ${range.from} AND ${to}
       GROUP BY 1
       ORDER BY 1
     `,
@@ -253,7 +257,7 @@ export async function getRevenueTrend(
 
   for (
     let cursor = startOfBucket(range.from);
-    cursor <= range.to;
+    cursor <= to;
     cursor = advance(cursor)
   ) {
     upsert(cursor);

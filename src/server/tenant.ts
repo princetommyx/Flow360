@@ -13,7 +13,7 @@ import {
   type PermissionKey,
 } from '@/lib/permissions';
 
-export const ACTIVE_ORG_COOKIE = 'nextora.org';
+export const ACTIVE_ORG_COOKIE = 'flow360.org';
 
 export class AuthorizationError extends Error {
   constructor(message = 'You do not have permission to do that.') {

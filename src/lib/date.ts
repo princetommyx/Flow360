@@ -73,8 +73,32 @@ export function resolveDateRange(
   }
 }
 
-/** The equivalent window immediately before `preset`, for period-over-period deltas. */
+/**
+ * The equivalent window immediately before `preset`, for period-over-period
+ * deltas.
+ *
+ * When the current period is still running — "this month" on the 13th — the
+ * comparison window is truncated to the same elapsed length, so a half-finished
+ * month is measured against the same half of the month before it rather than
+ * against a full one. Without this every in-progress period reads as a steep
+ * decline purely because it has not finished yet.
+ */
 export function previousDateRange(
+  preset: DateRangePreset,
+  current: DateRange,
+  now: Date = new Date(),
+): DateRange {
+  const full = fullPreviousRange(preset, current);
+
+  const inProgress = current.to > now && current.from <= now;
+  if (!inProgress) return full;
+
+  const elapsed = now.getTime() - current.from.getTime();
+  const truncated = new Date(full.from.getTime() + elapsed);
+  return { from: full.from, to: truncated < full.to ? truncated : full.to };
+}
+
+function fullPreviousRange(
   preset: DateRangePreset,
   current: DateRange,
 ): DateRange {

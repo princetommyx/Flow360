@@ -1,4 +1,4 @@
-// Nextora360 — data model
+// Flow360 — data model
 // ---------------------------------------------------------------------------
 // Multi-tenancy rule: every business-owned row carries `organizationId` and is
 // always queried through the tenant-scoped helpers in src/server/tenant.ts.

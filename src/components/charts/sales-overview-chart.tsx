@@ -33,29 +33,34 @@ export function SalesOverviewChart({ data }: { data: StatusSlice[] }) {
   return (
     <div className="h-[16rem] w-full">
       <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={rows} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
-          <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" />
+        <BarChart
+          data={rows}
+          layout="vertical"
+          margin={{ top: 4, right: 12, bottom: 0, left: 0 }}
+          barCategoryGap={8}
+        >
+          <CartesianGrid horizontal={false} stroke="var(--border)" strokeDasharray="3 3" />
           <XAxis
+            type="number"
+            tickLine={false}
+            axisLine={false}
+            tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
+            tickFormatter={(value: number) => formatCurrency(value, { compact: true })}
+          />
+          <YAxis
+            type="category"
             dataKey="label"
             tickLine={false}
             axisLine={false}
-            tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-            interval={0}
-            dy={6}
-          />
-          <YAxis
-            tickLine={false}
-            axisLine={false}
-            width={64}
-            tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-            tickFormatter={(value: number) => formatCurrency(value, { compact: true })}
+            width={96}
+            tick={{ fontSize: 11.5, fill: 'var(--foreground)' }}
           />
           <Tooltip cursor={{ fill: 'var(--muted)' }} content={<ChartTooltip />} />
           <Bar
             dataKey="amount"
             name="Invoiced"
-            radius={[4, 4, 0, 0]}
-            maxBarSize={44}
+            radius={[0, 4, 4, 0]}
+            barSize={14}
             // Recharts reads `fill` off each datum when the key matches.
             fill="var(--chart-1)"
           />

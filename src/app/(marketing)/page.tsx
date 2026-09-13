@@ -4,13 +4,11 @@ import {
   BarChart3,
   Boxes,
   Building2,
-  CheckCircle2,
   FileText,
   FolderKanban,
   ReceiptText,
   ShieldCheck,
   ShoppingCart,
-  Sparkles,
   TrendingDown,
   UserCog,
   Users,
@@ -18,7 +16,9 @@ import {
   Zap,
 } from 'lucide-react';
 
-import { Badge } from '@/components/ui/badge';
+import { Hero } from '@/components/marketing/hero';
+import { LookInside } from '@/components/marketing/look-inside';
+import { SectionHeading } from '@/components/marketing/section-heading';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -131,77 +131,18 @@ const FAQS = [
 export default function LandingPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border">
-        <div className="absolute inset-0 bg-grid opacity-60" aria-hidden />
-        <div
-          className="absolute -top-40 left-1/2 size-[34rem] -translate-x-1/2 rounded-full opacity-[0.16] blur-3xl"
-          style={{ background: 'var(--brand-primary)' }}
-          aria-hidden
-        />
+      <Hero />
 
-        <div className="relative mx-auto w-full max-w-6xl px-5 py-20 text-center md:px-8 md:py-28">
-          <Badge variant="default" className="mx-auto gap-1.5 px-3 py-1">
-            <Sparkles className="size-3" aria-hidden />
-            One platform, every part of the business
-          </Badge>
-
-          <h1 className="mx-auto mt-6 max-w-3xl text-balance text-[2.25rem] font-semibold leading-[1.08] tracking-[-0.035em] sm:text-5xl md:text-[3.5rem]">
-            Run your entire business from one place
-          </h1>
-
-          <p className="mx-auto mt-5 max-w-2xl text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-[17px]">
-            Manage sales, invoices, customers, inventory, expenses and operations
-            from one powerful business platform — built for teams who have
-            outgrown spreadsheets but do not want enterprise software.
-          </p>
-
-          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button size="xl" asChild className="w-full sm:w-auto">
-              <Link href="/register">
-                Start free <ArrowRight />
-              </Link>
-            </Button>
-            <Button size="xl" variant="secondary" asChild className="w-full sm:w-auto">
-              <Link href="/pricing">See pricing</Link>
-            </Button>
-          </div>
-
-          <p className="mt-4 text-[12.5px] text-muted-foreground">
-            No card required · Set up in minutes · Cancel any time
-          </p>
-
-          <ul className="mx-auto mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-x-6 gap-y-2">
-            {['Invoicing', 'Inventory', 'Expenses', 'Payroll', 'Projects', 'Reports'].map(
-              (item) => (
-                <li
-                  key={item}
-                  className="flex items-center gap-1.5 text-[13px] text-muted-foreground"
-                >
-                  <CheckCircle2 className="size-3.5 text-success" aria-hidden />
-                  {item}
-                </li>
-              ),
-            )}
-          </ul>
-        </div>
-      </section>
+      <LookInside />
 
       {/* Features */}
       <section id="features" className="scroll-mt-20 border-b border-border py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
-          <div className="max-w-2xl">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
-              What you get
-            </p>
-            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
-              The operational core, not another dashboard
-            </h2>
-            <p className="mt-4 text-pretty text-[15px] leading-relaxed text-muted-foreground">
-              Each module writes to the same records, so the work you do in one
-              place shows up correctly everywhere else.
-            </p>
-          </div>
+          <SectionHeading
+            eyebrow="What you get"
+            title="The operational core, not another dashboard"
+            lead="Each module writes to the same records, so the work you do in one place shows up correctly everywhere else."
+          />
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map((feature) => {
@@ -227,14 +168,11 @@ export default function LandingPage() {
       {/* Modules */}
       <section id="modules" className="scroll-mt-20 border-b border-border bg-surface-subtle py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
-          <div className="max-w-2xl">
-            <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
-              Modules
-            </p>
-            <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
-              Twenty modules that already know about each other
-            </h2>
-          </div>
+          <SectionHeading
+            eyebrow="Modules"
+            title="Twenty modules that already know about each other"
+            lead="Turn on what you need today and switch the rest on later — nothing has to be configured twice."
+          />
 
           <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {MODULES.map((module) => {
@@ -259,16 +197,11 @@ export default function LandingPage() {
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
           <div className="grid gap-12 lg:grid-cols-[0.9fr_1.1fr]">
             <div>
-              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
-                How it works
-              </p>
-              <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
-                From setup to insight in four steps
-              </h2>
-              <p className="mt-4 text-pretty text-[15px] leading-relaxed text-muted-foreground">
-                No implementation project, no consultant. Most teams are issuing
-                real invoices the same afternoon they sign up.
-              </p>
+              <SectionHeading
+                eyebrow="How it works"
+                title="From setup to insight in four steps"
+                lead="No implementation project, no consultant. Most teams are issuing real invoices the same afternoon they sign up."
+              />
               <Button size="lg" className="mt-7" asChild>
                 <Link href="/register">
                   Create your workspace <ArrowRight />
@@ -304,19 +237,11 @@ export default function LandingPage() {
       <section className="border-b border-border bg-surface-subtle py-20 md:py-24">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
-            <div>
-              <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
-                Why teams switch
-              </p>
-              <h2 className="mt-3 text-balance text-3xl font-semibold tracking-[-0.03em] md:text-4xl">
-                Less admin, fewer surprises
-              </h2>
-              <p className="mt-4 text-pretty text-[15px] leading-relaxed text-muted-foreground">
-                The cost of scattered tools is not the subscriptions — it is the
-                hours spent reconciling them and the decisions made on stale
-                numbers.
-              </p>
-            </div>
+            <SectionHeading
+              eyebrow="Why teams switch"
+              title="Less admin, fewer surprises"
+              lead="The cost of scattered tools is not the subscriptions — it is the hours spent reconciling them and the decisions made on stale numbers."
+            />
 
             <ul className="grid gap-3 sm:grid-cols-2">
               {BENEFITS.map((benefit) => (

@@ -4,7 +4,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
- * Nextora360 design system
+ * Flow360 design system
  * ------------------------------------------------------------------
  * Tokens are declared once here and consumed everywhere through
  * Tailwind utilities (bg-surface, text-muted-foreground, ...).

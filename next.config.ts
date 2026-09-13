@@ -6,6 +6,10 @@ const nextConfig: NextConfig = {
 
   typedRoutes: false,
 
+  // The floating dev badge overlaps the sidebar and ends up in captured
+  // product screenshots; the route overlay adds nothing we rely on.
+  devIndicators: false,
+
   // Security headers applied to every response.
   async headers() {
     return [

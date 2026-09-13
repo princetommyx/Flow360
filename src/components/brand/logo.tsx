@@ -9,8 +9,9 @@ type LogoProps = {
 };
 
 /**
- * Default logomark: three ascending bars inside a rounded tile, drawn with the
- * brand hues. Swap it wholesale by setting `NEXT_PUBLIC_BRAND_LOGO`.
+ * Default logomark: a continuous loop drawn as two offset arcs with a leading
+ * dot — the cycle a record travels through (quote, invoice, payment, ledger).
+ * Swap it wholesale by setting `NEXT_PUBLIC_BRAND_LOGO`.
  */
 export function LogoMark({ size = 32, className }: LogoProps) {
   if (brand.logoUrl) {
@@ -28,7 +29,7 @@ export function LogoMark({ size = 32, className }: LogoProps) {
   return (
     <span
       className={cn(
-        'inline-flex shrink-0 items-center justify-center rounded-lg bg-brand text-brand-foreground shadow-sm',
+        'inline-flex shrink-0 items-center justify-center rounded-[10px] bg-brand text-brand-foreground shadow-sm',
         className,
       )}
       style={{ width: size, height: size }}
@@ -37,13 +38,27 @@ export function LogoMark({ size = 32, className }: LogoProps) {
       <svg
         viewBox="0 0 24 24"
         fill="none"
-        width={size * 0.62}
-        height={size * 0.62}
+        width={size * 0.66}
+        height={size * 0.66}
         role="presentation"
       >
-        <rect x="3" y="13" width="4" height="8" rx="1.4" fill="currentColor" opacity="0.55" />
-        <rect x="10" y="8.5" width="4" height="12.5" rx="1.4" fill="currentColor" opacity="0.8" />
-        <rect x="17" y="3" width="4" height="18" rx="1.4" fill="currentColor" />
+        {/* Outer arc — open at the top right, where the flow re-enters */}
+        <path
+          d="M19.5 8.2A8.5 8.5 0 1 0 20.5 12"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+          opacity="0.55"
+        />
+        {/* Inner arc — the shorter return leg */}
+        <path
+          d="M7.4 14.6A5 5 0 0 1 15.2 9.2"
+          stroke="currentColor"
+          strokeWidth="2.4"
+          strokeLinecap="round"
+        />
+        {/* Leading dot */}
+        <circle cx="19.6" cy="5.6" r="2.1" fill="currentColor" />
       </svg>
     </span>
   );

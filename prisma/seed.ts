@@ -18,6 +18,7 @@ import {
   PAYMENT_NOTES,
   PRODUCTS,
   PROJECTS,
+  RECURRING_EXPENSES,
   SUPPLIERS,
   TASKS,
 } from './seed-data';
@@ -26,7 +27,7 @@ const db = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 });
 
-const DEMO_PASSWORD = 'Nextora2026!';
+const DEMO_PASSWORD = 'Flow360Demo!';
 const now = new Date();
 
 /** Deterministic pseudo-random so re-seeding produces the same demo numbers. */
@@ -364,25 +365,59 @@ async function main() {
   }
 
   console.info('Creating invoices, payments and ledger entries…');
+  // The live pipeline: one invoice in each status, all inside the last ~5 weeks
+  // so the current-period dashboard shows every state at once.
   const invoicePlan: Array<{
     status: 'PAID' | 'PARTIALLY_PAID' | 'SENT' | 'VIEWED' | 'OVERDUE' | 'DRAFT' | 'CANCELLED';
     daysAgo: number;
     termDays: number;
   }> = [
-    { status: 'PAID', daysAgo: 82, termDays: 30 },
-    { status: 'PAID', daysAgo: 68, termDays: 14 },
-    { status: 'PAID', daysAgo: 54, termDays: 30 },
-    { status: 'OVERDUE', daysAgo: 47, termDays: 14 },
-    { status: 'PARTIALLY_PAID', daysAgo: 33, termDays: 30 },
-    { status: 'PAID', daysAgo: 26, termDays: 14 },
-    { status: 'VIEWED', daysAgo: 14, termDays: 30 },
-    { status: 'SENT', daysAgo: 8, termDays: 21 },
-    { status: 'DRAFT', daysAgo: 3, termDays: 14 },
-    { status: 'CANCELLED', daysAgo: 59, termDays: 30 },
+    { status: 'PAID', daysAgo: 34, termDays: 30 },
+    { status: 'PAID', daysAgo: 28, termDays: 14 },
+    { status: 'OVERDUE', daysAgo: 26, termDays: 14 },
+    { status: 'PAID', daysAgo: 22, termDays: 30 },
+    { status: 'PARTIALLY_PAID', daysAgo: 18, termDays: 30 },
+    { status: 'PAID', daysAgo: 15, termDays: 14 },
+    { status: 'CANCELLED', daysAgo: 12, termDays: 30 },
+    { status: 'VIEWED', daysAgo: 9, termDays: 30 },
+    { status: 'PAID', daysAgo: 6, termDays: 14 },
+    { status: 'SENT', daysAgo: 4, termDays: 21 },
+    { status: 'DRAFT', daysAgo: 2, termDays: 14 },
   ];
 
+  /**
+   * Trading history for the five months before the current one. These are all
+   * settled, so the dashboard's trend, top-product and profit figures have a
+   * believable baseline instead of a single spike.
+   */
+  const historyPlan: Array<{ status: 'PAID'; daysAgo: number; termDays: number }> = [];
+  for (let monthsBack = 5; monthsBack >= 1; monthsBack -= 1) {
+    const invoicesThatMonth = between(3, 5);
+    for (let n = 0; n < invoicesThatMonth; n += 1) {
+      historyPlan.push({
+        status: 'PAID',
+        daysAgo: monthsBack * 30 + between(0, 27),
+        termDays: pick([14, 30] as const),
+      });
+    }
+  }
+
+  // Re-date the pipeline so it sits inside the current month however far into
+  // the month the seed happens to run; below ten days elapsed it reaches back a
+  // little further rather than stacking every invoice on the same date.
+  const daysElapsed = now.getDate() - 1;
+  const window = daysElapsed >= 10 ? daysElapsed : 20;
+  const pipeline = invoicePlan.map((plan, index) => ({
+    ...plan,
+    daysAgo: Math.round((index / Math.max(1, invoicePlan.length - 1)) * window),
+  }));
+
+  const allInvoices = [...historyPlan, ...pipeline].sort(
+    (a, b) => b.daysAgo - a.daysAgo,
+  );
+
   let paymentSeq = 0;
-  for (const [index, plan] of invoicePlan.entries()) {
+  for (const [index, plan] of allInvoices.entries()) {
     const customer = customers[index % customers.length];
     const issueDate = startOfDay(subDays(now, plan.daysAgo));
     const dueDate = addDays(issueDate, plan.termDays);
@@ -529,7 +564,27 @@ async function main() {
   const expenseCategories = await db.expenseCategory.findMany({ where: { organizationId } });
   const categoryByName = new Map(expenseCategories.map((row) => [row.name, row.id]));
 
-  for (const [index, expense] of EXPENSE_ROWS.entries()) {
+  // One-off costs, plus the recurring monthly baseline for each of the last
+  // six months, so spend is a steady line rather than a single cluster.
+  const expenseRows: Array<{
+    title: string;
+    category: string;
+    amount: number;
+    vendorName: string;
+    method: string;
+    daysAgo: number;
+  }> = [
+    ...EXPENSE_ROWS,
+    ...Array.from({ length: 6 }).flatMap((_, monthsBack) =>
+      RECURRING_EXPENSES.map((expense) => ({
+        ...expense,
+        title: `${expense.title} — ${monthsBack === 0 ? 'current month' : `${monthsBack} month${monthsBack === 1 ? '' : 's'} ago`}`,
+        daysAgo: monthsBack * 30 + between(1, 20),
+      })),
+    ),
+  ];
+
+  for (const [index, expense] of expenseRows.entries()) {
     const spentAt = startOfDay(subDays(now, expense.daysAgo));
     const taxAmount = round(expense.amount * 0.1);
     const account = expense.method === 'CARD' ? cashAccount : bankAccount;
