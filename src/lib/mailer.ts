@@ -47,8 +47,4 @@ async function sendWithProvider(message: MailMessage): Promise<void> {
   );
 }
 
-export function absoluteUrl(path: string) {
-  const base =
-    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, '') ?? 'http://localhost:3000';
-  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
-}
+export { absoluteUrl } from '@/lib/url';
