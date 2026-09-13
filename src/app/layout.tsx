@@ -6,6 +6,7 @@ import { ThemeProvider, ThemeScript } from '@/components/layout/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { brand } from '@/lib/config/brand';
+import { appUrl } from '@/lib/url';
 
 import './globals.css';
 
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
   description: brand.description,
   applicationName: brand.name,
   icons: { icon: brand.faviconUrl },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  metadataBase: appUrl(),
   openGraph: {
     title: `${brand.name} — ${brand.tagline}`,
     description: brand.description,

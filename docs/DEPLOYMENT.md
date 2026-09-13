@@ -35,7 +35,7 @@ Required in every environment:
 |---|---|
 | `DATABASE_URL` | Pooled connection string, TLS required |
 | `AUTH_SECRET` | `openssl rand -base64 32` — a different value per environment |
-| `AUTH_URL` | The deployment origin, e.g. `https://your-app.vercel.app` |
+| `AUTH_URL` | The deployment origin, e.g. `https://flow360.vercel.app` |
 | `NEXT_PUBLIC_APP_URL` | Same origin; used for metadata and email links |
 | `DATABASE_POOL_MAX` | Optional. Connections per instance; defaults to 1 on Vercel, 10 elsewhere |
 
@@ -67,6 +67,23 @@ DATABASE_URL="<direct-url>" npm run db:seed
 
 The seed **deletes all existing rows** before inserting. Never point it at
 production.
+
+### About the origin variables
+
+Write the real hostname, with a scheme and no angle brackets — a placeholder
+pasted verbatim is not a URL and `new URL()` rejects it:
+
+```
+NEXT_PUBLIC_APP_URL=https://flow360.vercel.app     # correct
+NEXT_PUBLIC_APP_URL=https://<your-app>.vercel.app  # not a URL
+NEXT_PUBLIC_APP_URL=flow360.vercel.app             # no scheme
+```
+
+`src/lib/url.ts` degrades gracefully if one slips through — it tries
+`NEXT_PUBLIC_APP_URL`, then Vercel's own origin, then localhost, taking the
+first that parses — so a bad value costs you correct links rather than the whole
+deployment. Setting it properly is still what you want: the fallback cannot know
+your custom domain.
 
 ## 4. Deploy
 
