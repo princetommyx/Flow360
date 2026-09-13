@@ -25,6 +25,7 @@ import {
 import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatCard } from '@/components/shared/stat-card';
+import { CountUp } from '@/components/shared/count-up';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { DateRangeFilter } from '@/components/shared/date-range-filter';
 import { RevenueTrendChart } from '@/components/charts/revenue-trend-chart';
@@ -86,13 +87,13 @@ export default async function DashboardPage({
       >
         <StatCard
           label="Total revenue"
-          value={formatCurrency(summary.revenue.value, { currency })}
+          value={<CountUp value={summary.revenue.value} kind="currency" currency={currency} decimals={2} />}
           change={summary.revenue.change}
           icon={TrendingUp}
         />
         <StatCard
           label="Outstanding invoices"
-          value={formatCurrency(summary.outstanding, { currency })}
+          value={<CountUp value={summary.outstanding} kind="currency" currency={currency} decimals={2} />}
           icon={FileWarning}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -104,14 +105,14 @@ export default async function DashboardPage({
         />
         <StatCard
           label="Total expenses"
-          value={formatCurrency(summary.expenses.value, { currency })}
+          value={<CountUp value={summary.expenses.value} kind="currency" currency={currency} decimals={2} />}
           change={summary.expenses.change}
           invertChange
           icon={TrendingDown}
         />
         <StatCard
           label="Net profit"
-          value={formatCurrency(summary.netProfit.value, { currency })}
+          value={<CountUp value={summary.netProfit.value} kind="currency" currency={currency} decimals={2} />}
           change={summary.netProfit.change}
           icon={Wallet}
         />
@@ -120,7 +121,7 @@ export default async function DashboardPage({
       <section aria-label="Business counts" className="stagger grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Active customers"
-          value={formatNumber(summary.customers, 0)}
+          value={<CountUp value={summary.customers} />}
           icon={Users}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -130,7 +131,7 @@ export default async function DashboardPage({
         />
         <StatCard
           label="Products & services"
-          value={formatNumber(summary.products, 0)}
+          value={<CountUp value={summary.products} />}
           icon={Boxes}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -140,7 +141,7 @@ export default async function DashboardPage({
         />
         <StatCard
           label="Low stock items"
-          value={formatNumber(summary.lowStockCount, 0)}
+          value={<CountUp value={summary.lowStockCount} />}
           icon={PackageX}
           footer={
             <span className="text-[11.5px] text-muted-foreground">

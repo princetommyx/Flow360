@@ -25,6 +25,7 @@ import { DetailList } from '@/components/shared/detail-list';
 import { EmptyState } from '@/components/shared/empty-state';
 import { PageHeader } from '@/components/shared/page-header';
 import { StatCard } from '@/components/shared/stat-card';
+import { CountUp } from '@/components/shared/count-up';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatCurrency, formatNumber, toNumber } from '@/lib/money';
 import { formatDate } from '@/lib/date';
@@ -125,10 +126,10 @@ export default async function ProductDetailPage({
         </Alert>
       ) : null}
 
-      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
           label="Selling price"
-          value={formatCurrency(product.sellingPrice, { currency })}
+          value={<CountUp value={toNumber(product.sellingPrice)} kind="currency" currency={currency} decimals={2} />}
           icon={Coins}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -140,7 +141,7 @@ export default async function ProductDetailPage({
         />
         <StatCard
           label="Units sold"
-          value={formatNumber(summary.unitsSold, 0)}
+          value={<CountUp value={summary.unitsSold} />}
           icon={TrendingUp}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
@@ -151,7 +152,7 @@ export default async function ProductDetailPage({
         />
         <StatCard
           label="Revenue"
-          value={formatCurrency(summary.revenue, { currency })}
+          value={<CountUp value={summary.revenue} kind="currency" currency={currency} decimals={2} />}
           icon={Boxes}
           footer={
             <span className="text-[11.5px] text-muted-foreground">

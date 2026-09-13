@@ -47,12 +47,14 @@ export function LookInside() {
       className="scroll-mt-20 border-b border-border bg-surface-subtle py-20 md:py-28"
     >
       <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
-        <SectionHeading
-          align="center"
-          eyebrow="Take a look inside"
-          title="The real interface, not an illustration of one"
-          lead="Every screen below is a screenshot of the running application. What you see here is what your team opens on a Monday morning."
-        />
+        <Reveal>
+          <SectionHeading
+            align="center"
+            eyebrow="Take a look inside"
+            title="The real interface, not an illustration of one"
+            lead="Every screen below is a screenshot of the running application. What you see here is what your team opens on a Monday morning."
+          />
+        </Reveal>
 
         <div className="mt-16 space-y-20 md:space-y-28">
           {SHOWCASES.map((showcase, index) => {
@@ -66,7 +68,7 @@ export function LookInside() {
                   <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
                     {showcase.eyebrow}
                   </p>
-                  <h3 className="mt-3 text-balance text-2xl font-semibold tracking-[-0.025em] md:text-[1.75rem]">
+                  <h3 className="motion-safe:reveal-mask mt-3 text-balance text-2xl font-semibold tracking-[-0.025em] md:text-[1.75rem]">
                     {showcase.title}
                   </h3>
                   <p className="mt-4 text-pretty text-[14.5px] leading-relaxed text-muted-foreground md:text-[15px]">

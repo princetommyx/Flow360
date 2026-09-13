@@ -313,6 +313,19 @@
   }
 }
 
+@keyframes mask-up {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+    transform: translate3d(0, 14px, 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 -20% 0);
+    transform: none;
+  }
+}
+
 @keyframes sweep-in {
   from {
     opacity: 0;
@@ -351,12 +364,35 @@
   .stagger > *:nth-child(n + 7) { animation-delay: 240ms; }
 
   /*
+   * Masked heading reveal: the text is clipped from below and wipes upward
+   * into place, so a headline assembles rather than simply fading. Paired with
+   * a small rise it reads as the line settling onto the page.
+   */
+  .reveal-mask {
+    animation: mask-up 620ms var(--ease-out-soft) both;
+  }
+  .reveal-mask-delayed {
+    animation: mask-up 620ms var(--ease-out-soft) 120ms both;
+  }
+
+  /*
    * Pre-reveal state. Scoped to `.js` so it only applies once the inline
    * bootstrap script has confirmed JavaScript is running — without it the
    * content stays visible rather than being hidden with no way to reveal it.
    */
   .js .reveal-pending {
     opacity: 0;
+  }
+
+  /*
+   * Animations inside a section that has not been revealed yet are held at
+   * their first frame. Without this a heading's wipe would play out while the
+   * section is still invisible, and the reader would scroll down to find the
+   * effect already over.
+   */
+  .js .reveal-pending,
+  .js .reveal-pending * {
+    animation-play-state: paused;
   }
 
   /* Lifts a card toward the reader on hover, for cards that are links. */
