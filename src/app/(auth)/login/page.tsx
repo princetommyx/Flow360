@@ -1,8 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 
-import { auth } from '@/lib/auth';
+import { LogoMark } from '@/components/brand/logo';
+import { auth, googleEnabled } from '@/lib/auth';
+import { brand } from '@/lib/config/brand';
 
 import { LoginForm } from './login-form';
 
@@ -14,21 +17,34 @@ export default async function LoginPage() {
 
   return (
     <div>
-      <header className="mb-7">
-        <h1 className="text-2xl font-semibold tracking-[-0.025em]">Welcome back</h1>
-        <p className="mt-1.5 text-[13.5px] text-muted-foreground">
-          Sign in to pick up where your business left off.
+      <LogoMark size={44} />
+
+      <header className="mt-6">
+        <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
+          Welcome back
+        </h1>
+        <p className="mt-1.5 text-[14px] text-muted-foreground">
+          Sign in to your {brand.name} workspace
         </p>
       </header>
 
-      <LoginForm />
+      <LoginForm googleEnabled={googleEnabled} />
 
-      <p className="mt-6 text-center text-[13px] text-muted-foreground">
-        New here?{' '}
-        <Link href="/register" className="font-medium text-primary hover:underline">
-          Create an account
+      <div className="mt-7 flex flex-col gap-4 border-t border-border pt-5">
+        <p className="text-center text-[13px] text-muted-foreground">
+          New to {brand.name}?{' '}
+          <Link href="/register" className="font-medium text-primary hover:underline">
+            Create a workspace
+          </Link>
+        </p>
+        <Link
+          href="/"
+          className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="size-3.5" aria-hidden />
+          Back to home
         </Link>
-      </p>
+      </div>
     </div>
   );
 }

@@ -16,7 +16,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { PasswordInput } from '@/components/shared/password-input';
 import { FormStatus } from '@/components/shared/form-status';
 import { resetPasswordAction } from '@/server/actions/auth';
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/validations/auth';
@@ -52,7 +52,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
         <p className="mt-1.5 text-[13px] text-muted-foreground">
           Taking you to sign in&hellip;
         </p>
-        <Button asChild variant="secondary" className="mt-5 w-full">
+        <Button asChild variant="secondary" className="mt-5 w-full rounded-full">
           <Link href="/login">Go now</Link>
         </Button>
       </div>
@@ -69,9 +69,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>New password</FormLabel>
+              <FormLabel>New password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <PasswordInput
+                  autoComplete="new-password"
+                  className="h-12 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -83,9 +87,13 @@ export function ResetPasswordForm({ token }: { token: string }) {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>Confirm new password</FormLabel>
+              <FormLabel>Confirm new password</FormLabel>
               <FormControl>
-                <Input type="password" autoComplete="new-password" {...field} />
+                <PasswordInput
+                  autoComplete="new-password"
+                  className="h-12 rounded-xl"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,8 +102,8 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
         <Button
           type="submit"
-          size="lg"
-          className="w-full"
+          size="xl"
+          className="w-full rounded-full"
           loading={form.formState.isSubmitting}
         >
           Update password

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { COUNTRY_CODES } from '@/lib/config/countries';
+
 const password = z
   .string()
   .min(10, 'Use at least 10 characters')
@@ -16,13 +18,27 @@ export type LoginInput = z.infer<typeof loginSchema>;
 
 export const registerSchema = z
   .object({
-    name: z.string().trim().min(2, 'Enter your full name').max(80),
-    email: z.string().trim().toLowerCase().email('Enter a valid email address'),
     organizationName: z
       .string()
       .trim()
       .min(2, 'Enter your company name')
       .max(80),
+    countryCode: z
+      .string()
+      .trim()
+      .length(2, 'Choose your country')
+      .refine((value) => COUNTRY_CODES.includes(value.toUpperCase()), {
+        message: 'Choose a country from the list',
+      }),
+    dialCode: z.string().trim().min(1, 'Choose a dial code').max(4),
+    phone: z
+      .string()
+      .trim()
+      .min(6, 'Enter a phone number')
+      .max(20)
+      .regex(/^[0-9\s-]+$/, 'Use digits only'),
+    name: z.string().trim().min(2, 'Enter your full name').max(80),
+    email: z.string().trim().toLowerCase().email('Enter a valid email address'),
     password,
     confirmPassword: z.string(),
   })
