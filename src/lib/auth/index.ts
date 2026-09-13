@@ -27,17 +27,35 @@ const providers: NextAuthConfig['providers'] = [
         const parsed = loginSchema.safeParse(raw);
         if (!parsed.success) return null;
 
-        const user = await db.user.findUnique({
-          where: { email: parsed.data.email },
-          select: {
-            id: true,
-            name: true,
-            email: true,
-            passwordHash: true,
-            avatarUrl: true,
-            isActive: true,
-          },
-        });
+        // Returning null means "bad credentials". Anything that goes wrong
+        // reaching the database must NOT come back as null, or a broken
+        // deployment would tell every user their password is wrong. Letting it
+        // throw surfaces a CallbackRouteError, which loginAction reports as a
+        // service problem instead.
+        let user: {
+          id: string;
+          name: string;
+          email: string;
+          passwordHash: string;
+          avatarUrl: string | null;
+          isActive: boolean;
+        } | null;
+
+        try {
+          user = await db.user.findUnique({
+            where: { email: parsed.data.email },
+            select: {
+              id: true,
+              name: true,
+              email: true,
+              passwordHash: true,
+              avatarUrl: true,
+              isActive: true,
+            },
+          });
+        } catch (error) {
+          throw new Error('DATABASE_UNAVAILABLE', { cause: error });
+        }
 
         // Compare against a dummy hash when the user is missing so the
         // response time does not reveal whether the address exists.
@@ -48,10 +66,15 @@ const providers: NextAuthConfig['providers'] = [
 
         if (!user || !valid || !user.isActive) return null;
 
-        await db.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        });
+        // Best-effort: a failure to stamp the login must not block sign-in.
+        try {
+          await db.user.update({
+            where: { id: user.id },
+            data: { lastLoginAt: new Date() },
+          });
+        } catch {
+          // Ignored deliberately.
+        }
 
         return {
           id: user.id,

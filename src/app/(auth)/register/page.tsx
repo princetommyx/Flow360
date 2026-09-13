@@ -2,7 +2,8 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
-import { LogoMark } from '@/components/brand/logo';
+import { Logo } from '@/components/brand/logo';
+import { AuthPanel } from '@/components/marketing/auth-panel';
 import { StepIndicator } from '@/components/shared/step-indicator';
 import { auth, googleEnabled } from '@/lib/auth';
 import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
@@ -16,10 +17,15 @@ export default async function RegisterPage() {
   if (session?.user) redirect('/dashboard');
 
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel
+      showcase={{
+        headline: 'Set up once, and every module already knows about it',
+        sub: 'Your company details, tax rates and numbering flow into quotes, invoices, stock and the books — so nothing is configured twice.',
+      }}
+    >
+      <Logo size={32} />
 
-      <StepIndicator steps={SIGNUP_STEPS} current={1} className="mt-6" />
+      <StepIndicator steps={SIGNUP_STEPS} current={1} className="mt-8" />
 
       <header className="mt-7">
         <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
@@ -30,12 +36,12 @@ export default async function RegisterPage() {
 
       <RegisterForm googleEnabled={googleEnabled} />
 
-      <p className="mt-6 border-t border-border pt-5 text-center text-[13px] text-muted-foreground">
+      <p className="mt-8 border-t border-border pt-5 text-[13px] text-muted-foreground">
         Already have an account?{' '}
         <Link href="/login" className="font-medium text-primary hover:underline">
           Sign in
         </Link>
       </p>
-    </div>
+    </AuthPanel>
   );
 }

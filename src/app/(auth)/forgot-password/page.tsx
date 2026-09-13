@@ -3,7 +3,8 @@ import Link from 'next/link';
 
 import { ArrowLeft } from 'lucide-react';
 
-import { LogoMark } from '@/components/brand/logo';
+import { Logo } from '@/components/brand/logo';
+import { AuthPanel } from '@/components/marketing/auth-panel';
 
 import { ForgotPasswordForm } from './forgot-password-form';
 
@@ -11,8 +12,8 @@ export const metadata: Metadata = { title: 'Reset your password' };
 
 export default function ForgotPasswordPage() {
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel>
+      <Logo size={32} />
 
       <header className="mt-6">
         <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
@@ -34,6 +35,6 @@ export default function ForgotPasswordPage() {
         <ArrowLeft className="size-3.5" aria-hidden />
         Back to sign in
       </Link>
-    </div>
+    </AuthPanel>
   );
 }

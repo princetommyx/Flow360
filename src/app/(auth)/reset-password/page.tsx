@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 
-import { LogoMark } from '@/components/brand/logo';
+import { Logo } from '@/components/brand/logo';
+import { AuthPanel } from '@/components/marketing/auth-panel';
 
 import { ResetPasswordForm } from './reset-password-form';
 
@@ -34,8 +35,8 @@ export default async function ResetPasswordPage({
   }
 
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel>
+      <Logo size={32} />
 
       <header className="mt-6">
         <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
@@ -49,6 +50,6 @@ export default async function ResetPasswordPage({
       <div className="mt-7">
         <ResetPasswordForm token={token} />
       </div>
-    </div>
+    </AuthPanel>
   );
 }

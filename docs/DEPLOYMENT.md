@@ -4,6 +4,9 @@ The app targets any Node host; the notes below use Vercel because that is the
 most common target for Next.js. Nothing here is Vercel-specific except where
 stated.
 
+> Using Supabase? Follow **[docs/SUPABASE.md](./SUPABASE.md)**, which covers the
+> same ground with the exact connection strings and steps for that provider.
+
 ## 1. Provision a Postgres database
 
 Any Postgres 14+ instance works — Neon, Supabase, Railway, RDS, or your own.
@@ -57,6 +60,13 @@ Run them as an explicit step instead, against the direct (non-pooled) URL:
 
 ```bash
 DATABASE_URL="<direct-url>" npx prisma migrate deploy
+```
+
+Check the result before deploying — this reports the precise cause when
+something is wrong, rather than leaving you to infer it from a failed login:
+
+```bash
+DATABASE_URL="<pooled-url>" npm run db:check
 ```
 
 Optionally load the demo dataset into a non-production database:

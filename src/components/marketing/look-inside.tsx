@@ -25,6 +25,13 @@ const SHOWCASES: Showcase[] = [
     alt: 'Flow360 dashboard showing metric tiles, a revenue and expense trend chart, invoice status breakdown and recent activity.',
   },
   {
+    eyebrow: 'Invoicing',
+    title: 'Raise it, send it, and watch the balance close itself',
+    body: 'Totals are recomputed on the server from the lines every time, sending commits the stock, and a recorded payment moves the invoice, the ledger and the bank balance together. Statuses follow the money rather than someone remembering to change them.',
+    src: '/product/invoices.png',
+    alt: 'Flow360 invoice list showing invoiced and outstanding totals, status filters and per-invoice balances.',
+  },
+  {
     eyebrow: 'Customers',
     title: 'One list that already knows who owes you what',
     body: 'Search, filter and sort straight from the URL, so any view you land on is one you can share or bookmark. Invoiced and outstanding totals sit on the row, and a credit limit warns you before the next order goes out.',

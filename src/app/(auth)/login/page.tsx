@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
 
-import { LogoMark } from '@/components/brand/logo';
+import { Logo } from '@/components/brand/logo';
+import { AuthPanel } from '@/components/marketing/auth-panel';
 import { auth, googleEnabled } from '@/lib/auth';
 import { brand } from '@/lib/config/brand';
 
@@ -16,35 +17,48 @@ export default async function LoginPage() {
   if (session?.user) redirect('/dashboard');
 
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel
+      showcase={{
+        headline: 'Everything your business runs on, in one workspace',
+        sub: 'Sales, purchasing, stock, money and people — reading from the same records, so every report reflects the work your team actually did.',
+      }}
+    >
+      <Logo size={32} />
 
-      <header className="mt-6">
-        <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
-          Welcome back
+      <header className="mt-9">
+        <h1 className="text-[1.65rem] font-semibold tracking-[-0.03em]">
+          Log in to your account
         </h1>
-        <p className="mt-1.5 text-[14px] text-muted-foreground">
-          Sign in to your {brand.name} workspace
+        <p className="mt-1.5 text-[13.5px] text-muted-foreground">
+          Please enter your details
         </p>
       </header>
 
       <LoginForm googleEnabled={googleEnabled} />
 
-      <div className="mt-7 flex flex-col gap-4 border-t border-border pt-5">
-        <p className="text-center text-[13px] text-muted-foreground">
-          New to {brand.name}?{' '}
-          <Link href="/register" className="font-medium text-primary hover:underline">
-            Create a workspace
-          </Link>
-        </p>
+      <p className="mt-8 text-[13px] text-muted-foreground">
+        New to {brand.name}?{' '}
+        <Link href="/register" className="font-medium text-primary hover:underline">
+          Create a workspace
+        </Link>
+      </p>
+
+      <div className="mt-10 flex flex-col gap-3 border-t border-border pt-5 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-[13px] text-muted-foreground transition-colors hover:text-foreground"
+          className="inline-flex items-center gap-1.5 text-[12.5px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <ArrowLeft className="size-3.5" aria-hidden />
           Back to home
         </Link>
+        <p className="text-[11.5px] leading-relaxed text-muted-foreground sm:text-right">
+          By continuing you agree to our{' '}
+          <a href="/terms" className="underline underline-offset-2 hover:text-foreground">
+            Terms of Use
+          </a>
+          .
+        </p>
       </div>
-    </div>
+    </AuthPanel>
   );
 }
