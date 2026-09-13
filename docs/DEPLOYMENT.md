@@ -9,12 +9,23 @@ stated.
 Any Postgres 14+ instance works — Neon, Supabase, Railway, RDS, or your own.
 
 On a serverless host, **use the pooled connection string**, not the direct one.
-Each serverless invocation opens its own connection, so a direct URL will
-exhaust the server's connection limit under any real traffic:
+Each instance opens its own connections, so a direct URL will exhaust the
+server's connection limit under any real traffic:
 
 ```
-postgresql://USER:PASSWORD@HOST/DB?sslmode=require&pgbouncer=true&connection_limit=1
+postgresql://USER:PASSWORD@HOST/DB?sslmode=require
 ```
+
+Do **not** append `?connection_limit=` or `?pgbouncer=`. Those are Prisma
+*query-engine* parameters; this app uses the `pg` driver adapter, which ignores
+them, so they would look like tuning while doing nothing.
+
+Pool size is a driver option instead, set in `src/lib/db.ts`: one connection per
+instance on Vercel, ten elsewhere. Override with `DATABASE_POOL_MAX`.
+
+PgBouncer in transaction mode is safe here — the adapter only issues named
+prepared statements when given a `statementNameGenerator`, and this app does not
+supply one.
 
 ## 2. Set environment variables
 
@@ -26,6 +37,7 @@ Required in every environment:
 | `AUTH_SECRET` | `openssl rand -base64 32` — a different value per environment |
 | `AUTH_URL` | The deployment origin, e.g. `https://your-app.vercel.app` |
 | `NEXT_PUBLIC_APP_URL` | Same origin; used for metadata and email links |
+| `DATABASE_POOL_MAX` | Optional. Connections per instance; defaults to 1 on Vercel, 10 elsewhere |
 
 Everything else is optional — see `.env.example`. The `NEXT_PUBLIC_BRAND_*` and
 locale variables re-theme and re-label the product without a code change.

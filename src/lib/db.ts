@@ -14,6 +14,26 @@ import { PrismaClient } from '@/generated/prisma/client';
  * The instance is cached on `globalThis` because dev-mode hot reloading
  * re-evaluates modules, which would otherwise exhaust the connection pool.
  */
+/**
+ * Connection pool size.
+ *
+ * This is a `pg` pool option, not a connection-string parameter: Prisma's
+ * `connection_limit` and `pgbouncer` query params are query-engine flags and
+ * have no effect when a driver adapter is used, so pool sizing has to be set
+ * here or it silently stays at the `pg` default of 10.
+ *
+ * On serverless each instance serves one request at a time, so a small pool
+ * per instance is correct — a large one multiplies across instances and
+ * exhausts Postgres. A long-running server wants a real pool.
+ */
+function poolSize(): number {
+  const configured = Number(process.env.DATABASE_POOL_MAX);
+  if (Number.isFinite(configured) && configured > 0) return configured;
+  // VERCEL is set on every Vercel runtime; treat any serverless host the same
+  // way by setting DATABASE_POOL_MAX explicitly.
+  return process.env.VERCEL ? 1 : 10;
+}
+
 function createClient(): PrismaClient {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
@@ -23,7 +43,14 @@ function createClient(): PrismaClient {
   }
 
   return new PrismaClient({
-    adapter: new PrismaPg({ connectionString }),
+    adapter: new PrismaPg({
+      connectionString,
+      max: poolSize(),
+      // Release idle connections quickly so a scaled-down deployment stops
+      // holding server slots it is no longer using.
+      idleTimeoutMillis: 10_000,
+      connectionTimeoutMillis: 10_000,
+    }),
     log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   });
 }
