@@ -32,7 +32,23 @@ export async function loginAction(
     await signIn('credentials', { ...parsed.data, redirect: false });
   } catch (error) {
     if (error instanceof AuthError) {
-      return { ok: false, error: 'That email and password combination is not valid.' };
+      // `CredentialsSignin` is the only type that means the details were
+      // wrong. Everything else — most often the database being unreachable —
+      // is an infrastructure problem, and saying "wrong password" would send
+      // the reader off to reset a password that was never the issue.
+      if (error.type === 'CredentialsSignin') {
+        return {
+          ok: false,
+          error: 'That email and password combination is not valid.',
+        };
+      }
+
+      console.error('Sign-in failed for a non-credential reason', error);
+      return {
+        ok: false,
+        error:
+          'We could not reach the service to sign you in. This is not your password — please try again shortly.',
+      };
     }
     throw error;
   }
@@ -55,7 +71,18 @@ export async function registerAction(
   // E.164, with any spacing or dashes the user typed removed.
   const fullPhone = `+${dialCode}${phone.replace(/[^0-9]/g, '')}`;
 
-  const existing = await db.user.findUnique({ where: { email }, select: { id: true } });
+  let existing: { id: string } | null;
+  try {
+    existing = await db.user.findUnique({ where: { email }, select: { id: true } });
+  } catch (error) {
+    console.error('Registration failed reaching the database', error);
+    return {
+      ok: false,
+      error:
+        'We could not reach the service to create your workspace. Please try again shortly.',
+    };
+  }
+
   if (existing) {
     return {
       ok: false,

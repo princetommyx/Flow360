@@ -3,7 +3,8 @@ import Link from 'next/link';
 import { CheckCircle2, MailCheck, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { LogoMark } from '@/components/brand/logo';
+import { Logo } from '@/components/brand/logo';
+import { AuthPanel } from '@/components/marketing/auth-panel';
 import { StepIndicator } from '@/components/shared/step-indicator';
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
@@ -68,8 +69,8 @@ export default async function VerifyEmailPage({
   }
 
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel>
+      <Logo size={32} />
       <StepIndicator steps={SIGNUP_STEPS} current={2} className="mt-6" />
 
       <div className="mt-7 flex size-11 items-center justify-center rounded-xl bg-info-soft text-info">
@@ -101,7 +102,7 @@ export default async function VerifyEmailPage({
         You can start working right away — confirming just secures password
         recovery and account notifications.
       </p>
-    </div>
+    </AuthPanel>
   );
 }
 
@@ -126,8 +127,8 @@ function Panel({
       : 'bg-destructive-soft text-destructive';
 
   return (
-    <div>
-      <LogoMark size={44} />
+    <AuthPanel>
+      <Logo size={32} />
       <StepIndicator steps={SIGNUP_STEPS} current={step} className="mt-6" />
 
       <div
@@ -144,6 +145,6 @@ function Panel({
       <Button size="xl" className="mt-7 w-full rounded-full" asChild>
         <Link href={action.href}>{action.label}</Link>
       </Button>
-    </div>
+    </AuthPanel>
   );
 }
