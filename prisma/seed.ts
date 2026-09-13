@@ -8,6 +8,7 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import type { Prisma } from '../src/generated/prisma/client';
 import { calculateDocumentTotals, round } from '../src/lib/money';
 import { provisionOrganization } from '../src/server/services/provisioning';
+import { nextDocumentNumber } from '../src/server/numbering';
 import { slugify } from '../src/lib/utils';
 
 import {
@@ -324,7 +325,9 @@ async function main() {
       data: {
         organizationId,
         customerId: customer.id,
-        number: `QTE-${issueDate.getFullYear()}-${String(index + 1).padStart(5, '0')}`,
+        number: await nextDocumentNumber(db, organizationId, 'quotation', {
+          date: issueDate,
+        }),
         status,
         issueDate,
         expiryDate: addDays(issueDate, 30),
@@ -446,7 +449,9 @@ async function main() {
       data: {
         organizationId,
         customerId: customer.id,
-        number: `INV-${issueDate.getFullYear()}-${String(index + 1).padStart(5, '0')}`,
+        number: await nextDocumentNumber(db, organizationId, 'invoice', {
+          date: issueDate,
+        }),
         status: plan.status,
         issueDate,
         dueDate,
@@ -523,7 +528,9 @@ async function main() {
       const payment = await db.payment.create({
         data: {
           organizationId,
-          number: `PAY-${paidAt.getFullYear()}-${String(paymentSeq).padStart(5, '0')}`,
+          number: await nextDocumentNumber(db, organizationId, 'payment', {
+            date: paidAt,
+          }),
           direction: 'INCOMING',
           method: pick(['BANK_TRANSFER', 'CARD', 'BANK_TRANSFER', 'CHECK'] as const),
           amount: amountPaid,
@@ -592,7 +599,9 @@ async function main() {
     const created = await db.expense.create({
       data: {
         organizationId,
-        number: `EXP-${spentAt.getFullYear()}-${String(index + 1).padStart(5, '0')}`,
+        number: await nextDocumentNumber(db, organizationId, 'expense', {
+          date: spentAt,
+        }),
         categoryId: categoryByName.get(expense.category) ?? null,
         accountId: account.id,
         title: expense.title,
@@ -707,7 +716,9 @@ async function main() {
       data: {
         organizationId,
         employeeId: employee.id,
-        number: `PR-${periodEnd.getFullYear()}-${String(index + 1).padStart(5, '0')}`,
+        number: await nextDocumentNumber(db, organizationId, 'payroll', {
+          date: periodEnd,
+        }),
         periodStart,
         periodEnd,
         baseSalary: base,
