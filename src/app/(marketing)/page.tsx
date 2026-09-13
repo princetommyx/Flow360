@@ -22,6 +22,7 @@ import {
 import { Hero } from '@/components/marketing/hero';
 import { LookInside } from '@/components/marketing/look-inside';
 import { SectionHeading } from '@/components/marketing/section-heading';
+import { Reveal } from '@/components/shared/reveal';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -160,20 +161,22 @@ export default function LandingPage() {
           />
 
           <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {FEATURES.map((feature) => {
+            {FEATURES.map((feature, index) => {
               const Icon = feature.icon;
               return (
-                <Card key={feature.title} className="p-6 transition-shadow hover:shadow-md">
-                  <span className="flex size-9 items-center justify-center rounded-lg bg-primary-soft text-primary">
-                    <Icon className="size-4.5" aria-hidden />
-                  </span>
-                  <h3 className="mt-4 text-[15px] font-semibold tracking-[-0.01em]">
-                    {feature.title}
-                  </h3>
-                  <p className="mt-2 text-pretty text-[13.5px] leading-relaxed text-muted-foreground">
-                    {feature.body}
-                  </p>
-                </Card>
+                <Reveal key={feature.title} delay={Math.min(index, 5) * 60}>
+                  <Card className="hover-lift h-full p-6">
+                    <span className="flex size-9 items-center justify-center rounded-lg bg-primary-soft text-primary">
+                      <Icon className="size-4.5" aria-hidden />
+                    </span>
+                    <h3 className="mt-4 text-[15px] font-semibold tracking-[-0.01em]">
+                      {feature.title}
+                    </h3>
+                    <p className="mt-2 text-pretty text-[13.5px] leading-relaxed text-muted-foreground">
+                      {feature.body}
+                    </p>
+                  </Card>
+                </Reveal>
               );
             })}
           </div>
@@ -189,7 +192,7 @@ export default function LandingPage() {
             lead="Turn on what you need today and switch the rest on later — nothing has to be configured twice."
           />
 
-          <ul className="mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <ul className="stagger mt-10 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
             {MODULES.map((module) => {
               const Icon = module.icon;
               return (
@@ -224,7 +227,7 @@ export default function LandingPage() {
               </Button>
             </div>
 
-            <ol className="grid gap-4">
+            <ol className="stagger grid gap-4">
               {STEPS.map((step, index) => (
                 <li
                   key={step.title}
@@ -258,7 +261,7 @@ export default function LandingPage() {
               lead="The cost of scattered tools is not the subscriptions — it is the hours spent reconciling them and the decisions made on stale numbers."
             />
 
-            <ul className="grid gap-3 sm:grid-cols-2">
+            <ul className="stagger grid gap-3 sm:grid-cols-2">
               {BENEFITS.map((benefit) => (
                 <li
                   key={benefit}

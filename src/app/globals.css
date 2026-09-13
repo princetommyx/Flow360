@@ -279,6 +279,120 @@
   }
 }
 
+/* ─────────────────────────── Motion ───────────────────────────────────────
+ * A small, deliberate vocabulary rather than animation for its own sake:
+ * things that arrive rise slightly as they fade in, things you press give way
+ * a little, and nothing moves for longer than it takes to read it.
+ *
+ * Durations sit between 150ms and 420ms — fast enough to feel immediate, long
+ * enough to be perceived. Easing is a gentle ease-out so motion decelerates
+ * into place instead of stopping dead.
+ */
+@theme inline {
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sweep-in {
+  from {
+    opacity: 0;
+    transform: translate3d(-6px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@layer utilities {
+  .animate-rise {
+    animation: rise-in 380ms var(--ease-out-soft) both;
+  }
+  .animate-fade {
+    animation: fade-in 260ms var(--ease-out-soft) both;
+  }
+  .animate-sweep {
+    animation: sweep-in 320ms var(--ease-out-soft) both;
+  }
+
+  /*
+   * Staggered entrance for a group of siblings. The delay is capped so a long
+   * list never leaves the reader waiting on the last row.
+   */
+  .stagger > * {
+    animation: rise-in 380ms var(--ease-out-soft) both;
+  }
+  .stagger > *:nth-child(1) { animation-delay: 0ms; }
+  .stagger > *:nth-child(2) { animation-delay: 45ms; }
+  .stagger > *:nth-child(3) { animation-delay: 90ms; }
+  .stagger > *:nth-child(4) { animation-delay: 135ms; }
+  .stagger > *:nth-child(5) { animation-delay: 180ms; }
+  .stagger > *:nth-child(6) { animation-delay: 215ms; }
+  .stagger > *:nth-child(n + 7) { animation-delay: 240ms; }
+
+  /*
+   * Pre-reveal state. Scoped to `.js` so it only applies once the inline
+   * bootstrap script has confirmed JavaScript is running — without it the
+   * content stays visible rather than being hidden with no way to reveal it.
+   */
+  .js .reveal-pending {
+    opacity: 0;
+  }
+
+  /* Lifts a card toward the reader on hover, for cards that are links. */
+  .hover-lift {
+    transition:
+      transform 220ms var(--ease-out-soft),
+      box-shadow 220ms var(--ease-out-soft),
+      border-color 220ms var(--ease-out-soft);
+  }
+  .hover-lift:hover {
+    transform: translate3d(0, -2px, 0);
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-strong);
+  }
+}
+
+/*
+ * Motion is an enhancement, never a requirement. Anyone who has asked their
+ * system to reduce motion gets the final state immediately, with opacity
+ * transitions preserved so nothing appears to break.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .hover-lift:hover {
+    transform: none;
+  }
+}
+
 @media print {
   .print\:hidden,
   nav,

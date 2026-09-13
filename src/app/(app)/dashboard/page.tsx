@@ -82,7 +82,7 @@ export default async function DashboardPage({
 
       <section
         aria-label="Key metrics"
-        className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
+        className="stagger grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
       >
         <StatCard
           label="Total revenue"
@@ -117,7 +117,7 @@ export default async function DashboardPage({
         />
       </section>
 
-      <section aria-label="Business counts" className="grid gap-4 sm:grid-cols-3">
+      <section aria-label="Business counts" className="stagger grid gap-4 sm:grid-cols-3">
         <StatCard
           label="Active customers"
           value={formatNumber(summary.customers, 0)}
@@ -150,7 +150,7 @@ export default async function DashboardPage({
         />
       </section>
 
-      <section className="grid gap-4 xl:grid-cols-3">
+      <section className="animate-fade grid gap-4 xl:grid-cols-3">
         <Card className="xl:col-span-2">
           <CardHeader>
             <div>

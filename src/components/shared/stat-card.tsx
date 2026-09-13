@@ -38,7 +38,7 @@ export function StatCard({
   const DeltaIcon = flat ? Minus : change! > 0 ? ArrowUpRight : ArrowDownRight;
 
   return (
-    <Card className={cn('p-5', className)}>
+    <Card className={cn('hover-lift p-5', className)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-[12.5px] font-medium text-muted-foreground">{label}</p>
         {Icon ? (
