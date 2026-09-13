@@ -22,6 +22,18 @@ const jetbrains = JetBrains_Mono({
   weight: ['400', '500'],
 });
 
+const getBaseUrl = () => {
+  let url = process.env.NEXT_PUBLIC_APP_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+  if (url.includes('<') || url.includes('>')) {
+    url = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000';
+  }
+  try {
+    return new URL(url);
+  } catch (e) {
+    return new URL('http://localhost:3000');
+  }
+};
+
 export const metadata: Metadata = {
   title: {
     default: `${brand.name} — ${brand.tagline}`,
@@ -30,7 +42,7 @@ export const metadata: Metadata = {
   description: brand.description,
   applicationName: brand.name,
   icons: { icon: brand.faviconUrl },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
+  metadataBase: getBaseUrl(),
   openGraph: {
     title: `${brand.name} — ${brand.tagline}`,
     description: brand.description,
