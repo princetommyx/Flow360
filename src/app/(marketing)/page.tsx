@@ -1,3 +1,6 @@
+import { existsSync } from 'node:fs';
+import path from 'node:path';
+
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -128,10 +131,22 @@ const FAQS = [
   },
 ];
 
+/**
+ * The hero photograph is optional: it is only rendered when the file is
+ * actually present in /public, so dropping it in (or removing it) needs no
+ * code change and a missing file never shows a broken image.
+ */
+function heroPhotoExists() {
+  if (!brand.heroImageUrl || brand.heroImageUrl.startsWith('http')) {
+    return Boolean(brand.heroImageUrl);
+  }
+  return existsSync(path.join(process.cwd(), 'public', brand.heroImageUrl));
+}
+
 export default function LandingPage() {
   return (
     <>
-      <Hero />
+      <Hero hasPhoto={heroPhotoExists()} />
 
       <LookInside />
 

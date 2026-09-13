@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, Check } from 'lucide-react';
 
@@ -18,9 +19,36 @@ const PROMISES = [
  * Dark section so the product screenshot below it reads as the bright object
  * on the page — the interface is the argument, not the decoration around it.
  */
-export function Hero() {
+export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
   return (
-    <section className="relative overflow-hidden bg-[oklch(0.19_0.016_265)] text-white">
+    <section className="relative isolate overflow-hidden bg-[oklch(0.19_0.016_265)] text-white">
+      {/*
+        Optional photograph, pushed well back: a dark base tint, a left-to-right
+        gradient behind the copy column, and a blur. Text contrast has to win
+        over the image in every case, so the scrim is deliberately heavy.
+      */}
+      {hasPhoto && brand.heroImageUrl ? (
+        <>
+          <Image
+            src={brand.heroImageUrl}
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            aria-hidden
+            className="-z-10 scale-105 object-cover opacity-[0.28] blur-[2px]"
+          />
+          <div
+            className="absolute inset-0 -z-10 bg-[oklch(0.19_0.016_265)]/72"
+            aria-hidden
+          />
+          <div
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-[oklch(0.17_0.016_265)] via-[oklch(0.19_0.016_265)]/92 to-transparent"
+            aria-hidden
+          />
+        </>
+      ) : null}
+
       {/* Depth: one warm brand wash, one cool accent, plus a faint dotted field */}
       <div
         className="absolute -left-40 -top-56 size-[44rem] rounded-full opacity-25 blur-3xl"

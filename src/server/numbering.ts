@@ -1,5 +1,5 @@
-import 'server-only';
-
+// Pure transaction helpers with no request context, so the seed script can use
+// the same implementation the application does. Deliberately not `server-only`.
 import type { Prisma } from '@/generated/prisma/client';
 
 export type DocType =
@@ -38,7 +38,7 @@ export async function nextDocumentNumber(
   const date = options?.date ?? new Date();
   const year = date.getFullYear();
 
-  const sequence = await tx.numberSequence.upsert({
+  let sequence = await tx.numberSequence.upsert({
     where: { organizationId_docType_year: { organizationId, docType, year } },
     create: { organizationId, docType, year, current: 1 },
     update: { current: { increment: 1 } },
@@ -72,8 +72,60 @@ export async function nextDocumentNumber(
   const padding = options?.padding ?? settings?.numberPadding ?? 5;
   const includeYear = options?.includeYear ?? settings?.numberIncludeYear ?? true;
 
-  const serial = String(sequence.current).padStart(padding, '0');
-  return includeYear ? `${prefix}-${year}-${serial}` : `${prefix}-${serial}`;
+  const format = (value: number) => {
+    const serial = String(value).padStart(padding, '0');
+    return includeYear ? `${prefix}-${year}-${serial}` : `${prefix}-${serial}`;
+  };
+
+  // The counter is the source of truth, but rows can be introduced by other
+  // means — a migration, an import, a seed — leaving it behind the numbers
+  // actually in use. Rather than failing on the unique constraint, advance past
+  // anything already taken so the sequence self-heals on first use.
+  let candidate = format(sequence.current);
+  for (let attempt = 0; attempt < 50; attempt += 1) {
+    if (!(await isTaken(tx, organizationId, docType, candidate))) return candidate;
+
+    sequence = await tx.numberSequence.update({
+      where: { organizationId_docType_year: { organizationId, docType, year } },
+      data: { current: { increment: 1 } },
+      select: { current: true },
+    });
+    candidate = format(sequence.current);
+  }
+
+  throw new Error(
+    `Could not allocate a free ${docType} number after 50 attempts (last tried ${candidate}).`,
+  );
+}
+
+/** Checks the table that actually owns this document type's numbers. */
+async function isTaken(
+  tx: Prisma.TransactionClient,
+  organizationId: string,
+  docType: DocType,
+  number: string,
+): Promise<boolean> {
+  const where = { organizationId, number };
+  switch (docType) {
+    case 'invoice':
+      return Boolean(await tx.invoice.findFirst({ where, select: { id: true } }));
+    case 'quotation':
+      return Boolean(await tx.quotation.findFirst({ where, select: { id: true } }));
+    case 'payment':
+      return Boolean(await tx.payment.findFirst({ where, select: { id: true } }));
+    case 'purchase_order':
+      return Boolean(await tx.purchaseOrder.findFirst({ where, select: { id: true } }));
+    case 'bill':
+      return Boolean(await tx.bill.findFirst({ where, select: { id: true } }));
+    case 'expense':
+      return Boolean(await tx.expense.findFirst({ where, select: { id: true } }));
+    case 'payroll':
+      return Boolean(await tx.payroll.findFirst({ where, select: { id: true } }));
+    case 'project':
+      return false;
+    default:
+      return false;
+  }
 }
 
 /** Preview of the next number, used to show the format in settings. */

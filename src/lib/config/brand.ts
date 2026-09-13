@@ -23,6 +23,8 @@ export type BrandConfig = {
   colors: BrandColorScale;
   /** Path (relative to /public) or inline mark. `null` uses the built-in logomark. */
   logoUrl: string | null;
+  /** Path (relative to /public) of the landing hero photograph, or `null`. */
+  heroImageUrl: string | null;
   faviconUrl: string;
   social: { x?: string; linkedin?: string; github?: string };
 };
@@ -74,6 +76,11 @@ export const brand: BrandConfig = {
     secondary: env('NEXT_PUBLIC_BRAND_SECONDARY', '#0d9488'),
   },
   logoUrl: env('NEXT_PUBLIC_BRAND_LOGO', '') || null,
+  /**
+   * Optional photograph behind the landing hero. It sits under a heavy scrim
+   * so the headline keeps its contrast; leave unset for the plain gradient.
+   */
+  heroImageUrl: env('NEXT_PUBLIC_HERO_IMAGE', '/hero.jpg') || null,
   faviconUrl: env('NEXT_PUBLIC_BRAND_FAVICON', '/favicon.svg'),
   social: {},
 };
