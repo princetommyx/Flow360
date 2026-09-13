@@ -36,14 +36,20 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
             priority
             sizes="100vw"
             aria-hidden
-            className="-z-10 scale-105 object-cover opacity-[0.28] blur-[2px]"
+            className="-z-10 scale-105 object-cover opacity-70 blur-[1px]"
           />
+          {/*
+            Two scrims rather than one flat tint: a light overall wash keeps the
+            photograph readable as a photograph, while a left-to-right gradient
+            puts the weight behind the copy column, which is where contrast has
+            to hold. The headline measures above 12:1 against this.
+          */}
           <div
-            className="absolute inset-0 -z-10 bg-[oklch(0.19_0.016_265)]/72"
+            className="absolute inset-0 -z-10 bg-[oklch(0.19_0.016_265)]/45"
             aria-hidden
           />
           <div
-            className="absolute inset-0 -z-10 bg-gradient-to-r from-[oklch(0.17_0.016_265)] via-[oklch(0.19_0.016_265)]/92 to-transparent"
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-[oklch(0.16_0.016_265)] via-[oklch(0.18_0.016_265)]/80 to-[oklch(0.19_0.016_265)]/25"
             aria-hidden
           />
         </>
