@@ -7,6 +7,7 @@ import {
   resolveTemplatePermissions,
 } from '@/lib/permissions';
 import { locale, numbering } from '@/lib/config/brand';
+import { TRIAL_DAYS } from '@/lib/config/plans';
 
 /**
  * Makes sure the global permission catalogue exists. Idempotent, so it is safe
@@ -58,6 +59,10 @@ export async function provisionOrganization(
       country: input.country ?? locale.country,
       timezone: locale.timezone,
       email: input.email ?? null,
+      // Every workspace starts on a full-featured trial.
+      plan: 'business',
+      subscriptionStatus: 'trialing',
+      trialEndsAt: new Date(Date.now() + TRIAL_DAYS * 86_400_000),
       settings: {
         create: {
           invoicePrefix: numbering.invoicePrefix,

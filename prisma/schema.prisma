@@ -47,14 +47,14 @@ enum TokenType {
 }
 
 model VerificationToken {
-  id        String    @id @default(cuid())
-  token     String    @unique
-  type      TokenType
+  id         String    @id @default(cuid())
+  token      String    @unique
+  type       TokenType
   identifier String
-  userId    String?
-  expiresAt DateTime
-  usedAt    DateTime?
-  createdAt DateTime  @default(now())
+  userId     String?
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime  @default(now())
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -63,65 +63,71 @@ model VerificationToken {
 }
 
 model Organization {
-  id          String    @id @default(cuid())
-  name        String
-  slug        String    @unique
-  legalName   String?
-  email       String?
-  phone       String?
-  website     String?
-  taxId       String?
-  logoUrl     String?
-  addressLine1 String?
-  addressLine2 String?
-  city        String?
-  state       String?
-  postalCode  String?
-  country     String   @default("United States")
-  currency    String   @default("USD")
-  timezone    String   @default("UTC")
-  industry    String?
-  plan        String   @default("starter")
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  deletedAt   DateTime?
+  id                 String    @id @default(cuid())
+  name               String
+  slug               String    @unique
+  legalName          String?
+  email              String?
+  phone              String?
+  website            String?
+  taxId              String?
+  logoUrl            String?
+  addressLine1       String?
+  addressLine2       String?
+  city               String?
+  state              String?
+  postalCode         String?
+  country            String    @default("United States")
+  currency           String    @default("USD")
+  timezone           String    @default("UTC")
+  industry           String?
+  plan               String    @default("starter")
+  /// Free trial ends here. Null means the workspace never had one.
+  trialEndsAt        DateTime?
+  /// trialing | active | past_due | cancelled — set by billing once wired up.
+  subscriptionStatus String    @default("trialing")
+  /// Plan the owner asked to move to, pending a payment provider.
+  requestedPlan      String?
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
 
-  settings      CompanySettings?
-  members       OrganizationMember[]
-  roles         Role[]
-  branches      Branch[]
-  customers     Customer[]
-  suppliers     Supplier[]
-  categories    ProductCategory[]
-  products      Product[]
-  inventoryTx   InventoryTransaction[]
-  invoices      Invoice[]
-  quotations    Quotation[]
-  payments      Payment[]
-  expenses      Expense[]
-  expenseCats   ExpenseCategory[]
-  accounts      Account[]
-  transactions  Transaction[]
-  employees     Employee[]
-  payrolls      Payroll[]
-  attendances   Attendance[]
-  projects      Project[]
-  tasks         Task[]
-  timesheets    Timesheet[]
+  settings       CompanySettings?
+  members        OrganizationMember[]
+  roles          Role[]
+  branches       Branch[]
+  customers      Customer[]
+  suppliers      Supplier[]
+  categories     ProductCategory[]
+  products       Product[]
+  inventoryTx    InventoryTransaction[]
+  invoices       Invoice[]
+  quotations     Quotation[]
+  payments       Payment[]
+  expenses       Expense[]
+  expenseCats    ExpenseCategory[]
+  accounts       Account[]
+  transactions   Transaction[]
+  employees      Employee[]
+  payrolls       Payroll[]
+  attendances    Attendance[]
+  projects       Project[]
+  tasks          Task[]
+  timesheets     Timesheet[]
   purchaseOrders PurchaseOrder[]
-  bills         Bill[]
-  notifications Notification[]
-  taxRates      TaxRate[]
-  sequences     NumberSequence[]
-  activities    ActivityLog[]
+  bills          Bill[]
+  notifications  Notification[]
+  taxRates       TaxRate[]
+  sequences      NumberSequence[]
+  activities     ActivityLog[]
 
   @@index([slug])
   @@map("organizations")
 }
 
 model Branch {
-  id             String  @id @default(cuid())
+  id             String    @id @default(cuid())
   organizationId String
   name           String
   code           String
@@ -132,10 +138,10 @@ model Branch {
   country        String?
   phone          String?
   email          String?
-  isPrimary      Boolean @default(false)
-  isActive       Boolean @default(true)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  isPrimary      Boolean   @default(false)
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
   deletedAt      DateTime?
 
   organization Organization         @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -201,8 +207,8 @@ model Role {
 
 /// Global catalogue of permissions, e.g. module "invoices", action "create".
 model Permission {
-  id          String   @id @default(cuid())
-  key         String   @unique
+  id          String  @id @default(cuid())
+  key         String  @unique
   module      String
   action      String
   description String?
@@ -246,8 +252,8 @@ model CompanySettings {
   invoiceFooter          String?
 
   // Tax
-  taxLabel        String  @default("Sales Tax")
-  defaultTaxRate  Decimal @default(0) @db.Decimal(6, 3)
+  taxLabel         String  @default("Sales Tax")
+  defaultTaxRate   Decimal @default(0) @db.Decimal(6, 3)
   pricesIncludeTax Boolean @default(false)
 
   // Inventory
@@ -314,31 +320,31 @@ enum PartyStatus {
 }
 
 model Customer {
-  id             String      @id @default(cuid())
-  organizationId String
-  name           String
-  companyName    String?
-  email          String?
-  phone          String?
-  website        String?
-  taxId          String?
-  addressLine1   String?
-  addressLine2   String?
-  city           String?
-  state          String?
-  postalCode     String?
-  country        String?
-  currency       String?
-  creditLimit    Decimal?    @db.Decimal(18, 2)
-  paymentTermDays Int        @default(14)
-  notes          String?
-  tags           String[]    @default([])
-  status         PartyStatus @default(ACTIVE)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  deletedAt      DateTime?
+  id              String      @id @default(cuid())
+  organizationId  String
+  name            String
+  companyName     String?
+  email           String?
+  phone           String?
+  website         String?
+  taxId           String?
+  addressLine1    String?
+  addressLine2    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
+  currency        String?
+  creditLimit     Decimal?    @db.Decimal(18, 2)
+  paymentTermDays Int         @default(14)
+  notes           String?
+  tags            String[]    @default([])
+  status          PartyStatus @default(ACTIVE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invoices     Invoice[]
   quotations   Quotation[]
   payments     Payment[]
@@ -351,25 +357,25 @@ model Customer {
 }
 
 model Supplier {
-  id             String      @id @default(cuid())
-  organizationId String
-  name           String
-  companyName    String?
-  email          String?
-  phone          String?
-  website        String?
-  taxId          String?
-  addressLine1   String?
-  city           String?
-  state          String?
-  postalCode     String?
-  country        String?
-  paymentTermDays Int        @default(30)
-  notes          String?
-  status         PartyStatus @default(ACTIVE)
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  deletedAt      DateTime?
+  id              String      @id @default(cuid())
+  organizationId  String
+  name            String
+  companyName     String?
+  email           String?
+  phone           String?
+  website         String?
+  taxId           String?
+  addressLine1    String?
+  city            String?
+  state           String?
+  postalCode      String?
+  country         String?
+  paymentTermDays Int         @default(30)
+  notes           String?
+  status          PartyStatus @default(ACTIVE)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
 
   organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   products       Product[]
@@ -434,14 +440,14 @@ model Product {
   updatedAt      DateTime    @updatedAt
   deletedAt      DateTime?
 
-  organization Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  category     ProductCategory?       @relation(fields: [categoryId], references: [id])
-  supplier     Supplier?              @relation(fields: [supplierId], references: [id])
-  invoiceItems InvoiceItem[]
+  organization   Organization           @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  category       ProductCategory?       @relation(fields: [categoryId], references: [id])
+  supplier       Supplier?              @relation(fields: [supplierId], references: [id])
+  invoiceItems   InvoiceItem[]
   quotationItems QuotationItem[]
-  poItems      PurchaseOrderItem[]
-  billItems    BillItem[]
-  inventoryTx  InventoryTransaction[]
+  poItems        PurchaseOrderItem[]
+  billItems      BillItem[]
+  inventoryTx    InventoryTransaction[]
 
   @@unique([organizationId, sku])
   @@index([organizationId, status])
@@ -522,19 +528,19 @@ model Invoice {
   amountPaid     Decimal      @default(0) @db.Decimal(18, 2)
   balanceDue     Decimal      @default(0) @db.Decimal(18, 2)
 
-  notes         String?
-  terms         String?
-  reference     String?
-  quotationId   String?   @unique
-  projectId     String?
-  sentAt        DateTime?
-  viewedAt      DateTime?
-  paidAt        DateTime?
-  cancelledAt   DateTime?
-  createdById   String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  deletedAt     DateTime?
+  notes       String?
+  terms       String?
+  reference   String?
+  quotationId String?   @unique
+  projectId   String?
+  sentAt      DateTime?
+  viewedAt    DateTime?
+  paidAt      DateTime?
+  cancelledAt DateTime?
+  createdById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
   organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   branch       Branch?       @relation(fields: [branchId], references: [id])
@@ -554,21 +560,21 @@ model Invoice {
 }
 
 model InvoiceItem {
-  id          String  @id @default(cuid())
-  invoiceId   String
-  productId   String?
-  name        String
-  description String?
-  quantity    Decimal @db.Decimal(18, 3)
-  unit        String  @default("unit")
-  unitPrice   Decimal @db.Decimal(18, 2)
+  id           String  @id @default(cuid())
+  invoiceId    String
+  productId    String?
+  name         String
+  description  String?
+  quantity     Decimal @db.Decimal(18, 3)
+  unit         String  @default("unit")
+  unitPrice    Decimal @db.Decimal(18, 2)
   discountRate Decimal @default(0) @db.Decimal(6, 3)
-  taxRate     Decimal @default(0) @db.Decimal(6, 3)
+  taxRate      Decimal @default(0) @db.Decimal(6, 3)
   lineSubtotal Decimal @db.Decimal(18, 2)
   lineDiscount Decimal @default(0) @db.Decimal(18, 2)
-  lineTax     Decimal @default(0) @db.Decimal(18, 2)
-  lineTotal   Decimal @db.Decimal(18, 2)
-  sortOrder   Int     @default(0)
+  lineTax      Decimal @default(0) @db.Decimal(18, 2)
+  lineTotal    Decimal @db.Decimal(18, 2)
+  sortOrder    Int     @default(0)
 
   invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   product Product? @relation(fields: [productId], references: [id])
@@ -691,12 +697,12 @@ model Payment {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  customer     Customer?    @relation(fields: [customerId], references: [id])
-  supplier     Supplier?    @relation(fields: [supplierId], references: [id])
-  invoice      Invoice?     @relation(fields: [invoiceId], references: [id])
-  bill         Bill?        @relation(fields: [billId], references: [id])
-  account      Account?     @relation(fields: [accountId], references: [id])
+  organization Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  customer     Customer?     @relation(fields: [customerId], references: [id])
+  supplier     Supplier?     @relation(fields: [supplierId], references: [id])
+  invoice      Invoice?      @relation(fields: [invoiceId], references: [id])
+  bill         Bill?         @relation(fields: [billId], references: [id])
+  account      Account?      @relation(fields: [accountId], references: [id])
   transactions Transaction[]
 
   @@unique([organizationId, number])
@@ -727,10 +733,10 @@ model PurchaseOrder {
   expectedDate   DateTime?
   currency       String              @default("USD")
 
-  subtotal    Decimal @default(0) @db.Decimal(18, 2)
-  taxAmount   Decimal @default(0) @db.Decimal(18, 2)
+  subtotal       Decimal @default(0) @db.Decimal(18, 2)
+  taxAmount      Decimal @default(0) @db.Decimal(18, 2)
   discountAmount Decimal @default(0) @db.Decimal(18, 2)
-  total       Decimal @default(0) @db.Decimal(18, 2)
+  total          Decimal @default(0) @db.Decimal(18, 2)
 
   notes       String?
   receivedAt  DateTime?
@@ -750,20 +756,20 @@ model PurchaseOrder {
 }
 
 model PurchaseOrderItem {
-  id              String  @id @default(cuid())
-  purchaseOrderId String
-  productId       String?
-  name            String
-  description     String?
-  quantity        Decimal @db.Decimal(18, 3)
+  id               String  @id @default(cuid())
+  purchaseOrderId  String
+  productId        String?
+  name             String
+  description      String?
+  quantity         Decimal @db.Decimal(18, 3)
   receivedQuantity Decimal @default(0) @db.Decimal(18, 3)
-  unit            String  @default("unit")
-  unitPrice       Decimal @db.Decimal(18, 2)
-  taxRate         Decimal @default(0) @db.Decimal(6, 3)
-  lineSubtotal    Decimal @db.Decimal(18, 2)
-  lineTax         Decimal @default(0) @db.Decimal(18, 2)
-  lineTotal       Decimal @db.Decimal(18, 2)
-  sortOrder       Int     @default(0)
+  unit             String  @default("unit")
+  unitPrice        Decimal @db.Decimal(18, 2)
+  taxRate          Decimal @default(0) @db.Decimal(6, 3)
+  lineSubtotal     Decimal @db.Decimal(18, 2)
+  lineTax          Decimal @default(0) @db.Decimal(18, 2)
+  lineTotal        Decimal @db.Decimal(18, 2)
+  sortOrder        Int     @default(0)
 
   purchaseOrder PurchaseOrder @relation(fields: [purchaseOrderId], references: [id], onDelete: Cascade)
   product       Product?      @relation(fields: [productId], references: [id])
@@ -782,16 +788,16 @@ enum BillStatus {
 }
 
 model Bill {
-  id             String     @id @default(cuid())
-  organizationId String
-  supplierId     String
+  id              String     @id @default(cuid())
+  organizationId  String
+  supplierId      String
   purchaseOrderId String?
-  number         String
-  supplierRef    String?
-  status         BillStatus @default(DRAFT)
-  issueDate      DateTime   @default(now())
-  dueDate        DateTime
-  currency       String     @default("USD")
+  number          String
+  supplierRef     String?
+  status          BillStatus @default(DRAFT)
+  issueDate       DateTime   @default(now())
+  dueDate         DateTime
+  currency        String     @default("USD")
 
   subtotal   Decimal @default(0) @db.Decimal(18, 2)
   taxAmount  Decimal @default(0) @db.Decimal(18, 2)

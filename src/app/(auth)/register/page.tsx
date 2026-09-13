@@ -7,14 +7,24 @@ import { AuthPanel } from '@/components/marketing/auth-panel';
 import { StepIndicator } from '@/components/shared/step-indicator';
 import { auth, googleEnabled } from '@/lib/auth';
 import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
+import { TRIAL_DAYS, findPlan } from '@/lib/config/plans';
 
 import { RegisterForm } from './register-form';
 
 export const metadata: Metadata = { title: 'Create your workspace' };
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ plan?: string }>;
+}) {
   const session = await auth();
   if (session?.user) redirect('/dashboard');
+
+  // Arriving from a pricing card records which plan drew them in. Unknown
+  // values are ignored rather than shown back, so a hand-typed query string
+  // cannot put words in the page.
+  const plan = findPlan((await searchParams).plan);
 
   return (
     <AuthPanel
@@ -31,10 +41,14 @@ export default async function RegisterPage() {
         <h1 className="text-[1.75rem] font-semibold tracking-[-0.03em]">
           Create your workspace
         </h1>
-        <p className="mt-1.5 text-[14px] text-muted-foreground">Ready in seconds.</p>
+        <p className="mt-1.5 text-[14px] text-muted-foreground">
+          {plan
+            ? `${TRIAL_DAYS} days free, then ${plan.name}. No card needed today.`
+            : `Ready in seconds, with ${TRIAL_DAYS} days free.`}
+        </p>
       </header>
 
-      <RegisterForm googleEnabled={googleEnabled} />
+      <RegisterForm googleEnabled={googleEnabled} plan={plan?.id ?? null} />
 
       <p className="mt-8 border-t border-border pt-5 text-[13px] text-muted-foreground">
         Already have an account?{' '}

@@ -279,6 +279,13 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: 'bell',
         permission: 'settings.view',
       },
+      {
+        label: 'Plan & billing',
+        href: '/settings/billing',
+        icon: 'card',
+        permission: 'settings.view',
+        keywords: ['subscription', 'trial', 'plan', 'upgrade'],
+      },
     ],
   },
 ];
@@ -287,7 +294,7 @@ export const NAV_GROUPS: NavGroup[] = [
 export const EXTRA_SEARCH_TARGETS: NavItem[] = [
   { label: 'My profile', href: '/settings/profile', icon: 'settings' },
   { label: 'Notification inbox', href: '/notifications', icon: 'bell' },
-  { label: 'Payment methods', href: '/payments', icon: 'card' },
+  { label: 'Payments received', href: '/payments', icon: 'payments' },
   { label: 'Business health', href: '/dashboard', icon: 'gauge' },
 ];
 

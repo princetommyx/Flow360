@@ -1,7 +1,9 @@
+import { Suspense } from 'react';
 import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import { BrandStyle } from '@/components/brand/brand-style';
+import { NavigationProgress } from '@/components/layout/navigation-progress';
 import { ThemeProvider, ThemeScript } from '@/components/layout/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -60,6 +62,9 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} ${jetbrains.variable} antialiased`}>
         <ThemeProvider>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
           <TooltipProvider delayDuration={250}>{children}</TooltipProvider>
           <Toaster />
         </ThemeProvider>

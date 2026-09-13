@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -27,6 +28,9 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = React.useState<string | null>(null);
+  // Keeps the button busy until the dashboard has actually rendered, rather
+  // than going idle the moment the sign-in request comes back.
+  const [navigating, startNavigation] = React.useTransition();
 
   const form = useForm<LoginInput>({
     resolver: zodResolver(loginSchema),
@@ -45,8 +49,11 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       return;
     }
 
-    router.push(next?.startsWith('/') ? next : result.data.redirectTo);
-    router.refresh();
+    toast.success('Signed in', { description: 'Taking you to your workspace…' });
+    startNavigation(() => {
+      router.push(next?.startsWith('/') ? next : result.data.redirectTo);
+      router.refresh();
+    });
   }
 
   return (
@@ -118,7 +125,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
             type="submit"
             size="xl"
             className="mt-1 w-full rounded-full"
-            loading={form.formState.isSubmitting}
+            loading={form.formState.isSubmitting || navigating}
           >
             Sign in
           </Button>

@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useLinkStatus } from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/shared/icon';
@@ -11,6 +13,33 @@ type SidebarNavProps = {
   groups: NavGroup[];
   onNavigate?: () => void;
 };
+
+/**
+ * Swaps the item's icon for a spinner while its page is being fetched, so a
+ * slow module gives feedback at the point the reader clicked.
+ */
+function NavIcon({ name, active }: { name: NavGroup['items'][number]['icon']; active: boolean }) {
+  const { pending } = useLinkStatus();
+
+  if (pending) {
+    return (
+      <Loader2
+        className="size-[17px] shrink-0 animate-spin text-primary"
+        aria-hidden
+      />
+    );
+  }
+
+  return (
+    <Icon
+      name={name}
+      className={cn(
+        'size-[17px] shrink-0 transition-colors',
+        active ? 'text-primary' : 'text-sidebar-muted group-hover:text-foreground',
+      )}
+    />
+  );
+}
 
 export function SidebarNav({ groups, onNavigate }: SidebarNavProps) {
   const pathname = usePathname();
@@ -38,12 +67,9 @@ export function SidebarNav({ groups, onNavigate }: SidebarNavProps) {
                         : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-foreground',
                     )}
                   >
-                    <Icon
+                    <NavIcon
                       name={item.icon}
-                      className={cn(
-                        'size-[17px] shrink-0 transition-colors',
-                        active ? 'text-primary' : 'text-sidebar-muted group-hover:text-foreground',
-                      )}
+                      active={active}
                     />
                     <span className="truncate">{item.label}</span>
                     {active ? (

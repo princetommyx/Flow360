@@ -4,6 +4,7 @@ import { Logo } from '@/components/brand/logo';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { CompanySwitcher } from '@/components/layout/company-switcher';
 import { UserMenu } from '@/components/layout/user-menu';
+import { TrialCard } from '@/components/billing/trial-status';
 import type { NavGroup } from '@/lib/navigation';
 import type { TenantContext } from '@/server/tenant';
 
@@ -35,6 +36,7 @@ export function AppSidebar({
       </div>
 
       <div className="border-t border-sidebar-border px-2 py-2">
+        <TrialCard organization={context.organization} className="mx-1 mb-2" />
         <UserMenu user={context.user} roleName={context.role.name} />
       </div>
     </aside>

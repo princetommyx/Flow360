@@ -2,6 +2,7 @@
 
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 
@@ -28,7 +29,17 @@ export function ExportButton({
 
   return (
     <Button variant="secondary" size="sm" asChild>
-      <a href={href} download>
+      {/* The browser handles the download itself, so the only thing missing is
+          a word that it started — the file can take a moment to build. */}
+      <a
+        href={href}
+        download
+        onClick={() =>
+          toast.success('Preparing your export', {
+            description: 'The CSV will download as soon as it is ready.',
+          })
+        }
+      >
         <Download />
         <span className="hidden sm:inline">{label}</span>
       </a>

@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
 
@@ -13,14 +14,25 @@ import {
 } from '@/components/ui/select';
 import { PER_PAGE_OPTIONS, buildQueryString, type PageInfo } from '@/lib/query';
 
+type Control = 'first' | 'previous' | 'next' | 'last';
+
 export function DataTablePagination({ info }: { info: PageInfo }) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = React.useTransition();
+  // Which control was pressed, so only that one shows the spinner.
+  const [active, setActive] = React.useState<Control | null>(null);
 
-  const goTo = (changes: Record<string, string | number | null>) => {
-    router.push(`${pathname}${buildQueryString(searchParams, changes)}`, {
-      scroll: false,
+  const goTo = (
+    changes: Record<string, string | number | null>,
+    control: Control | null = null,
+  ) => {
+    setActive(control);
+    startTransition(() => {
+      router.push(`${pathname}${buildQueryString(searchParams, changes)}`, {
+        scroll: false,
+      });
     });
   };
 
@@ -58,44 +70,48 @@ export function DataTablePagination({ info }: { info: PageInfo }) {
         </div>
 
         <div className="flex items-center gap-1">
-          <span className="mr-2 text-[13px] text-muted-foreground tabular">
+          <span className="mr-2 text-[13px] text-muted-foreground tabular" aria-live="polite">
             Page {info.page} of {info.totalPages}
           </span>
           <Button
             variant="secondary"
             size="icon-sm"
-            disabled={isFirst}
-            onClick={() => goTo({ page: null })}
+            disabled={isFirst || isPending}
+            loading={isPending && active === 'first'}
+            onClick={() => goTo({ page: null }, 'first')}
             aria-label="First page"
           >
-            <ChevronsLeft />
+            {isPending && active === 'first' ? null : <ChevronsLeft />}
           </Button>
           <Button
             variant="secondary"
             size="icon-sm"
-            disabled={isFirst}
-            onClick={() => goTo({ page: info.page - 1 })}
+            disabled={isFirst || isPending}
+            loading={isPending && active === 'previous'}
+            onClick={() => goTo({ page: info.page - 1 }, 'previous')}
             aria-label="Previous page"
           >
-            <ChevronLeft />
+            {isPending && active === 'previous' ? null : <ChevronLeft />}
           </Button>
           <Button
             variant="secondary"
             size="icon-sm"
-            disabled={isLast}
-            onClick={() => goTo({ page: info.page + 1 })}
+            disabled={isLast || isPending}
+            loading={isPending && active === 'next'}
+            onClick={() => goTo({ page: info.page + 1 }, 'next')}
             aria-label="Next page"
           >
-            <ChevronRight />
+            {isPending && active === 'next' ? null : <ChevronRight />}
           </Button>
           <Button
             variant="secondary"
             size="icon-sm"
-            disabled={isLast}
-            onClick={() => goTo({ page: info.totalPages })}
+            disabled={isLast || isPending}
+            loading={isPending && active === 'last'}
+            onClick={() => goTo({ page: info.totalPages }, 'last')}
             aria-label="Last page"
           >
-            <ChevronsRight />
+            {isPending && active === 'last' ? null : <ChevronsRight />}
           </Button>
         </div>
       </div>

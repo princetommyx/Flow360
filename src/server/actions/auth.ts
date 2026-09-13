@@ -64,7 +64,7 @@ export async function registerAction(
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid details.' };
   }
 
-  const { name, email, organizationName, password, countryCode, dialCode, phone } =
+  const { name, email, organizationName, password, countryCode, dialCode, phone, plan } =
     parsed.data;
 
   const country = findCountry(countryCode);
@@ -111,7 +111,13 @@ export async function registerAction(
 
     await tx.organization.update({
       where: { id: organizationId },
-      data: { phone: fullPhone, country: country?.name ?? undefined },
+      data: {
+        phone: fullPhone,
+        country: country?.name ?? undefined,
+        // The plan they clicked on the pricing page, kept as an intention.
+        // The trial itself is identical whichever one they came from.
+        requestedPlan: plan ?? null,
+      },
     });
 
     await tx.verificationToken.create({

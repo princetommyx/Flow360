@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Check } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
@@ -30,6 +31,7 @@ import { GoogleButton } from '@/components/shared/google-button';
 import { PasswordInput } from '@/components/shared/password-input';
 import { registerAction } from '@/server/actions/auth';
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth';
+import { TRIAL_DAYS, type PlanId } from '@/lib/config/plans';
 import { COUNTRIES, DIAL_CODES, findCountry } from '@/lib/config/countries';
 import { locale } from '@/lib/config/brand';
 import { cn } from '@/lib/utils';
@@ -43,9 +45,19 @@ const RULES = [
   { label: 'A number', test: (value: string) => /[0-9]/.test(value) },
 ];
 
-export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
+export function RegisterForm({
+  googleEnabled,
+  plan = null,
+}: {
+  googleEnabled: boolean;
+  /** Plan chosen on the pricing page, recorded with the new workspace. */
+  plan?: PlanId | null;
+}) {
   const router = useRouter();
   const [error, setError] = React.useState<string | null>(null);
+  // The workspace is provisioned before the next screen renders, so the button
+  // stays busy across the navigation too.
+  const [navigating, startNavigation] = React.useTransition();
 
   const defaultCountry =
     findCountry(locale.countryCode) ?? COUNTRIES.find((c) => c.code === 'US')!;
@@ -61,6 +73,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
       email: '',
       password: '',
       confirmPassword: '',
+      plan: plan ?? undefined,
     },
   });
 
@@ -87,8 +100,13 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
       return;
     }
 
-    router.push(result.data.redirectTo);
-    router.refresh();
+    toast.success(`${values.organizationName} is ready`, {
+      description: `Your ${TRIAL_DAYS}-day free trial has started. No card needed.`,
+    });
+    startNavigation(() => {
+      router.push(result.data.redirectTo);
+      router.refresh();
+    });
   }
 
   return (
@@ -307,7 +325,7 @@ export function RegisterForm({ googleEnabled }: { googleEnabled: boolean }) {
             type="submit"
             size="xl"
             className="mt-1 w-full rounded-full"
-            loading={form.formState.isSubmitting}
+            loading={form.formState.isSubmitting || navigating}
           >
             Continue
           </Button>
