@@ -46,6 +46,9 @@ export const useTheme = () => React.useContext(ThemeContext);
 
 /** Applies the stored theme before paint so there is no flash of the wrong palette. */
 export function ThemeScript() {
-  const script = `(function(){try{var t=localStorage.getItem('${STORAGE_KEY}');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){document.documentElement.classList.add('dark')}}catch(e){}})();`;
+  // Also marks the document as scripted, before paint. Scroll reveals hide
+  // their content only under that flag, so with JavaScript disabled the page
+  // renders fully visible instead of blank.
+  const script = `(function(){var d=document.documentElement;d.classList.add('js');try{var t=localStorage.getItem('${STORAGE_KEY}');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}if(t==='dark'){d.classList.add('dark')}}catch(e){}})();`;
   return <script dangerouslySetInnerHTML={{ __html: script }} />;
 }

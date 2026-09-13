@@ -146,7 +146,7 @@ export function CategoriesManager({
       ) : (
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {categories.map((category) => (
-            <Card key={category.id} className="flex flex-col p-5">
+            <Card key={category.id} className="flex flex-col p-5 hover-lift">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <h2 className="truncate text-[14.5px] font-semibold tracking-[-0.01em]">

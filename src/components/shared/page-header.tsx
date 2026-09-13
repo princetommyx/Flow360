@@ -19,7 +19,7 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        'flex flex-col gap-4 md:flex-row md:items-start md:justify-between',
+        'animate-sweep flex flex-col gap-4 md:flex-row md:items-start md:justify-between',
         className,
       )}
     >

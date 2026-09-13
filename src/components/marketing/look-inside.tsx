@@ -1,5 +1,6 @@
 import { AppFrame } from '@/components/marketing/app-frame';
 import { SectionHeading } from '@/components/marketing/section-heading';
+import { Reveal } from '@/components/shared/reveal';
 import { cn } from '@/lib/utils';
 
 type Showcase = {
@@ -61,7 +62,7 @@ export function LookInside() {
                 key={showcase.src}
                 className="grid items-center gap-8 lg:grid-cols-2 lg:gap-14"
               >
-                <div className={cn(imageFirst && 'lg:order-2')}>
+                <Reveal className={cn(imageFirst && 'lg:order-2')}>
                   <p className="text-[12.5px] font-semibold uppercase tracking-[0.12em] text-primary">
                     {showcase.eyebrow}
                   </p>
@@ -71,15 +72,16 @@ export function LookInside() {
                   <p className="mt-4 text-pretty text-[14.5px] leading-relaxed text-muted-foreground md:text-[15px]">
                     {showcase.body}
                   </p>
-                </div>
+                </Reveal>
 
-                <AppFrame
-                  src={showcase.src}
-                  alt={showcase.alt}
-                  width={2800}
-                  height={1760}
-                  className={cn(imageFirst && 'lg:order-1')}
-                />
+                <Reveal delay={90} className={cn(imageFirst && 'lg:order-1')}>
+                  <AppFrame
+                    src={showcase.src}
+                    alt={showcase.alt}
+                    width={2800}
+                    height={1760}
+                  />
+                </Reveal>
               </article>
             );
           })}
