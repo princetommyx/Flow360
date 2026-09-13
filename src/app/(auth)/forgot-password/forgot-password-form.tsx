@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
         </p>
         <Button
           variant="secondary"
-          className="mt-5 w-full"
+          className="mt-5 w-full rounded-full"
           onClick={() => {
             setSentTo(null);
             form.reset();
@@ -76,12 +76,14 @@ export function ForgotPasswordForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel required>Work email</FormLabel>
+              <FormLabel>Work email</FormLabel>
               <FormControl>
                 <Input
                   type="email"
+                  inputMode="email"
                   autoComplete="email"
                   placeholder="you@company.com"
+                  className="h-12 rounded-xl"
                   {...field}
                 />
               </FormControl>
@@ -92,8 +94,8 @@ export function ForgotPasswordForm() {
 
         <Button
           type="submit"
-          size="lg"
-          className="w-full"
+          size="xl"
+          className="w-full rounded-full"
           loading={form.formState.isSubmitting}
         >
           Send reset link

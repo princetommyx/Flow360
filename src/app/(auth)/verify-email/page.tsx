@@ -3,7 +3,14 @@ import Link from 'next/link';
 import { CheckCircle2, MailCheck, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { LogoMark } from '@/components/brand/logo';
+import { StepIndicator } from '@/components/shared/step-indicator';
+import { auth } from '@/lib/auth';
+import { db } from '@/lib/db';
+import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
 import { verifyEmailAction } from '@/server/actions/auth';
+
+import { ResendButton } from './resend-button';
 
 export const metadata: Metadata = { title: 'Confirm your email' };
 
@@ -14,70 +21,127 @@ export default async function VerifyEmailPage({
 }) {
   const { token } = await searchParams;
 
-  if (!token) {
-    return (
+  // Arriving from the emailed link.
+  if (token) {
+    const result = await verifyEmailAction(token);
+    return result.ok ? (
       <Panel
-        icon={<MailCheck className="size-5" aria-hidden />}
-        tone="info"
-        title="Confirm your email"
-        description="We sent a confirmation link to the address you signed up with. Open it to finish securing your account."
-        action={{ href: '/dashboard', label: 'Continue to dashboard' }}
+        tone="success"
+        icon={<CheckCircle2 className="size-5" aria-hidden />}
+        step={2}
+        title="Email confirmed"
+        description="Your address is verified and your workspace is ready to use."
+        action={{ href: '/dashboard', label: 'Go to your dashboard' }}
+      />
+    ) : (
+      <Panel
+        tone="error"
+        icon={<XCircle className="size-5" aria-hidden />}
+        step={2}
+        title="That link is no longer valid"
+        description={result.error}
+        action={{ href: '/login', label: 'Back to sign in' }}
       />
     );
   }
 
-  const result = await verifyEmailAction(token);
+  // Arriving straight after sign-up.
+  const session = await auth();
+  const user = session?.user?.id
+    ? await db.user.findUnique({
+        where: { id: session.user.id },
+        select: { email: true, emailVerified: true },
+      })
+    : null;
 
-  return result.ok ? (
-    <Panel
-      icon={<CheckCircle2 className="size-5" aria-hidden />}
-      tone="success"
-      title="Email confirmed"
-      description="Your address is verified. You have full access to your workspace."
-      action={{ href: '/dashboard', label: 'Go to dashboard' }}
-    />
-  ) : (
-    <Panel
-      icon={<XCircle className="size-5" aria-hidden />}
-      tone="error"
-      title="Link no longer valid"
-      description={result.error}
-      action={{ href: '/login', label: 'Back to sign in' }}
-    />
+  if (user?.emailVerified) {
+    return (
+      <Panel
+        tone="success"
+        icon={<CheckCircle2 className="size-5" aria-hidden />}
+        step={2}
+        title="Already confirmed"
+        description="This address has been verified. Nothing else to do."
+        action={{ href: '/dashboard', label: 'Go to your dashboard' }}
+      />
+    );
+  }
+
+  return (
+    <div>
+      <LogoMark size={44} />
+      <StepIndicator steps={SIGNUP_STEPS} current={2} className="mt-6" />
+
+      <div className="mt-7 flex size-11 items-center justify-center rounded-xl bg-info-soft text-info">
+        <MailCheck className="size-5" aria-hidden />
+      </div>
+
+      <h1 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.03em]">
+        Check your inbox
+      </h1>
+      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+        We sent a confirmation link
+        {user?.email ? (
+          <>
+            {' '}
+            to <strong className="text-foreground">{user.email}</strong>
+          </>
+        ) : null}
+        . Open it to finish securing your account — the link expires in 24 hours.
+      </p>
+
+      <div className="mt-7 grid gap-3">
+        <Button size="xl" className="w-full rounded-full" asChild>
+          <Link href="/dashboard">Continue to your workspace</Link>
+        </Button>
+        {session?.user ? <ResendButton /> : null}
+      </div>
+
+      <p className="mt-6 border-t border-border pt-5 text-center text-[12.5px] leading-relaxed text-muted-foreground">
+        You can start working right away — confirming just secures password
+        recovery and account notifications.
+      </p>
+    </div>
   );
 }
 
 function Panel({
-  icon,
   tone,
+  icon,
+  step,
   title,
   description,
   action,
 }: {
+  tone: 'success' | 'error';
   icon: React.ReactNode;
-  tone: 'success' | 'error' | 'info';
+  step: number;
   title: string;
   description: string;
   action: { href: string; label: string };
 }) {
-  const toneClass = {
-    success: 'bg-success-soft text-success',
-    error: 'bg-destructive-soft text-destructive',
-    info: 'bg-info-soft text-info',
-  }[tone];
+  const toneClass =
+    tone === 'success'
+      ? 'bg-success-soft text-success'
+      : 'bg-destructive-soft text-destructive';
 
   return (
-    <div className="rounded-xl border border-border bg-card p-6 text-center shadow-sm">
+    <div>
+      <LogoMark size={44} />
+      <StepIndicator steps={SIGNUP_STEPS} current={step} className="mt-6" />
+
       <div
-        className={`mx-auto mb-4 flex size-11 items-center justify-center rounded-xl ${toneClass}`}
+        className={`mt-7 flex size-11 items-center justify-center rounded-xl ${toneClass}`}
       >
         {icon}
       </div>
-      <p className="text-[15px] font-semibold">{title}</p>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-muted-foreground">
+
+      <h1 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.03em]">{title}</h1>
+      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
         {description}
       </p>
-      <Button asChild className="mt-5 w-full" size="lg">
+
+      <Button size="xl" className="mt-7 w-full rounded-full" asChild>
         <Link href={action.href}>{action.label}</Link>
       </Button>
     </div>

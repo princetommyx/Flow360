@@ -1,5 +1,6 @@
-import NextAuth from 'next-auth';
+import NextAuth, { type NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
+import Google from 'next-auth/providers/google';
 import { compare } from 'bcryptjs';
 
 import { db } from '@/lib/db';
@@ -7,10 +8,17 @@ import { loginSchema } from '@/lib/validations/auth';
 
 import { authConfig } from './config';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
-  ...authConfig,
-  providers: [
-    Credentials({
+/**
+ * Google sign-in is only offered when it is actually configured. Without
+ * credentials the provider would render a button that fails on click, so it is
+ * omitted entirely and `googleEnabled` tells the UI not to show it.
+ */
+export const googleEnabled = Boolean(
+  process.env.AUTH_GOOGLE_ID && process.env.AUTH_GOOGLE_SECRET,
+);
+
+const providers: NextAuthConfig['providers'] = [
+  Credentials({
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' },
@@ -53,5 +61,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         };
       },
     }),
-  ],
+];
+
+if (googleEnabled) {
+  providers.push(
+    Google({
+      clientId: process.env.AUTH_GOOGLE_ID,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: false,
+    }),
+  );
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  ...authConfig,
+  providers,
 });

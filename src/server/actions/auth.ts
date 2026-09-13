@@ -5,11 +5,12 @@ import { hash } from 'bcryptjs';
 import { AuthError } from 'next-auth';
 
 import { db } from '@/lib/db';
-import { signIn, signOut } from '@/lib/auth';
+import { auth, signIn, signOut } from '@/lib/auth';
 import { absoluteUrl, sendMail } from '@/lib/mailer';
 import { createToken, expiryFor, hashToken } from '@/lib/tokens';
 import { brand } from '@/lib/config/brand';
 import { slugify } from '@/lib/utils';
+import { findCountry } from '@/lib/config/countries';
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -47,7 +48,12 @@ export async function registerAction(
     return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid details.' };
   }
 
-  const { name, email, organizationName, password } = parsed.data;
+  const { name, email, organizationName, password, countryCode, dialCode, phone } =
+    parsed.data;
+
+  const country = findCountry(countryCode);
+  // E.164, with any spacing or dashes the user typed removed.
+  const fullPhone = `+${dialCode}${phone.replace(/[^0-9]/g, '')}`;
 
   const existing = await db.user.findUnique({ where: { email }, select: { id: true } });
   if (existing) {
@@ -63,14 +69,22 @@ export async function registerAction(
 
   await db.$transaction(async (tx) => {
     const user = await tx.user.create({
-      data: { name, email, passwordHash },
+      data: { name, email, passwordHash, phone: fullPhone },
       select: { id: true },
     });
 
-    await provisionOrganization(tx, {
+    const { organizationId } = await provisionOrganization(tx, {
       name: organizationName,
       slug: await uniqueSlug(tx, slugify(organizationName)),
       ownerUserId: user.id,
+      // The chosen country sets the workspace's currency and locale defaults.
+      currency: country?.currency,
+      country: country?.name,
+    });
+
+    await tx.organization.update({
+      where: { id: organizationId },
+      data: { phone: fullPhone, country: country?.name ?? undefined },
     });
 
     await tx.verificationToken.create({
@@ -100,7 +114,8 @@ export async function registerAction(
 
   await signIn('credentials', { email, password, redirect: false });
 
-  return { ok: true, data: { redirectTo: '/dashboard' } };
+  // Step two of sign-up: confirm the address we just sent the link to.
+  return { ok: true, data: { redirectTo: '/verify-email' } };
 }
 
 export async function forgotPasswordAction(input: unknown): Promise<ActionResult> {
@@ -232,4 +247,62 @@ async function uniqueSlug(
     slug = `${candidate}-${suffix}`;
   }
   return slug;
+}
+
+/**
+ * Re-issues the confirmation link for the signed-in account.
+ *
+ * Any outstanding link is consumed first, so only the newest one works and an
+ * older email cannot be replayed.
+ */
+export async function resendVerificationAction(): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: 'Sign in again to resend the confirmation email.' };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { id: true, name: true, email: true, emailVerified: true },
+  });
+  if (!user) {
+    return { ok: false, error: 'That account no longer exists.' };
+  }
+  if (user.emailVerified) {
+    return { ok: false, error: 'This address is already confirmed.' };
+  }
+
+  const token = createToken();
+
+  await db.$transaction([
+    db.verificationToken.updateMany({
+      where: { userId: user.id, type: 'EMAIL_VERIFICATION', usedAt: null },
+      data: { usedAt: new Date() },
+    }),
+    db.verificationToken.create({
+      data: {
+        token: token.hash,
+        type: 'EMAIL_VERIFICATION',
+        identifier: user.email,
+        userId: user.id,
+        expiresAt: expiryFor('EMAIL_VERIFICATION'),
+      },
+    }),
+  ]);
+
+  await sendMail({
+    to: user.email,
+    subject: `Confirm your ${brand.name} account`,
+    heading: 'Confirm your email address',
+    body: [
+      `Hi ${user.name.split(' ')[0]}, use the link below to confirm this address.`,
+      'The link expires in 24 hours.',
+    ],
+    action: {
+      label: 'Confirm email',
+      url: absoluteUrl(`/verify-email?token=${token.raw}`),
+    },
+  });
+
+  return { ok: true, data: undefined };
 }
