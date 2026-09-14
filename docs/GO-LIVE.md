@@ -31,21 +31,43 @@ string (Session mode, port 6543) and paste it as `DATABASE_URL` in step 3.
 
 ## 2. Load the schema and the demo data
 
-Open your provider's SQL editor:
+Pick whichever suits the device you are on.
 
-- **Neon** → the database → **SQL Editor**
-- **Supabase** → **SQL Editor** → **New query**
+### From a phone — GitHub Actions (no copy-paste)
 
-Paste the entire contents of [`prisma/deploy/flow360-setup.sql`](../prisma/deploy/flow360-setup.sql)
-and run it.
+1. Copy the connection string from your database provider
+2. GitHub → this repo → **Settings** → **Secrets and variables** → **Actions**
+   → **New repository secret**, named `DATABASE_URL`
+3. **Actions** tab → **Set up database** → **Run workflow**
 
-It creates all 39 tables, records both migrations as applied (so a future
-`prisma migrate deploy` picks up correctly from here), and loads the demo
-dataset. It runs in a single transaction, so it either fully succeeds or
-changes nothing.
+It applies both migrations, checks the database is reachable and complete, then
+loads the demo data. It runs only when you start it, never on a push, and the
+connection string stays in the secret — it is not written to the logs.
 
-> Run it on an **empty** database only. It is a first-time installer, not a
-> reset script.
+If the database already holds a company, the demo step stops rather than
+running: the seed clears every table first, so it must never land on real work.
+Re-run with *load demo data* unchecked to apply migrations only.
+
+### From a computer — a SQL console or psql
+
+Paste [`prisma/deploy/flow360-setup.sql`](../prisma/deploy/flow360-setup.sql)
+into your provider's SQL editor and run it — schema, migration history and demo
+data in one transaction.
+
+The same content is also split, if you want the schema without the demo data:
+
+- [`prisma/deploy/01-schema.sql`](../prisma/deploy/01-schema.sql) — tables and migration history
+- [`prisma/deploy/02-demo-data.sql`](../prisma/deploy/02-demo-data.sql) — the demo companies
+
+Or, with the repo checked out:
+
+```bash
+DATABASE_URL="<your-url>" npx prisma migrate deploy
+DATABASE_URL="<your-url>" npm run db:seed
+```
+
+> All of these expect an **empty** database. They are first-time installers,
+> not reset scripts.
 
 ---
 

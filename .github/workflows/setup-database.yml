@@ -1,0 +1,92 @@
+# Sets up the hosted database, by hand, from the Actions tab.
+#
+# This exists so the database can be created from a phone: the GitHub mobile
+# app can run it, and nothing needs to be pasted into a SQL console.
+#
+# It never runs on a push — only when someone chooses to run it — and it takes
+# the connection string from a repository secret, so the URL is never in the
+# repository or in the logs.
+name: Set up database
+
+on:
+  workflow_dispatch:
+    inputs:
+      load_demo_data:
+        description: 'Also load the demo companies (only works on an empty database)'
+        type: boolean
+        default: true
+
+# One at a time: two concurrent runs against one database would race.
+concurrency:
+  group: setup-database
+  cancel-in-progress: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    # Nothing here reads or writes the repository.
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Check the connection string is present
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::The DATABASE_URL repository secret is not set."
+            echo "Add it under Settings -> Secrets and variables -> Actions -> New repository secret."
+            exit 1
+          fi
+          echo "DATABASE_URL is set."
+
+      - name: Apply migrations
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma migrate deploy
+
+      - name: Verify the database is reachable and complete
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npm run db:check
+
+      - name: Load demo data
+        if: ${{ inputs.load_demo_data }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          # The seed clears the tables first, so it must not run over real data.
+          existing=$(npx tsx scripts/count-organizations.ts)
+          if [ "$existing" != "0" ]; then
+            echo "::error::This database already holds $existing organization(s)."
+            echo "The seed deletes every row before inserting, so it was not run."
+            echo "Re-run with 'load demo data' unchecked, or point the secret at an empty database."
+            exit 1
+          fi
+          npm run db:seed
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Database setup"
+            echo ""
+            echo "Migrations applied to the database in the \`DATABASE_URL\` secret."
+            if [ "${{ inputs.load_demo_data }}" = "true" ]; then
+              echo ""
+              echo "Demo sign-in:"
+              echo ""
+              echo '- `owner@northwindsupply.example` / `Flow360Demo!`'
+              echo '- `rosa@harbourfitouts.example` / `Flow360Demo!` (a second company)'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
