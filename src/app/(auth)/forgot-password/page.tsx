@@ -6,6 +6,8 @@ import { ArrowLeft } from 'lucide-react';
 import { Logo } from '@/components/brand/logo';
 import { AuthPanel } from '@/components/marketing/auth-panel';
 
+import { mailIsDelivered } from '@/lib/mailer';
+
 import { ForgotPasswordForm } from './forgot-password-form';
 
 export const metadata: Metadata = { title: 'Reset your password' };
@@ -25,7 +27,7 @@ export default function ForgotPasswordPage() {
       </header>
 
       <div className="mt-7">
-        <ForgotPasswordForm />
+        <ForgotPasswordForm mailDelivered={mailIsDelivered()} />
       </div>
 
       <Link

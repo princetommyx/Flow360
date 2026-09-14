@@ -80,7 +80,7 @@ export const brand: BrandConfig = {
    * Optional photograph behind the landing hero. It sits under a heavy scrim
    * so the headline keeps its contrast; leave unset for the plain gradient.
    */
-  heroImageUrl: env('NEXT_PUBLIC_HERO_IMAGE', '/hero.jpg') || null,
+  heroImageUrl: env('NEXT_PUBLIC_HERO_IMAGE', '/product/hero.jpg') || null,
   faviconUrl: env('NEXT_PUBLIC_BRAND_FAVICON', '/favicon.svg'),
   social: {},
 };
