@@ -26,6 +26,7 @@ export default async function BillingPage() {
       trialEndsAt: true,
       subscriptionStatus: true,
       requestedPlan: true,
+      requestedBilling: true,
       createdAt: true,
     },
   });
@@ -153,6 +154,12 @@ export default async function BillingPage() {
       <PlanChooser
         currentPlan={current.id}
         requestedPlan={requested?.id ?? null}
+        requestedPeriod={
+          organization.requestedBilling === 'monthly' ||
+          organization.requestedBilling === 'annual'
+            ? organization.requestedBilling
+            : null
+        }
         isOwner={context.membership.isOwner}
       />
 

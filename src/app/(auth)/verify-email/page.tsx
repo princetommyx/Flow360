@@ -12,7 +12,7 @@ import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
 import { verifyEmailAction } from '@/server/actions/auth';
 import { mailIsDelivered } from '@/lib/mailer';
 
-import { ResendButton } from './resend-button';
+import { VerifyForm } from './verify-form';
 
 export const metadata: Metadata = { title: 'Confirm your email' };
 
@@ -93,47 +93,66 @@ export default async function VerifyEmailPage({
       </div>
 
       <h1 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.03em]">
-        {delivered ? 'Check your inbox' : "You're in — email not set up yet"}
+        {delivered ? 'Check your inbox' : "You're in — no provider connected"}
       </h1>
 
       {delivered ? (
         <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-          We sent a confirmation link
+          We sent a six-digit code
           {user?.email ? (
             <>
               {' '}
               to <strong className="text-foreground">{user.email}</strong>
             </>
           ) : null}
-          . Open it to finish securing your account — the link expires in 24
-          hours.
+          . Enter it below, or open the link in the same email. Both expire in
+          24 hours.
         </p>
       ) : (
         <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-          Your account is created and ready to use. No confirmation email was
-          sent
+          Your account is created and ready to use. Nothing was delivered to
           {user?.email ? (
             <>
               {' '}
-              to <strong className="text-foreground">{user.email}</strong>
+              <strong className="text-foreground">{user.email}</strong>
             </>
-          ) : null}
-          , because this deployment has no email provider connected yet — so
-          there is nothing waiting in your inbox.
+          ) : (
+            ' your inbox'
+          )}
+          , because this deployment has no email provider connected — the code
+          below was printed to the server log instead, and it works just the
+          same.
         </p>
       )}
 
-      <div className="mt-7 grid gap-3">
-        <Button size="xl" className="w-full rounded-full" asChild>
-          <Link href="/dashboard">Continue to your workspace</Link>
-        </Button>
-        {session?.user && delivered ? <ResendButton /> : null}
-      </div>
+      {/*
+        The code is real whichever transport is configured; only where it comes
+        out differs. Hiding the field when no provider is connected would leave
+        a confirmable account with nothing to confirm it with.
+      */}
+      {session?.user ? (
+        <VerifyForm />
+      ) : (
+        <div className="mt-7 grid gap-3">
+          <Button size="xl" className="w-full rounded-full" asChild>
+            <Link href="/dashboard">Continue to your workspace</Link>
+          </Button>
+        </div>
+      )}
+
+      {session?.user ? (
+        <p className="mt-4 text-center text-[13px] text-muted-foreground">
+          <Link href="/dashboard" className="font-medium text-primary hover:underline">
+            Skip for now
+          </Link>{' '}
+          — you can confirm later from any page.
+        </p>
+      ) : null}
 
       <p className="mt-6 border-t border-border pt-5 text-center text-[12.5px] leading-relaxed text-muted-foreground">
         {delivered
           ? 'You can start working right away — confirming just secures password recovery and account notifications.'
-          : 'Everything works without it. Connect a provider (EMAIL_TRANSPORT) when you want password recovery and account notifications by email.'}
+          : 'Set EMAIL_TRANSPORT and RESEND_API_KEY to have this arrive by email instead of in the log.'}
       </p>
     </AuthPanel>
   );

@@ -124,7 +124,7 @@ Vercel → **Deployments** → the most recent one → **⋯** → **Redeploy**.
 | `rosa@harbourfitouts.example` | `Flow360Demo!` | A **separate company** — proves tenant isolation, 4 days left on trial so the trial warnings show |
 
 Signing up with a fresh email also works and gives you an empty workspace on a
-30-day trial. Email is not required to get in — verification links are written
+30-day trial. Email is not required to get in — confirmation codes are written
 to the server log rather than sent, because no mail provider is connected yet.
 
 ---

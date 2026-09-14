@@ -7,8 +7,9 @@ import { AuthError } from 'next-auth';
 import { db } from '@/lib/db';
 import { auth, signIn, signOut } from '@/lib/auth';
 import { absoluteUrl, sendMail } from '@/lib/mailer';
-import { createToken, expiryFor, hashToken } from '@/lib/tokens';
-import { brand } from '@/lib/config/brand';
+import { createToken, expiryFor, hashToken, TOKEN_TTL_MINUTES } from '@/lib/tokens';
+import { passwordResetEmail, trialStartedEmail } from '@/lib/email/templates';
+import { findPlan, PLANS } from '@/lib/config/plans';
 import { slugify } from '@/lib/utils';
 import { findCountry } from '@/lib/config/countries';
 import {
@@ -16,8 +17,15 @@ import {
   loginSchema,
   registerSchema,
   resetPasswordSchema,
+  verificationCodeSchema,
 } from '@/lib/validations/auth';
 import { provisionOrganization } from '@/server/services/provisioning';
+import {
+  checkVerificationCode,
+  completeEmailVerification,
+  issueEmailVerification,
+  sendVerificationEmail,
+} from '@/server/services/verification';
 import type { ActionResult } from '@/server/actions/types';
 
 export async function loginAction(
@@ -92,9 +100,8 @@ export async function registerAction(
   }
 
   const passwordHash = await hash(password, 12);
-  const token = createToken();
 
-  await db.$transaction(async (tx) => {
+  const { issued, organization } = await db.$transaction(async (tx) => {
     const user = await tx.user.create({
       data: { name, email, passwordHash, phone: fullPhone },
       select: { id: true },
@@ -109,7 +116,7 @@ export async function registerAction(
       country: country?.name,
     });
 
-    await tx.organization.update({
+    const organization = await tx.organization.update({
       where: { id: organizationId },
       data: {
         phone: fullPhone,
@@ -118,17 +125,12 @@ export async function registerAction(
         // The trial itself is identical whichever one they came from.
         requestedPlan: plan ?? null,
       },
+      select: { id: true, name: true, trialEndsAt: true },
     });
 
-    await tx.verificationToken.create({
-      data: {
-        token: token.hash,
-        type: 'EMAIL_VERIFICATION',
-        identifier: email,
-        userId: user.id,
-        expiresAt: expiryFor('EMAIL_VERIFICATION'),
-      },
-    });
+    const issued = await issueEmailVerification(tx, { userId: user.id, email });
+
+    return { issued, organization };
   });
 
   // The user and their workspace are already committed. A mail provider that
@@ -136,21 +138,31 @@ export async function registerAction(
   // and strand an account nobody can register again — verification is not
   // required to sign in, and the link can be resent.
   try {
-    await sendMail({
-      to: email,
-      subject: `Confirm your ${brand.name} account`,
-      heading: `Welcome to ${brand.name}, ${name.split(' ')[0]}.`,
-      body: [
-        `Your workspace "${organizationName}" is ready.`,
-        'Confirm your email address to secure the account.',
-      ],
-      action: {
-        label: 'Confirm email',
-        url: absoluteUrl(`/verify-email?token=${token.raw}`),
-      },
-    });
+    await sendVerificationEmail({ to: email, name, issued });
   } catch (error) {
     console.error('Confirmation email could not be sent', error);
+  }
+
+  // The trial begins at sign-up, so this is the moment it is true to say so.
+  // Separate from the confirmation above on purpose: one asks for an action,
+  // the other is a receipt worth keeping.
+  try {
+    const trialEndsAt = organization.trialEndsAt;
+    if (trialEndsAt) {
+      await sendMail(
+        trialStartedEmail({
+          to: email,
+          name,
+          organizationName: organization.name,
+          trialEndsAt,
+          // Every trial runs on the full feature set, whichever plan they
+          // arrived from — so the email describes what they actually have.
+          plan: findPlan('business') ?? PLANS[0],
+        }),
+      );
+    }
+  } catch (error) {
+    console.error('Trial email could not be sent', error);
   }
 
   await signIn('credentials', { email, password, redirect: false });
@@ -199,19 +211,14 @@ export async function forgotPasswordAction(input: unknown): Promise<ActionResult
     // A provider outage must not leak whether the address exists, so the
     // response is unchanged either way — but it is logged, loudly.
     try {
-      await sendMail({
-        to: user.email,
-        subject: `Reset your ${brand.name} password`,
-        heading: 'Password reset requested',
-        body: [
-          `Hi ${user.name.split(' ')[0]}, use the link below to choose a new password.`,
-          'The link expires in 60 minutes. If this wasn’t you, no action is needed.',
-        ],
-        action: {
-          label: 'Reset password',
+      await sendMail(
+        passwordResetEmail({
+          to: user.email,
+          name: user.name,
           url: absoluteUrl(`/reset-password?token=${token.raw}`),
-        },
-      });
+          expiresInMinutes: TOKEN_TTL_MINUTES.PASSWORD_RESET,
+        }),
+      );
     } catch (error) {
       console.error('Password reset email could not be sent', error);
     }
@@ -275,16 +282,47 @@ export async function verifyEmailAction(token: string): Promise<ActionResult> {
     return { ok: false, error: 'That confirmation link is invalid or has expired.' };
   }
 
-  await db.$transaction([
-    db.user.update({
-      where: { id: record.userId },
-      data: { emailVerified: new Date() },
-    }),
-    db.verificationToken.update({
-      where: { id: record.id },
-      data: { usedAt: new Date() },
-    }),
-  ]);
+  await db.verificationToken.update({
+    where: { id: record.id },
+    data: { usedAt: new Date() },
+  });
+
+  await completeEmailVerification(record.userId);
+
+  return { ok: true, data: undefined };
+}
+
+/**
+ * Confirms the signed-in account from the six-digit code in the email.
+ *
+ * The code is only ever checked against the account already in the session, so
+ * a guessed code cannot be pointed at somebody else's address.
+ */
+export async function verifyEmailCodeAction(code: unknown): Promise<ActionResult> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { ok: false, error: 'Sign in again to confirm your email address.' };
+  }
+
+  const parsed = verificationCodeSchema.safeParse({ code });
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Enter your code.' };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailVerified: true },
+  });
+  if (!user) return { ok: false, error: 'That account no longer exists.' };
+  if (user.emailVerified) return { ok: true, data: undefined };
+
+  const result = await checkVerificationCode({
+    userId: session.user.id,
+    code: parsed.data.code,
+  });
+  if (!result.ok) return { ok: false, error: result.error };
+
+  await completeEmailVerification(result.userId);
 
   return { ok: true, data: undefined };
 }
@@ -332,40 +370,14 @@ export async function resendVerificationAction(): Promise<ActionResult> {
     return { ok: false, error: 'This address is already confirmed.' };
   }
 
-  const token = createToken();
-
-  await db.$transaction([
-    db.verificationToken.updateMany({
-      where: { userId: user.id, type: 'EMAIL_VERIFICATION', usedAt: null },
-      data: { usedAt: new Date() },
-    }),
-    db.verificationToken.create({
-      data: {
-        token: token.hash,
-        type: 'EMAIL_VERIFICATION',
-        identifier: user.email,
-        userId: user.id,
-        expiresAt: expiryFor('EMAIL_VERIFICATION'),
-      },
-    }),
-  ]);
+  const issued = await db.$transaction((tx) =>
+    issueEmailVerification(tx, { userId: user.id, email: user.email }),
+  );
 
   // Here the send *is* the request, so a failure is reported rather than
   // logged and hidden behind a success message.
   try {
-    await sendMail({
-      to: user.email,
-      subject: `Confirm your ${brand.name} account`,
-      heading: 'Confirm your email address',
-      body: [
-        `Hi ${user.name.split(' ')[0]}, use the link below to confirm this address.`,
-        'The link expires in 24 hours.',
-      ],
-      action: {
-        label: 'Confirm email',
-        url: absoluteUrl(`/verify-email?token=${token.raw}`),
-      },
-    });
+    await sendVerificationEmail({ to: user.email, name: user.name, issued });
   } catch (error) {
     console.error('Confirmation email could not be resent', error);
     return {

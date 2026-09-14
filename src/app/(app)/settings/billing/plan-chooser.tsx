@@ -8,7 +8,12 @@ import { ArrowRight, Check, Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PLANS, annualSaving, type PlanId } from '@/lib/config/plans';
+import {
+  PLANS,
+  annualSaving,
+  type BillingPeriod,
+  type PlanId,
+} from '@/lib/config/plans';
 import { brand } from '@/lib/config/brand';
 import { formatCurrency } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -23,14 +28,18 @@ import { cancelPlanRequestAction, requestPlanAction } from '@/server/actions/bil
 export function PlanChooser({
   currentPlan,
   requestedPlan,
+  requestedPeriod,
   isOwner,
 }: {
   currentPlan: PlanId;
   requestedPlan: PlanId | null;
+  requestedPeriod: BillingPeriod | null;
   isOwner: boolean;
 }) {
   const router = useRouter();
-  const [annual, setAnnual] = React.useState(true);
+  // Open on the period they last asked for, so the prices on screen match the
+  // request in the banner above them.
+  const [annual, setAnnual] = React.useState(requestedPeriod !== 'monthly');
   const [pending, setPending] = React.useState<PlanId | null>(null);
   const [cancelling, setCancelling] = React.useState(false);
 
@@ -38,7 +47,10 @@ export function PlanChooser({
 
   async function choose(planId: PlanId, planName: string) {
     setPending(planId);
-    const result = await requestPlanAction({ plan: planId });
+    const result = await requestPlanAction({
+      plan: planId,
+      period: annual ? 'annual' : 'monthly',
+    });
     setPending(null);
 
     if (!result.ok) {
@@ -47,7 +59,7 @@ export function PlanChooser({
     }
 
     toast.success(`${planName} requested`, {
-      description: 'Recorded — nothing has been charged. We will be in touch to set it up.',
+      description: `Recorded at the ${annual ? 'yearly' : 'monthly'} price — nothing has been charged. A confirmation is on its way to your inbox.`,
     });
     router.refresh();
   }
@@ -114,8 +126,11 @@ export function PlanChooser({
       {requested ? (
         <Card className="flex flex-col gap-3 border-primary/30 bg-primary-soft/40 p-4 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[13px] leading-relaxed">
-            <span className="font-medium">{requested.name}</span> is requested. Nothing
-            has been charged — we will be in touch to set it up.
+            <span className="font-medium">{requested.name}</span>
+            {requestedPeriod
+              ? `, billed ${requestedPeriod === 'annual' ? 'yearly' : 'monthly'},`
+              : ''}{' '}
+            is requested. Nothing has been charged — we will be in touch to set it up.
           </p>
           {isOwner ? (
             <Button
