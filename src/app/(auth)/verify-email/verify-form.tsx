@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { CodeInput } from '@/components/shared/code-input';
 import { resendVerificationAction, verifyEmailCodeAction } from '@/server/actions/auth';
+import { runAction } from '@/lib/client-action';
 
 /**
  * Confirming from the code in the email.
@@ -35,7 +36,7 @@ export function VerifyForm() {
     setPending(true);
     setInvalid(false);
     try {
-      const result = await verifyEmailCodeAction(value);
+      const result = await runAction(() => verifyEmailCodeAction(value));
       if (!result.ok) {
         setInvalid(true);
         toast.error(result.error);
@@ -53,7 +54,7 @@ export function VerifyForm() {
   async function resend() {
     setResending(true);
     try {
-      const result = await resendVerificationAction();
+      const result = await runAction(() => resendVerificationAction());
       if (!result.ok) {
         toast.error(result.error);
         return;

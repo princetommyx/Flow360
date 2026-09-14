@@ -22,6 +22,7 @@ import { FormStatus } from '@/components/shared/form-status';
 import { GoogleButton } from '@/components/shared/google-button';
 import { PasswordInput } from '@/components/shared/password-input';
 import { loginAction } from '@/server/actions/auth';
+import { runAction } from '@/lib/client-action';
 import { loginSchema, type LoginInput } from '@/lib/validations/auth';
 
 export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
@@ -41,7 +42,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
 
   async function onSubmit(values: LoginInput) {
     setError(null);
-    const result = await loginAction(values);
+    const result = await runAction(() => loginAction(values));
 
     if (!result.ok) {
       setError(result.error);

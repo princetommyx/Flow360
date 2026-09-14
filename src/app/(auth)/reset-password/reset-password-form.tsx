@@ -19,6 +19,7 @@ import {
 import { PasswordInput } from '@/components/shared/password-input';
 import { FormStatus } from '@/components/shared/form-status';
 import { resetPasswordAction } from '@/server/actions/auth';
+import { runAction } from '@/lib/client-action';
 import { resetPasswordSchema, type ResetPasswordInput } from '@/lib/validations/auth';
 
 export function ResetPasswordForm({ token }: { token: string }) {
@@ -33,7 +34,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
 
   async function onSubmit(values: ResetPasswordInput) {
     setError(null);
-    const result = await resetPasswordAction(values);
+    const result = await runAction(() => resetPasswordAction(values));
     if (!result.ok) {
       setError(result.error);
       return;

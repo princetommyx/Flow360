@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import { BrandStyle } from '@/components/brand/brand-style';
+import { UnhandledErrorToast } from '@/components/layout/unhandled-error-toast';
 import { NavigationProgress } from '@/components/layout/navigation-progress';
 import { ThemeProvider, ThemeScript } from '@/components/layout/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
@@ -67,6 +68,7 @@ export default function RootLayout({
           </Suspense>
           <TooltipProvider delayDuration={250}>{children}</TooltipProvider>
           <Toaster />
+          <UnhandledErrorToast />
         </ThemeProvider>
       </body>
     </html>
