@@ -17,9 +17,21 @@ export type { MailMessage, MailAction } from '@/lib/email/render';
 
 type Transport = 'console' | 'resend';
 
+/**
+ * Reads a setting the way it was probably pasted.
+ *
+ * A `.env` file quotes its values and the parser strips those quotes; a
+ * hosting dashboard stores exactly what is in the box. Copying a line out of
+ * `.env.example` therefore lands the quotes in the value, and `"resend"` is
+ * not `resend` — the app silently keeps writing to the log while the console
+ * shows the variable set, which is a miserable thing to debug.
+ */
+function setting(name: string): string {
+  return (process.env[name] ?? '').trim().replace(/^["']|["']$/g, '').trim();
+}
+
 function transport(): Transport {
-  const configured = (process.env.EMAIL_TRANSPORT ?? 'console').trim().toLowerCase();
-  return configured === 'resend' ? 'resend' : 'console';
+  return setting('EMAIL_TRANSPORT').toLowerCase() === 'resend' ? 'resend' : 'console';
 }
 
 /**
@@ -30,7 +42,7 @@ function transport(): Transport {
  * someone to go and check their inbox use this to say something true instead.
  */
 export function mailIsDelivered(): boolean {
-  return transport() === 'resend' && Boolean(process.env.RESEND_API_KEY?.trim());
+  return transport() === 'resend' && setting('RESEND_API_KEY') !== '';
 }
 
 export async function sendMail(message: MailMessage): Promise<void> {
@@ -78,11 +90,11 @@ async function sendWithResend(message: MailMessage): Promise<void> {
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
-      authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+      authorization: `Bearer ${setting('RESEND_API_KEY')}`,
       'content-type': 'application/json',
     },
     body: JSON.stringify({
-      from: process.env.EMAIL_FROM?.trim() || `${brand.name} <onboarding@resend.dev>`,
+      from: setting('EMAIL_FROM') || `${brand.name} <onboarding@resend.dev>`,
       to: [message.to],
       subject: message.subject,
       html: renderHtml(message),

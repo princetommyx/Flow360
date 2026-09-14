@@ -122,8 +122,8 @@ export const brand: BrandConfig = {
     'NEXT_PUBLIC_BRAND_DESCRIPTION',
     'Run sales, purchasing, stock, money and people from a single set of records — so every report reflects the work your team actually did.',
   ),
-  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'adwuma360.app'),
-  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@adwuma360.app'),
+  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'adwuma360.online'),
+  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@adwuma360.online'),
   colors: {
     // Sampled from the logomark: its action blue and its navy.
     primary: env('NEXT_PUBLIC_BRAND_PRIMARY', '#2563eb'),
