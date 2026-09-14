@@ -8,7 +8,7 @@ import { ArrowRight, Check, Mail } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PLANS, type PlanId } from '@/lib/config/plans';
+import { PLANS, annualSaving, type PlanId } from '@/lib/config/plans';
 import { brand } from '@/lib/config/brand';
 import { formatCurrency } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -166,7 +166,9 @@ export function PlanChooser({
                     <span className="text-[1.6rem] font-semibold tracking-[-0.025em] tabular">
                       {formatCurrency(price, { compact: false }).replace(/\.00$/, '')}
                     </span>
-                    <span className="text-[12.5px] text-muted-foreground">/ month</span>
+                    <span className="text-[12.5px] text-muted-foreground">
+                      {annual ? '/ year' : '/ month'}
+                    </span>
                   </>
                 )}
               </div>
@@ -174,8 +176,13 @@ export function PlanChooser({
                 {price === null
                   ? 'Priced on your entity count'
                   : annual
-                    ? 'Billed annually'
-                    : 'Billed monthly'}
+                    ? (() => {
+                        const percent = annualSaving(plan);
+                        return percent === null
+                          ? 'Billed once a year'
+                          : `Billed once a year — ${percent}% less`;
+                      })()
+                    : 'Billed every month'}
               </p>
 
               {plan.monthly === null ? (

@@ -17,9 +17,9 @@ export type Plan = {
   id: PlanId;
   name: string;
   tagline: string;
-  /** Monthly price in the display currency. `null` means "talk to us". */
+  /** Price per month when billed monthly. `null` means "talk to us". */
   monthly: number | null;
-  /** Billed annually, per month. */
+  /** Total for a year when billed annually — not a monthly equivalent. */
   annual: number | null;
   seats: string;
   featured?: boolean;
@@ -32,8 +32,8 @@ export const PLANS: Plan[] = [
     id: 'starter',
     name: 'Starter',
     tagline: 'For owner-operators getting off spreadsheets.',
-    monthly: 19,
-    annual: 15,
+    monthly: 1,
+    annual: 3,
     seats: 'Up to 3 users',
     limits: { users: '3 users', invoices: '100 invoices a month', companies: '1 company' },
     includes: [
@@ -49,8 +49,8 @@ export const PLANS: Plan[] = [
     id: 'business',
     name: 'Business',
     tagline: 'For teams running sales, stock and books together.',
-    monthly: 49,
-    annual: 39,
+    monthly: 2,
+    annual: 7,
     seats: 'Up to 15 users',
     featured: true,
     limits: { users: '15 users', invoices: 'Unlimited invoices', companies: '3 companies' },
@@ -82,6 +82,24 @@ export const PLANS: Plan[] = [
     ],
   },
 ];
+
+/**
+ * What paying yearly saves, as a whole percentage of twelve months at the
+ * monthly rate. Derived rather than written into the copy, so the claim cannot
+ * drift away from the prices above.
+ */
+export function annualSaving(plan: Plan): number | null {
+  if (plan.monthly === null || plan.annual === null) return null;
+  const monthlyTotal = plan.monthly * 12;
+  if (monthlyTotal <= 0 || plan.annual >= monthlyTotal) return null;
+  return Math.round(((monthlyTotal - plan.annual) / monthlyTotal) * 100);
+}
+
+/** The smallest saving across the paid plans, for a headline that holds. */
+export function headlineAnnualSaving(): number | null {
+  const savings = PLANS.map(annualSaving).filter((v): v is number => v !== null);
+  return savings.length > 0 ? Math.min(...savings) : null;
+}
 
 export function findPlan(id: string | null | undefined): Plan | undefined {
   return PLANS.find((plan) => plan.id === id);
