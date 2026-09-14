@@ -15,14 +15,29 @@ type LogoProps = {
  */
 export function LogoMark({ size = 32, className }: LogoProps) {
   if (brand.logoUrl) {
+    /*
+      The supplied mark is drawn for a white ground: its navy half all but
+      disappears against the dark sidebar, hero and auth panel. Sitting it on a
+      white tile keeps one asset legible everywhere, instead of needing a
+      second, light variant and somewhere to decide between them.
+    */
     return (
-      <Image
-        src={brand.logoUrl}
-        alt=""
-        width={size}
-        height={size}
-        className={cn('rounded-lg object-contain', className)}
-      />
+      <span
+        className={cn(
+          'inline-flex shrink-0 items-center justify-center overflow-hidden rounded-[10px] bg-white shadow-sm ring-1 ring-black/5',
+          className,
+        )}
+        style={{ width: size, height: size }}
+      >
+        <Image
+          src={brand.logoUrl}
+          alt=""
+          width={size}
+          height={size}
+          className="object-contain"
+          style={{ width: size * 0.82, height: size * 0.82 }}
+        />
+      </span>
     );
   }
 

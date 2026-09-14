@@ -38,11 +38,11 @@
   --ring: var(--brand-primary);
 
   /* Brand — overridden inline by <BrandStyle /> */
-  --brand-primary: #4f46e5;
-  --brand-primary-foreground: oklch(0.99 0.005 277);
+  --brand-primary: #2563eb;
+  --brand-primary-foreground: oklch(0.99 0.005 258);
   --brand-primary-soft: color-mix(in oklab, var(--brand-primary) 11%, white);
-  --brand-secondary: #0d9488;
-  --brand-secondary-foreground: oklch(0.99 0.01 183);
+  --brand-secondary: #0c3060;
+  --brand-secondary-foreground: oklch(0.99 0.008 258);
   --brand-secondary-soft: color-mix(in oklab, var(--brand-secondary) 11%, white);
 
   --primary: var(--brand-primary);

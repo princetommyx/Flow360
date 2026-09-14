@@ -125,16 +125,17 @@ export const brand: BrandConfig = {
   domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'adwuma360.app'),
   supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@adwuma360.app'),
   colors: {
-    primary: env('NEXT_PUBLIC_BRAND_PRIMARY', '#4f46e5'),
-    secondary: env('NEXT_PUBLIC_BRAND_SECONDARY', '#0d9488'),
+    // Sampled from the logomark: its action blue and its navy.
+    primary: env('NEXT_PUBLIC_BRAND_PRIMARY', '#2563eb'),
+    secondary: env('NEXT_PUBLIC_BRAND_SECONDARY', '#0c3060'),
   },
-  logoUrl: env('NEXT_PUBLIC_BRAND_LOGO', '') || null,
+  logoUrl: env('NEXT_PUBLIC_BRAND_LOGO', '/brand/logomark.png') || null,
   /**
    * Optional photograph behind the landing hero. It sits under a heavy scrim
    * so the headline keeps its contrast; leave unset for the plain gradient.
    */
   heroImageUrl: env('NEXT_PUBLIC_HERO_IMAGE', '/product/hero.jpg') || null,
-  faviconUrl: env('NEXT_PUBLIC_BRAND_FAVICON', '/favicon.svg'),
+  faviconUrl: env('NEXT_PUBLIC_BRAND_FAVICON', '/brand/favicon.png'),
   social: {},
 };
 
