@@ -23,7 +23,7 @@ In Vercel → the project → **Settings** → **Environment Variables**:
 |---|---|---|
 | `EMAIL_TRANSPORT` | `resend` | Config |
 | `RESEND_API_KEY` | `re_...` | **Secret** |
-| `EMAIL_FROM` | `Flow360 <onboarding@resend.dev>` | Config |
+| `EMAIL_FROM` | `Adwuma360 <onboarding@resend.dev>` | Config |
 
 Then redeploy — environment variables only reach a build that starts after they
 are saved.
@@ -40,7 +40,7 @@ fail for every other person.
 To send to anyone, verify a domain: Resend → **Domains** → **Add Domain**, then
 add the DNS records it gives you at your registrar. Once it verifies, set
 `EMAIL_FROM` to an address on that domain, for example
-`Flow360 <no-reply@yourdomain.com>`, and redeploy.
+`Adwuma360 <no-reply@yourdomain.com>`, and redeploy.
 
 ## What gets sent
 

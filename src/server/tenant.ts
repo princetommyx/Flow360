@@ -13,6 +13,11 @@ import {
   type PermissionKey,
 } from '@/lib/permissions';
 
+/**
+ * Cookie name, not a brand string. It keeps its original namespace through
+ * renames: changing it would invalidate every signed-in visitor's chosen
+ * company at once, for no visible benefit.
+ */
 export const ACTIVE_ORG_COOKIE = 'flow360.org';
 
 export class AuthorizationError extends Error {

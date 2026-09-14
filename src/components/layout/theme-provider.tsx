@@ -12,6 +12,8 @@ const ThemeContext = React.createContext<ThemeContextValue>({
   toggle: () => {},
 });
 
+// Storage key, not a brand string — it keeps its original namespace through
+// renames so nobody's saved light/dark choice is silently reset.
 const STORAGE_KEY = 'flow360.theme';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

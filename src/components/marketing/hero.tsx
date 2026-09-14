@@ -149,7 +149,7 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
           <div className="lg:-mr-24 xl:-mr-40">
             <AppFrame
               src="/product/dashboard.png"
-              alt="The Flow360 dashboard, showing revenue, outstanding invoices, expenses and net profit alongside a revenue trend chart and recent invoices."
+              alt={`The ${brand.name} dashboard, showing revenue, outstanding invoices, expenses and net profit alongside a revenue trend chart and recent invoices.`}
               width={2800}
               height={1760}
               priority

@@ -1,6 +1,7 @@
 import { AppFrame } from '@/components/marketing/app-frame';
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { Reveal } from '@/components/shared/reveal';
+import { brand } from '@/lib/config/brand';
 import { cn } from '@/lib/utils';
 
 type Showcase = {
@@ -22,28 +23,28 @@ const SHOWCASES: Showcase[] = [
     title: 'Know where the business stands before anyone asks',
     body: 'Revenue, outstanding balances, spend and net profit for any period you choose — today, this quarter, or a range you type in. Every figure is read from the same records your team works in, so there is nothing to reconcile.',
     src: '/product/dashboard.png',
-    alt: 'Flow360 dashboard showing metric tiles, a revenue and expense trend chart, invoice status breakdown and recent activity.',
+    alt: `${brand.name} dashboard showing metric tiles, a revenue and expense trend chart, invoice status breakdown and recent activity.`,
   },
   {
     eyebrow: 'Invoicing',
     title: 'Raise it, send it, and watch the balance close itself',
     body: 'Totals are recomputed on the server from the lines every time, sending commits the stock, and a recorded payment moves the invoice, the ledger and the bank balance together. Statuses follow the money rather than someone remembering to change them.',
     src: '/product/invoices.png',
-    alt: 'Flow360 invoice list showing invoiced and outstanding totals, status filters and per-invoice balances.',
+    alt: `${brand.name} invoice list showing invoiced and outstanding totals, status filters and per-invoice balances.`,
   },
   {
     eyebrow: 'Customers',
     title: 'One list that already knows who owes you what',
     body: 'Search, filter and sort straight from the URL, so any view you land on is one you can share or bookmark. Invoiced and outstanding totals sit on the row, and a credit limit warns you before the next order goes out.',
     src: '/product/customers.png',
-    alt: 'Flow360 customer list with search, status filter, invoiced and outstanding columns, and per-row actions.',
+    alt: `${brand.name} customer list with search, status filter, invoiced and outstanding columns, and per-row actions.`,
   },
   {
     eyebrow: 'Customer profile',
     title: 'The whole relationship, without digging through email',
     body: 'Contact details, terms and tax information beside live totals, then tabs for invoices, payments, ledger entries and private notes. Anyone on the team can open a customer and see exactly where things stand.',
     src: '/product/customer-profile.png',
-    alt: 'Flow360 customer profile showing totals for invoiced, paid and outstanding amounts with tabs for invoices, payments, transactions and notes.',
+    alt: `${brand.name} customer profile showing totals for invoiced, paid and outstanding amounts with tabs for invoices, payments, transactions and notes.`,
   },
 ];
 

@@ -28,6 +28,8 @@ const db = new PrismaClient({
   adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }),
 });
 
+// Unchanged through the rename on purpose: the deployed database was already
+// seeded with it, and rotating it here would only desynchronise the two.
 const DEMO_PASSWORD = 'Flow360Demo!';
 const now = new Date();
 
