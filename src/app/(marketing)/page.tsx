@@ -3,20 +3,23 @@ import path from 'node:path';
 
 import Link from 'next/link';
 import {
+  AlarmClock,
+  ArrowLeftRight,
   ArrowRight,
   BarChart3,
   Boxes,
   Building2,
+  Database,
   FileText,
   FolderKanban,
   ReceiptText,
+  Search,
   ShieldCheck,
   ShoppingCart,
   TrendingDown,
   UserCog,
   Users,
   Wallet,
-  Zap,
 } from 'lucide-react';
 
 import { Hero } from '@/components/marketing/hero';
@@ -100,13 +103,18 @@ const STEPS = [
   },
 ];
 
+/**
+ * Each benefit carries the icon for the thing it describes, not a decorative
+ * one repeated six times. These are independent claims rather than ordered
+ * steps, so they are not numbered — numbering would imply a sequence.
+ */
 const BENEFITS = [
-  'One record of truth instead of five spreadsheets',
-  'Quotes convert to invoices without retyping a line',
-  'Stock and books update from the same transaction',
-  'Overdue invoices surface before they become bad debt',
-  'Role-based access for finance, sales and operations',
-  'Every list searchable, filterable and exportable',
+  { icon: Database, text: 'One record of truth instead of five spreadsheets' },
+  { icon: ArrowLeftRight, text: 'Quotes convert to invoices without retyping a line' },
+  { icon: Boxes, text: 'Stock and books update from the same transaction' },
+  { icon: AlarmClock, text: 'Overdue invoices surface before they become bad debt' },
+  { icon: ShieldCheck, text: 'Role-based access for finance, sales and operations' },
+  { icon: Search, text: 'Every list searchable, filterable and exportable' },
 ];
 
 const FAQS = [
@@ -268,13 +276,18 @@ export default function LandingPage() {
             </Reveal>
 
             <ul className="stagger grid gap-3 sm:grid-cols-2">
-              {BENEFITS.map((benefit) => (
+              {BENEFITS.map(({ icon: Icon, text }) => (
                 <li
-                  key={benefit}
-                  className="flex items-start gap-2.5 rounded-lg border border-border bg-card px-4 py-3 text-[13.5px] leading-relaxed shadow-sm"
+                  key={text}
+                  className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3 text-[13.5px] leading-relaxed shadow-sm"
                 >
-                  <Zap className="mt-0.5 size-4 shrink-0 text-brand-secondary" aria-hidden />
-                  {benefit}
+                  <span
+                    className="mt-px flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-secondary-soft text-brand-secondary"
+                    aria-hidden
+                  >
+                    <Icon className="size-3.5" strokeWidth={2.25} />
+                  </span>
+                  <span className="pt-1">{text}</span>
                 </li>
               ))}
             </ul>
