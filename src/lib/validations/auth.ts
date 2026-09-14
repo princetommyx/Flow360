@@ -90,3 +90,20 @@ export const profileSchema = z.object({
   jobTitle: z.string().trim().max(80).optional().or(z.literal('')),
 });
 export type ProfileInput = z.infer<typeof profileSchema>;
+
+/**
+ * The six digits from a confirmation email.
+ *
+ * Non-digits are stripped before the length is checked, so a code pasted with
+ * the spacing it was displayed in ("123 456") is accepted rather than rejected
+ * for a formatting difference the reader did not choose.
+ */
+export const verificationCodeSchema = z.object({
+  code: z
+    .string()
+    .transform((value) => value.replace(/\D/g, ''))
+    .refine((value) => value.length === 6, {
+      message: 'Enter the six digits from the email',
+    }),
+});
+export type VerificationCodeInput = z.infer<typeof verificationCodeSchema>;

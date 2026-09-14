@@ -13,6 +13,15 @@ export const PLAN_IDS = ['starter', 'business', 'enterprise'] as const;
 
 export type PlanId = (typeof PLAN_IDS)[number];
 
+export const BILLING_PERIODS = ['monthly', 'annual'] as const;
+
+export type BillingPeriod = (typeof BILLING_PERIODS)[number];
+
+/** The price of a plan for a period, or null where it is "talk to us". */
+export function planPrice(plan: Plan, period: BillingPeriod): number | null {
+  return period === 'annual' ? plan.annual : plan.monthly;
+}
+
 export type Plan = {
   id: PlanId;
   name: string;
@@ -103,6 +112,26 @@ export function headlineAnnualSaving(): number | null {
 
 export function findPlan(id: string | null | undefined): Plan | undefined {
   return PLANS.find((plan) => plan.id === id);
+}
+
+/**
+ * A plan's feature list with "Everything in X" resolved into the features it
+ * stands for.
+ *
+ * On the pricing page that shorthand sits next to the plan it refers to and
+ * reads fine. On its own — in an email, say — it tells the reader nothing, so
+ * the referenced plan's list is spliced in where the line was.
+ */
+export function expandedIncludes(plan: Plan): string[] {
+  return plan.includes.flatMap((line) => {
+    const match = /^Everything in (.+)$/.exec(line);
+    if (!match) return [line];
+
+    const referenced = PLANS.find(
+      (candidate) => candidate.name.toLowerCase() === match[1].trim().toLowerCase(),
+    );
+    return referenced ? expandedIncludes(referenced) : [];
+  });
 }
 
 export type TrialState = {

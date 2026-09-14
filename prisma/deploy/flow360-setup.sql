@@ -1394,6 +1394,15 @@ ALTER TABLE "organizations" ADD COLUMN     "requestedPlan" TEXT,
 ADD COLUMN     "subscriptionStatus" TEXT NOT NULL DEFAULT 'trialing',
 ADD COLUMN     "trialEndsAt" TIMESTAMP(3);
 
+-- ===== migration: 20260914203514_verification_codes =====
+-- AlterTable
+ALTER TABLE "verification_tokens" ADD COLUMN     "attempts" INTEGER NOT NULL DEFAULT 0,
+ADD COLUMN     "codeHash" TEXT;
+
+-- ===== migration: 20260914203552_requested_billing_period =====
+-- AlterTable
+ALTER TABLE "organizations" ADD COLUMN     "requestedBilling" TEXT;
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1407,6 +1416,8 @@ CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
 );
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'a2b779a1a1709d6ce46833e4de94e3fdf4141877ab8fc4740535e9772f327450', now(), '20260912231858_init', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '502c661c3ff28ba12a62d2d0e47ff9c701aee8e8279cdac51cf0c424963d678e', now(), '20260913230103_add_trial_and_subscription', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'b37c9fd0ded3213b306118ad5b24b18dc712dc0a8d5f6da20d725e66a5f7b6e4', now(), '20260914203514_verification_codes', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'fe1cf463d627d8e7193c2d3e585a3db9e0b65aa700dfed34eeb263c1089de5f3', now(), '20260914203552_requested_billing_period', now(), 1);
 
 -- ===== demo dataset =====
 --

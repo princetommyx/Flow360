@@ -49,6 +49,13 @@ enum TokenType {
 model VerificationToken {
   id         String    @id @default(cuid())
   token      String    @unique
+  /// SHA-256 of the short code that goes in the email body, when the flow has
+  /// one. The link and the code are two ways into the same record, so using
+  /// either consumes both.
+  codeHash   String?
+  /// Failed code attempts. Six digits is only a million guesses, so the record
+  /// is burned after a handful rather than left open until it expires.
+  attempts   Int       @default(0)
   type       TokenType
   identifier String
   userId     String?
@@ -88,6 +95,9 @@ model Organization {
   subscriptionStatus String    @default("trialing")
   /// Plan the owner asked to move to, pending a payment provider.
   requestedPlan      String?
+  /// monthly | annual — which price they asked for. Kept with the request so
+  /// the confirmation, the billing page and the eventual invoice agree.
+  requestedBilling   String?
   isActive           Boolean   @default(true)
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
