@@ -282,7 +282,7 @@ export default function LandingPage() {
                   className="flex items-start gap-3 rounded-lg border border-border bg-card px-4 py-3 text-[13.5px] leading-relaxed shadow-sm"
                 >
                   <span
-                    className="mt-px flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-secondary-soft text-brand-secondary"
+                    className="mt-px flex size-7 shrink-0 items-center justify-center rounded-md bg-primary-soft text-primary"
                     aria-hidden
                   >
                     <Icon className="size-3.5" strokeWidth={2.25} />
