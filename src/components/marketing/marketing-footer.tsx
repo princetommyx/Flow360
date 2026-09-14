@@ -67,7 +67,10 @@ export function MarketingFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex w-full max-w-6xl flex-col gap-2 px-5 py-5 text-[12.5px] text-muted-foreground md:flex-row md:items-center md:justify-between md:px-8">
           <p>
-            © {new Date().getFullYear()} {company.legalName}. All rights reserved.
+            {/* Many legal names already end in a full stop ("… Ltd."), so one
+                is only added when the name does not bring its own. */}
+            © {new Date().getFullYear()} {company.legalName.replace(/\.$/, '')}. All
+            rights reserved.
           </p>
           <p>
             {company.city}, {company.country} · {brand.supportEmail}
