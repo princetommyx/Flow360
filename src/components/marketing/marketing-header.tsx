@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/layout/theme-toggle';
 import { Logo } from '@/components/brand/logo';
 import { cn } from '@/lib/utils';
 
@@ -55,6 +56,7 @@ export function MarketingHeader() {
         </nav>
 
         <div className="ml-auto flex items-center gap-2">
+          <ThemeToggle variant="inline" />
           <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
             <Link href="/login">Sign in</Link>
           </Button>

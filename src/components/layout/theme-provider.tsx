@@ -26,13 +26,48 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   const setTheme = React.useCallback((next: Theme) => {
     setThemeState(next);
-    document.documentElement.classList.toggle('dark', next === 'dark');
     try {
       window.localStorage.setItem(STORAGE_KEY, next);
     } catch {
       // Storage can be unavailable in private browsing — the choice just won't persist.
     }
   }, []);
+
+  /**
+   * Owns the classes on `<html>`, and keeps them alive across a server
+   * re-render.
+   *
+   * `ThemeScript` writes `js` and `dark` before paint, but the server's markup
+   * for `<html>` carries no className at all. Anything that re-renders the root
+   * layout on the client — `router.refresh()`, which runs right after sign-in —
+   * makes React reconcile that element and reset the attribute to the server
+   * value, silently dropping both classes. A dark-mode user landed on a light
+   * dashboard.
+   *
+   * Re-asserting here is the repair. It watches the attribute rather than
+   * polling, and writes only when the value is actually wrong, so it cannot
+   * loop.
+   */
+  React.useEffect(() => {
+    const root = document.documentElement;
+    const wantsDark = theme === 'dark';
+
+    const apply = () => {
+      root.classList.add('js');
+      root.classList.toggle('dark', wantsDark);
+    };
+
+    apply();
+
+    const observer = new MutationObserver(() => {
+      if (root.classList.contains('dark') !== wantsDark || !root.classList.contains('js')) {
+        apply();
+      }
+    });
+    observer.observe(root, { attributes: true, attributeFilter: ['class'] });
+
+    return () => observer.disconnect();
+  }, [theme]);
 
   const value = React.useMemo(
     () => ({ theme, setTheme, toggle: () => setTheme(theme === 'dark' ? 'light' : 'dark') }),
