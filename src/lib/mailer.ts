@@ -27,7 +27,15 @@ type Transport = 'console' | 'resend';
  * shows the variable set, which is a miserable thing to debug.
  */
 function setting(name: string): string {
-  return (process.env[name] ?? '').trim().replace(/^["']|["']$/g, '').trim();
+  const raw = (process.env[name] ?? '').trim();
+
+  // Only a *matched* surrounding pair counts. Stripping quotes one end at a
+  // time would maul `"Adwuma360" <support@…>`, which is a legitimate From
+  // header — the quotes there belong to the display name, not to the paste.
+  const wrapped =
+    raw.length >= 2 && (raw[0] === '"' || raw[0] === "'") && raw.at(-1) === raw[0];
+
+  return (wrapped ? raw.slice(1, -1) : raw).trim();
 }
 
 function transport(): Transport {
