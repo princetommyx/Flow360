@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { FormStatus } from '@/components/shared/form-status';
 import { forgotPasswordAction } from '@/server/actions/auth';
+import { runAction } from '@/lib/client-action';
 import {
   forgotPasswordSchema,
   type ForgotPasswordInput,
@@ -38,7 +39,7 @@ export function ForgotPasswordForm({
 
   async function onSubmit(values: ForgotPasswordInput) {
     setError(null);
-    const result = await forgotPasswordAction(values);
+    const result = await runAction(() => forgotPasswordAction(values));
     if (!result.ok) {
       setError(result.error);
       return;

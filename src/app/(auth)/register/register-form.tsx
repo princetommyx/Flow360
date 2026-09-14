@@ -30,6 +30,7 @@ import { FormStatus } from '@/components/shared/form-status';
 import { GoogleButton } from '@/components/shared/google-button';
 import { PasswordInput } from '@/components/shared/password-input';
 import { registerAction } from '@/server/actions/auth';
+import { runAction } from '@/lib/client-action';
 import { registerSchema, type RegisterInput } from '@/lib/validations/auth';
 import { TRIAL_DAYS, type PlanId } from '@/lib/config/plans';
 import { COUNTRIES, DIAL_CODES, findCountry } from '@/lib/config/countries';
@@ -90,7 +91,7 @@ export function RegisterForm({
 
   async function onSubmit(values: RegisterInput) {
     setError(null);
-    const result = await registerAction(values);
+    const result = await runAction(() => registerAction(values));
 
     if (!result.ok) {
       setError(result.error);
