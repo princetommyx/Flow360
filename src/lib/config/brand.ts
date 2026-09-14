@@ -161,17 +161,24 @@ export const numbering: DocumentNumberingConfig = {
   includeYear: env('NEXT_PUBLIC_NUMBER_INCLUDE_YEAR', 'true') !== 'false',
 };
 
-/** Marketing-side company facts, kept out of components. */
+/**
+ * Marketing-side company facts, kept out of components.
+ *
+ * Placeholders. Every one is overridable by environment variable, and they
+ * should be replaced with the real registered details before the site is used
+ * commercially — an address and tax number appear on invoices.
+ */
 export const company = {
   legalName: env('NEXT_PUBLIC_COMPANY_LEGAL_NAME', 'Adwuma360 Software Ltd.'),
-  addressLine1: env('NEXT_PUBLIC_COMPANY_ADDRESS_1', '400 Market Street'),
-  addressLine2: env('NEXT_PUBLIC_COMPANY_ADDRESS_2', 'Suite 1200'),
-  city: env('NEXT_PUBLIC_COMPANY_CITY', 'San Francisco'),
-  state: env('NEXT_PUBLIC_COMPANY_STATE', 'CA'),
-  postalCode: env('NEXT_PUBLIC_COMPANY_POSTAL', '94111'),
-  country: env('NEXT_PUBLIC_COMPANY_COUNTRY', 'United States'),
-  phone: env('NEXT_PUBLIC_COMPANY_PHONE', '+1 (415) 555-0134'),
-  taxId: env('NEXT_PUBLIC_COMPANY_TAX_ID', 'US-882-441-901'),
+  addressLine1: env('NEXT_PUBLIC_COMPANY_ADDRESS_1', 'Ring Road Central'),
+  addressLine2: env('NEXT_PUBLIC_COMPANY_ADDRESS_2', 'Accra Central'),
+  city: env('NEXT_PUBLIC_COMPANY_CITY', 'Accra'),
+  state: env('NEXT_PUBLIC_COMPANY_STATE', 'Greater Accra'),
+  // GhanaPost digital address rather than a postcode, which Ghana does not use.
+  postalCode: env('NEXT_PUBLIC_COMPANY_POSTAL', 'GA-145-2401'),
+  country: env('NEXT_PUBLIC_COMPANY_COUNTRY', 'Ghana'),
+  phone: env('NEXT_PUBLIC_COMPANY_PHONE', '+233 30 123 4567'),
+  taxId: env('NEXT_PUBLIC_COMPANY_TAX_ID', 'C0012345678'),
 } as const;
 
 export const appConfig = { brand, locale, numbering, company } as const;
