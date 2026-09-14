@@ -7,7 +7,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PLANS, TRIAL_DAYS } from '@/lib/config/plans';
+import { PLANS, TRIAL_DAYS, annualSaving, headlineAnnualSaving } from '@/lib/config/plans';
 import { brand } from '@/lib/config/brand';
 import { formatCurrency } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 /** Plan cards with a monthly/annual toggle. */
 export function PricingPlans() {
   const [annual, setAnnual] = React.useState(true);
+  const saving = headlineAnnualSaving();
 
   return (
     <div>
@@ -49,7 +50,11 @@ export function PricingPlans() {
           })}
         </div>
         <p className="text-[12.5px] text-muted-foreground">
-          {annual ? 'Two months free when you pay annually' : 'Switch to annual to save 20%'}
+          {saving === null
+            ? 'Pay monthly or yearly — same features either way'
+            : annual
+              ? `Paying yearly saves at least ${saving}%`
+              : `Switch to yearly and save at least ${saving}%`}
         </p>
       </div>
 
@@ -87,7 +92,7 @@ export function PricingPlans() {
                       {formatCurrency(price, { compact: false }).replace(/\.00$/, '')}
                     </span>
                     <span className="text-[13px] text-muted-foreground">
-                      per month
+                      {annual ? 'per year' : 'per month'}
                     </span>
                   </>
                 )}
@@ -96,8 +101,13 @@ export function PricingPlans() {
                 {price === null
                   ? 'Priced on your entity count and support needs'
                   : annual
-                    ? 'Billed annually'
-                    : 'Billed monthly'}
+                    ? (() => {
+                        const percent = annualSaving(plan);
+                        return percent === null
+                          ? 'Billed once a year'
+                          : `Billed once a year — ${percent}% less than monthly`;
+                      })()
+                    : 'Billed every month'}
               </p>
 
               <Button
