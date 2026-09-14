@@ -55,8 +55,61 @@ export type DocumentNumberingConfig = {
   includeYear: boolean;
 };
 
-const env = (key: string, fallback: string) =>
-  (process.env[key] ?? '').trim() || fallback;
+/**
+ * Every public variable, read by literal member access.
+ *
+ * Next.js inlines `process.env.NEXT_PUBLIC_FOO` into the browser bundle only
+ * when the property is written out literally. A computed read —
+ * `process.env[key]` — is left alone, so it resolves on the server and comes
+ * back undefined in the browser. That silently ignored every branding override
+ * client-side while the server honoured it, and any value differing from its
+ * fallback then produced a hydration mismatch that React refuses to patch.
+ *
+ * Listing the keys is the price of having them work in both places. A new
+ * variable has to be added here as well as used below, and the type forces it.
+ */
+const PUBLIC_ENV = {
+  NEXT_PUBLIC_BRAND_DESCRIPTION: process.env.NEXT_PUBLIC_BRAND_DESCRIPTION,
+  NEXT_PUBLIC_BRAND_DOMAIN: process.env.NEXT_PUBLIC_BRAND_DOMAIN,
+  NEXT_PUBLIC_BRAND_FAVICON: process.env.NEXT_PUBLIC_BRAND_FAVICON,
+  NEXT_PUBLIC_BRAND_LOGO: process.env.NEXT_PUBLIC_BRAND_LOGO,
+  NEXT_PUBLIC_BRAND_NAME: process.env.NEXT_PUBLIC_BRAND_NAME,
+  NEXT_PUBLIC_BRAND_PRIMARY: process.env.NEXT_PUBLIC_BRAND_PRIMARY,
+  NEXT_PUBLIC_BRAND_SECONDARY: process.env.NEXT_PUBLIC_BRAND_SECONDARY,
+  NEXT_PUBLIC_BRAND_TAGLINE: process.env.NEXT_PUBLIC_BRAND_TAGLINE,
+  NEXT_PUBLIC_BRAND_SHORT_NAME: process.env.NEXT_PUBLIC_BRAND_SHORT_NAME,
+  NEXT_PUBLIC_COMPANY_ADDRESS_1: process.env.NEXT_PUBLIC_COMPANY_ADDRESS_1,
+  NEXT_PUBLIC_COMPANY_ADDRESS_2: process.env.NEXT_PUBLIC_COMPANY_ADDRESS_2,
+  NEXT_PUBLIC_COMPANY_CITY: process.env.NEXT_PUBLIC_COMPANY_CITY,
+  NEXT_PUBLIC_COMPANY_COUNTRY: process.env.NEXT_PUBLIC_COMPANY_COUNTRY,
+  NEXT_PUBLIC_COMPANY_LEGAL_NAME: process.env.NEXT_PUBLIC_COMPANY_LEGAL_NAME,
+  NEXT_PUBLIC_COMPANY_PHONE: process.env.NEXT_PUBLIC_COMPANY_PHONE,
+  NEXT_PUBLIC_COMPANY_POSTAL: process.env.NEXT_PUBLIC_COMPANY_POSTAL,
+  NEXT_PUBLIC_COMPANY_STATE: process.env.NEXT_PUBLIC_COMPANY_STATE,
+  NEXT_PUBLIC_COMPANY_TAX_ID: process.env.NEXT_PUBLIC_COMPANY_TAX_ID,
+  NEXT_PUBLIC_COUNTRY: process.env.NEXT_PUBLIC_COUNTRY,
+  NEXT_PUBLIC_COUNTRY_CODE: process.env.NEXT_PUBLIC_COUNTRY_CODE,
+  NEXT_PUBLIC_CURRENCY: process.env.NEXT_PUBLIC_CURRENCY,
+  NEXT_PUBLIC_CURRENCY_SYMBOL: process.env.NEXT_PUBLIC_CURRENCY_SYMBOL,
+  NEXT_PUBLIC_DATE_FORMAT: process.env.NEXT_PUBLIC_DATE_FORMAT,
+  NEXT_PUBLIC_DEFAULT_TAX_RATE: process.env.NEXT_PUBLIC_DEFAULT_TAX_RATE,
+  NEXT_PUBLIC_EXPENSE_PREFIX: process.env.NEXT_PUBLIC_EXPENSE_PREFIX,
+  NEXT_PUBLIC_HERO_IMAGE: process.env.NEXT_PUBLIC_HERO_IMAGE,
+  NEXT_PUBLIC_INVOICE_PREFIX: process.env.NEXT_PUBLIC_INVOICE_PREFIX,
+  NEXT_PUBLIC_LOCALE: process.env.NEXT_PUBLIC_LOCALE,
+  NEXT_PUBLIC_NUMBER_INCLUDE_YEAR: process.env.NEXT_PUBLIC_NUMBER_INCLUDE_YEAR,
+  NEXT_PUBLIC_NUMBER_PADDING: process.env.NEXT_PUBLIC_NUMBER_PADDING,
+  NEXT_PUBLIC_PAYMENT_PREFIX: process.env.NEXT_PUBLIC_PAYMENT_PREFIX,
+  NEXT_PUBLIC_PAYROLL_PREFIX: process.env.NEXT_PUBLIC_PAYROLL_PREFIX,
+  NEXT_PUBLIC_PO_PREFIX: process.env.NEXT_PUBLIC_PO_PREFIX,
+  NEXT_PUBLIC_QUOTATION_PREFIX: process.env.NEXT_PUBLIC_QUOTATION_PREFIX,
+  NEXT_PUBLIC_SUPPORT_EMAIL: process.env.NEXT_PUBLIC_SUPPORT_EMAIL,
+  NEXT_PUBLIC_TAX_LABEL: process.env.NEXT_PUBLIC_TAX_LABEL,
+  NEXT_PUBLIC_TIMEZONE: process.env.NEXT_PUBLIC_TIMEZONE,
+} as const;
+
+const env = (key: keyof typeof PUBLIC_ENV, fallback: string) =>
+  (PUBLIC_ENV[key] ?? '').trim() || fallback;
 
 export const brand: BrandConfig = {
   name: env('NEXT_PUBLIC_BRAND_NAME', 'Flow360'),
@@ -89,8 +142,8 @@ export const locale: LocaleConfig = {
   locale: env('NEXT_PUBLIC_LOCALE', 'en-US'),
   currency: env('NEXT_PUBLIC_CURRENCY', 'USD'),
   currencySymbol: env('NEXT_PUBLIC_CURRENCY_SYMBOL', '$'),
-  country: env('NEXT_PUBLIC_COUNTRY', 'United States'),
-  countryCode: env('NEXT_PUBLIC_COUNTRY_CODE', 'US'),
+  country: env('NEXT_PUBLIC_COUNTRY', 'Ghana'),
+  countryCode: env('NEXT_PUBLIC_COUNTRY_CODE', 'GH'),
   timezone: env('NEXT_PUBLIC_TIMEZONE', 'UTC'),
   dateFormat: env('NEXT_PUBLIC_DATE_FORMAT', 'dd MMM yyyy'),
   defaultTaxRate: Number(env('NEXT_PUBLIC_DEFAULT_TAX_RATE', '10')),

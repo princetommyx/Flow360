@@ -21,6 +21,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { PhoneField } from '@/components/shared/phone-field';
 import {
   Select,
   SelectContent,
@@ -166,7 +167,12 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input type="tel" placeholder="+1 (415) 555-0121" {...field} />
+                      <PhoneField
+                        name={field.name}
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -222,7 +228,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem className="sm:col-span-2">
                     <FormLabel>Address line 1</FormLabel>
                     <FormControl>
-                      <Input placeholder="2100 Folsom Street" {...field} />
+                      <Input placeholder="Street and number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -235,7 +241,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem className="sm:col-span-2">
                     <FormLabel>Address line 2</FormLabel>
                     <FormControl>
-                      <Input placeholder="Suite 400" {...field} />
+                      <Input placeholder="Apartment, suite or floor" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -248,7 +254,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem>
                     <FormLabel>City</FormLabel>
                     <FormControl>
-                      <Input placeholder="San Francisco" {...field} />
+                      <Input placeholder="City or town" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -261,7 +267,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem>
                     <FormLabel>State / region</FormLabel>
                     <FormControl>
-                      <Input placeholder="CA" {...field} />
+                      <Input placeholder="State, region or province" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -274,7 +280,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem>
                     <FormLabel>Postal code</FormLabel>
                     <FormControl>
-                      <Input placeholder="94110" {...field} />
+                      <Input placeholder="Postal or ZIP code" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -357,7 +363,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                   <FormItem>
                     <FormLabel>Tax ID</FormLabel>
                     <FormControl>
-                      <Input placeholder="US-338-221-904" {...field} />
+                      <Input placeholder="Optional" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
