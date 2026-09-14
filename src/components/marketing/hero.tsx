@@ -23,9 +23,17 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
   return (
     <section className="relative isolate overflow-hidden bg-[oklch(0.19_0.016_265)] text-white">
       {/*
-        Optional photograph, pushed well back: a dark base tint, a left-to-right
-        gradient behind the copy column, and a blur. Text contrast has to win
-        over the image in every case, so the scrim is deliberately heavy.
+        Optional photograph.
+
+        The scrim is shaped rather than flat. A photograph bright enough to
+        read as a photograph is also bright enough to destroy white text, so
+        the darkening is concentrated where the copy sits — down the left and
+        along the bottom — and released towards the top right, which is where
+        the picture actually gets to show.
+
+        `object-position` favours the lower part of the frame: these images
+        tend to put their subject under a lot of empty wall, and a wide crop
+        taken from the centre would be mostly that wall.
       */}
       {hasPhoto && brand.heroImageUrl ? (
         <>
@@ -36,20 +44,26 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
             priority
             sizes="100vw"
             aria-hidden
-            className="-z-10 scale-105 object-cover opacity-70 blur-[1px]"
+            className="-z-10 scale-105 object-cover object-[center_68%]"
           />
           {/*
-            Two scrims rather than one flat tint: a light overall wash keeps the
-            photograph readable as a photograph, while a left-to-right gradient
-            puts the weight behind the copy column, which is where contrast has
-            to hold. The headline measures above 12:1 against this.
+            Floor. Heavier on small screens: there is no second column there,
+            so the copy runs the full width of the picture and the horizontal
+            gradient below has nothing to hide behind. Measured, not guessed —
+            the lead paragraph is the binding constraint at 4.5:1.
           */}
           <div
-            className="absolute inset-0 -z-10 bg-[oklch(0.19_0.016_265)]/45"
+            className="absolute inset-0 -z-10 bg-[oklch(0.19_0.016_265)]/78 lg:bg-[oklch(0.19_0.016_265)]/35"
             aria-hidden
           />
+          {/* Weight behind the copy column, released to the right. */}
           <div
-            className="absolute inset-0 -z-10 bg-gradient-to-r from-[oklch(0.16_0.016_265)] via-[oklch(0.18_0.016_265)]/80 to-[oklch(0.19_0.016_265)]/25"
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-[oklch(0.15_0.016_265)]/95 via-[oklch(0.17_0.016_265)]/70 to-transparent"
+            aria-hidden
+          />
+          {/* And under it, so the promises and buttons keep their footing. */}
+          <div
+            className="absolute inset-0 -z-10 bg-gradient-to-t from-[oklch(0.15_0.016_265)]/85 via-transparent to-transparent"
             aria-hidden
           />
         </>
@@ -57,12 +71,12 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
 
       {/* Depth: one warm brand wash, one cool accent, plus a faint dotted field */}
       <div
-        className="absolute -left-40 -top-56 size-[44rem] rounded-full opacity-25 blur-3xl"
+        className="absolute -left-40 -top-56 -z-20 size-[44rem] rounded-full opacity-25 blur-3xl"
         style={{ background: 'var(--brand-primary)' }}
         aria-hidden
       />
       <div
-        className="absolute -right-52 top-24 size-[36rem] rounded-full opacity-20 blur-3xl"
+        className="absolute -right-52 top-24 -z-20 size-[36rem] rounded-full opacity-20 blur-3xl"
         style={{ background: 'var(--brand-secondary)' }}
         aria-hidden
       />

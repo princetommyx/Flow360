@@ -17,6 +17,17 @@ export type MailMessage = {
   action?: { label: string; url: string };
 };
 
+/**
+ * Whether mail actually leaves the building.
+ *
+ * The console transport is the default, so a deployment with no provider
+ * configured silently sends nothing. Screens that would otherwise tell people
+ * to go and check their inbox use this to say something true instead.
+ */
+export function mailIsDelivered(): boolean {
+  return (process.env.EMAIL_TRANSPORT ?? 'console') !== 'console';
+}
+
 export async function sendMail(message: MailMessage): Promise<void> {
   const transport = process.env.EMAIL_TRANSPORT ?? 'console';
 

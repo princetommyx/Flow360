@@ -157,10 +157,23 @@ export async function forgotPasswordAction(input: unknown): Promise<ActionResult
     return { ok: false, error: 'Enter a valid email address.' };
   }
 
-  const user = await db.user.findUnique({
-    where: { email: parsed.data.email },
-    select: { id: true, name: true, email: true },
-  });
+  // A database failure must not surface as a 500 with a stack trace, and must
+  // not surface as success either — that would leave someone waiting on a reset
+  // link that was never going to arrive.
+  let user: { id: string; name: string; email: string } | null;
+  try {
+    user = await db.user.findUnique({
+      where: { email: parsed.data.email },
+      select: { id: true, name: true, email: true },
+    });
+  } catch (error) {
+    console.error('Password reset failed reaching the database', error);
+    return {
+      ok: false,
+      error:
+        'We could not reach the service to send a reset link. Please try again shortly.',
+    };
+  }
 
   // Always report success so the form cannot be used to enumerate accounts.
   if (user) {
@@ -175,19 +188,25 @@ export async function forgotPasswordAction(input: unknown): Promise<ActionResult
       },
     });
 
-    await sendMail({
-      to: user.email,
-      subject: `Reset your ${brand.name} password`,
-      heading: 'Password reset requested',
-      body: [
-        `Hi ${user.name.split(' ')[0]}, use the link below to choose a new password.`,
-        'The link expires in 60 minutes. If this wasn’t you, no action is needed.',
-      ],
-      action: {
-        label: 'Reset password',
-        url: absoluteUrl(`/reset-password?token=${token.raw}`),
-      },
-    });
+    // A provider outage must not leak whether the address exists, so the
+    // response is unchanged either way — but it is logged, loudly.
+    try {
+      await sendMail({
+        to: user.email,
+        subject: `Reset your ${brand.name} password`,
+        heading: 'Password reset requested',
+        body: [
+          `Hi ${user.name.split(' ')[0]}, use the link below to choose a new password.`,
+          'The link expires in 60 minutes. If this wasn’t you, no action is needed.',
+        ],
+        action: {
+          label: 'Reset password',
+          url: absoluteUrl(`/reset-password?token=${token.raw}`),
+        },
+      });
+    } catch (error) {
+      console.error('Password reset email could not be sent', error);
+    }
   }
 
   return { ok: true, data: undefined };

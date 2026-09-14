@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle2, MailCheck, XCircle } from 'lucide-react';
+import { CheckCircle2, MailCheck, MailX, XCircle } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/brand/logo';
@@ -10,6 +10,7 @@ import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
 import { verifyEmailAction } from '@/server/actions/auth';
+import { mailIsDelivered } from '@/lib/mailer';
 
 import { ResendButton } from './resend-button';
 
@@ -68,39 +69,71 @@ export default async function VerifyEmailPage({
     );
   }
 
+  // Claiming "we sent you an email" when no provider is connected sends people
+  // to an inbox that will never receive anything. Say which it is.
+  const delivered = mailIsDelivered();
+
   return (
     <AuthPanel>
       <Logo size={32} />
       <StepIndicator steps={SIGNUP_STEPS} current={2} className="mt-6" />
 
-      <div className="mt-7 flex size-11 items-center justify-center rounded-xl bg-info-soft text-info">
-        <MailCheck className="size-5" aria-hidden />
+      <div
+        className={
+          delivered
+            ? 'mt-7 flex size-11 items-center justify-center rounded-xl bg-info-soft text-info'
+            : 'mt-7 flex size-11 items-center justify-center rounded-xl bg-warning-soft text-warning-foreground'
+        }
+      >
+        {delivered ? (
+          <MailCheck className="size-5" aria-hidden />
+        ) : (
+          <MailX className="size-5" aria-hidden />
+        )}
       </div>
 
       <h1 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.03em]">
-        Check your inbox
+        {delivered ? 'Check your inbox' : "You're in — email not set up yet"}
       </h1>
-      <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
-        We sent a confirmation link
-        {user?.email ? (
-          <>
-            {' '}
-            to <strong className="text-foreground">{user.email}</strong>
-          </>
-        ) : null}
-        . Open it to finish securing your account — the link expires in 24 hours.
-      </p>
+
+      {delivered ? (
+        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+          We sent a confirmation link
+          {user?.email ? (
+            <>
+              {' '}
+              to <strong className="text-foreground">{user.email}</strong>
+            </>
+          ) : null}
+          . Open it to finish securing your account — the link expires in 24
+          hours.
+        </p>
+      ) : (
+        <p className="mt-2 text-[14px] leading-relaxed text-muted-foreground">
+          Your account is created and ready to use. No confirmation email was
+          sent
+          {user?.email ? (
+            <>
+              {' '}
+              to <strong className="text-foreground">{user.email}</strong>
+            </>
+          ) : null}
+          , because this deployment has no email provider connected yet — so
+          there is nothing waiting in your inbox.
+        </p>
+      )}
 
       <div className="mt-7 grid gap-3">
         <Button size="xl" className="w-full rounded-full" asChild>
           <Link href="/dashboard">Continue to your workspace</Link>
         </Button>
-        {session?.user ? <ResendButton /> : null}
+        {session?.user && delivered ? <ResendButton /> : null}
       </div>
 
       <p className="mt-6 border-t border-border pt-5 text-center text-[12.5px] leading-relaxed text-muted-foreground">
-        You can start working right away — confirming just secures password
-        recovery and account notifications.
+        {delivered
+          ? 'You can start working right away — confirming just secures password recovery and account notifications.'
+          : 'Everything works without it. Connect a provider (EMAIL_TRANSPORT) when you want password recovery and account notifications by email.'}
       </p>
     </AuthPanel>
   );
