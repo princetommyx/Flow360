@@ -35,10 +35,18 @@ Pick whichever suits the device you are on.
 
 ### From a phone — GitHub Actions (no copy-paste)
 
-1. Copy the connection string from your database provider
+1. Copy the **direct** connection string from your provider — on Neon that is
+   `DATABASE_URL_UNPOOLED`, on Supabase the one on port 5432. Not the pooled
+   one: `prisma migrate deploy` takes an advisory lock, and a pooler in
+   transaction mode gives each statement a different backend, so the lock is
+   never seen again. The workflow checks for this and stops rather than hanging.
 2. GitHub → this repo → **Settings** → **Secrets and variables** → **Actions**
    → **New repository secret**, named `DATABASE_URL`
 3. **Actions** tab → **Set up database** → **Run workflow**
+
+The app itself keeps using the **pooled** string — that one is right for
+serverless, where each instance opens its own connections. Two different
+strings for two different jobs.
 
 It applies both migrations, checks the database is reachable and complete, then
 loads the demo data. It runs only when you start it, never on a push, and the
@@ -78,7 +86,7 @@ Add each one to **all three** environments (Production, Preview, Development):
 
 | Name | Value |
 |---|---|
-| `DATABASE_URL` | your pooled connection string — **skip this if you used Option A**, Vercel already set it |
+| `DATABASE_URL` | the **pooled** connection string — **skip this if you used Option A**, the Neon integration already set it |
 | `AUTH_SECRET` | `XmmGgyS5BhbHBYkbVc2edQociITayk+59d5auwYKCvk=` |
 | `AUTH_URL` | `https://flow360-puce.vercel.app` |
 | `AUTH_TRUST_HOST` | `true` |

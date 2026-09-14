@@ -6,6 +6,12 @@
 # It never runs on a push — only when someone chooses to run it — and it takes
 # the connection string from a repository secret, so the URL is never in the
 # repository or in the logs.
+#
+# The DATABASE_URL secret must be the DIRECT (unpooled) connection string, not
+# the pooled one the app runs on. `prisma migrate deploy` takes a Postgres
+# advisory lock, and a pooler in transaction mode hands each statement to a
+# different backend, so the lock is taken on one connection and looked for on
+# another. On Neon that is the DATABASE_URL_UNPOOLED value.
 name: Set up database
 
 on:
@@ -39,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Check the connection string is present
+      - name: Check the connection string
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
@@ -48,7 +54,20 @@ jobs:
             echo "Add it under Settings -> Secrets and variables -> Actions -> New repository secret."
             exit 1
           fi
-          echo "DATABASE_URL is set."
+
+          # A pooled string here fails in a way that is hard to read: migrate
+          # hangs or reports a lock error rather than saying "wrong URL".
+          case "$DATABASE_URL" in
+            *-pooler.*|*pgbouncer=true*)
+              echo "::error::This looks like a POOLED connection string."
+              echo "Migrations need the direct one — on Neon that is DATABASE_URL_UNPOOLED"
+              echo "(its host has no '-pooler'). Update the secret and run this again."
+              echo "Leave the pooled string as the app's DATABASE_URL in Vercel; that one is correct there."
+              exit 1
+              ;;
+          esac
+
+          echo "DATABASE_URL is set and looks like a direct connection."
 
       - name: Apply migrations
         env:
