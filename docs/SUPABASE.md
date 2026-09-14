@@ -1,6 +1,6 @@
 # Connecting Supabase
 
-Flow360 stores everything in PostgreSQL through Prisma. Supabase provides that
+Adwuma360 stores everything in PostgreSQL through Prisma. Supabase provides that
 PostgreSQL, so **no application code changes** — you are pointing `DATABASE_URL`
 at Supabase instead of a local server.
 

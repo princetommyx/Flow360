@@ -1,4 +1,4 @@
-# Deploying Flow360
+# Deploying Adwuma360
 
 The app targets any Node host; the notes below use Vercel because that is the
 most common target for Next.js. Nothing here is Vercel-specific except where

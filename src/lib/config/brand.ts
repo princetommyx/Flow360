@@ -112,7 +112,7 @@ const env = (key: keyof typeof PUBLIC_ENV, fallback: string) =>
   (PUBLIC_ENV[key] ?? '').trim() || fallback;
 
 export const brand: BrandConfig = {
-  name: env('NEXT_PUBLIC_BRAND_NAME', 'Flow360'),
+  name: env('NEXT_PUBLIC_BRAND_NAME', 'Adwuma360'),
   shortName: env('NEXT_PUBLIC_BRAND_SHORT_NAME', 'Flow'),
   tagline: env(
     'NEXT_PUBLIC_BRAND_TAGLINE',
@@ -122,8 +122,8 @@ export const brand: BrandConfig = {
     'NEXT_PUBLIC_BRAND_DESCRIPTION',
     'Run sales, purchasing, stock, money and people from a single set of records — so every report reflects the work your team actually did.',
   ),
-  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'flow360.app'),
-  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@flow360.app'),
+  domain: env('NEXT_PUBLIC_BRAND_DOMAIN', 'adwuma360.app'),
+  supportEmail: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@adwuma360.app'),
   colors: {
     primary: env('NEXT_PUBLIC_BRAND_PRIMARY', '#4f46e5'),
     secondary: env('NEXT_PUBLIC_BRAND_SECONDARY', '#0d9488'),
@@ -163,7 +163,7 @@ export const numbering: DocumentNumberingConfig = {
 
 /** Marketing-side company facts, kept out of components. */
 export const company = {
-  legalName: env('NEXT_PUBLIC_COMPANY_LEGAL_NAME', 'Flow360 Software Ltd.'),
+  legalName: env('NEXT_PUBLIC_COMPANY_LEGAL_NAME', 'Adwuma360 Software Ltd.'),
   addressLine1: env('NEXT_PUBLIC_COMPANY_ADDRESS_1', '400 Market Street'),
   addressLine2: env('NEXT_PUBLIC_COMPANY_ADDRESS_2', 'Suite 1200'),
   city: env('NEXT_PUBLIC_COMPANY_CITY', 'San Francisco'),
