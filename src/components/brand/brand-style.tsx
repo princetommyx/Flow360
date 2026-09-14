@@ -14,6 +14,13 @@ export function BrandStyle({
   primary?: string | null;
   secondary?: string | null;
 }) {
-  const css = `:root{--brand-primary:${primary || brand.colors.primary};--brand-secondary:${secondary || brand.colors.secondary};}`;
+  /*
+    `html:root` rather than `:root`: the root layout renders this in <head>,
+    where Next's own stylesheet link is appended after it. Two `:root` rules of
+    equal specificity means the later one wins, so the defaults in globals.css
+    were silently beating the configured hues. The extra element selector
+    settles it by specificity instead of by document order.
+  */
+  const css = `html:root{--brand-primary:${primary || brand.colors.primary};--brand-secondary:${secondary || brand.colors.secondary};}`;
   return <style dangerouslySetInnerHTML={{ __html: css }} />;
 }

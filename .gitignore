@@ -30,8 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — real secrets stay out, but the documented template ships:
+# docs and CLAUDE.md both tell a new contributor to copy it.
 .env*
+!.env.example
 
 # vercel
 .vercel
