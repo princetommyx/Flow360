@@ -131,19 +131,27 @@ export async function registerAction(
     });
   });
 
-  await sendMail({
-    to: email,
-    subject: `Confirm your ${brand.name} account`,
-    heading: `Welcome to ${brand.name}, ${name.split(' ')[0]}.`,
-    body: [
-      `Your workspace "${organizationName}" is ready.`,
-      'Confirm your email address to secure the account.',
-    ],
-    action: {
-      label: 'Confirm email',
-      url: absoluteUrl(`/verify-email?token=${token.raw}`),
-    },
-  });
+  // The user and their workspace are already committed. A mail provider that
+  // is down or misconfigured must not turn a successful sign-up into an error
+  // and strand an account nobody can register again — verification is not
+  // required to sign in, and the link can be resent.
+  try {
+    await sendMail({
+      to: email,
+      subject: `Confirm your ${brand.name} account`,
+      heading: `Welcome to ${brand.name}, ${name.split(' ')[0]}.`,
+      body: [
+        `Your workspace "${organizationName}" is ready.`,
+        'Confirm your email address to secure the account.',
+      ],
+      action: {
+        label: 'Confirm email',
+        url: absoluteUrl(`/verify-email?token=${token.raw}`),
+      },
+    });
+  } catch (error) {
+    console.error('Confirmation email could not be sent', error);
+  }
 
   await signIn('credentials', { email, password, redirect: false });
 
@@ -342,19 +350,29 @@ export async function resendVerificationAction(): Promise<ActionResult> {
     }),
   ]);
 
-  await sendMail({
-    to: user.email,
-    subject: `Confirm your ${brand.name} account`,
-    heading: 'Confirm your email address',
-    body: [
-      `Hi ${user.name.split(' ')[0]}, use the link below to confirm this address.`,
-      'The link expires in 24 hours.',
-    ],
-    action: {
-      label: 'Confirm email',
-      url: absoluteUrl(`/verify-email?token=${token.raw}`),
-    },
-  });
+  // Here the send *is* the request, so a failure is reported rather than
+  // logged and hidden behind a success message.
+  try {
+    await sendMail({
+      to: user.email,
+      subject: `Confirm your ${brand.name} account`,
+      heading: 'Confirm your email address',
+      body: [
+        `Hi ${user.name.split(' ')[0]}, use the link below to confirm this address.`,
+        'The link expires in 24 hours.',
+      ],
+      action: {
+        label: 'Confirm email',
+        url: absoluteUrl(`/verify-email?token=${token.raw}`),
+      },
+    });
+  } catch (error) {
+    console.error('Confirmation email could not be resent', error);
+    return {
+      ok: false,
+      error: 'We could not send the email just now. Please try again shortly.',
+    };
+  }
 
   return { ok: true, data: undefined };
 }
