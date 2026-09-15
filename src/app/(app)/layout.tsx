@@ -1,3 +1,5 @@
+import type { Metadata } from 'next';
+
 import { db } from '@/lib/db';
 import { AppHeader } from '@/components/layout/app-header';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -9,6 +11,17 @@ import { requireTenant } from '@/server/tenant';
 import { getPlatformContext } from '@/server/platform';
 
 export const dynamic = 'force-dynamic';
+
+/**
+ * Nothing behind the sign-in belongs in a search result.
+ *
+ * `robots.txt` asks a crawler not to fetch these; this tells one that has
+ * fetched anyway not to index what it found. The two are different promises
+ * and a page that matters needs both.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /**
  * Authenticated shell.

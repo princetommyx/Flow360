@@ -13,13 +13,26 @@ import {
 import { SectionHeading } from '@/components/marketing/section-heading';
 import { Reveal } from '@/components/shared/reveal';
 import { PLANS, TRIAL_DAYS } from '@/lib/config/plans';
-import { brand } from '@/lib/config/brand';
+import { brand, locale } from '@/lib/config/brand';
+import { FaqSchema, OrganizationSchema } from '@/components/marketing/structured-data';
 
 import { PricingPlans } from './pricing-plans';
 
 export const metadata: Metadata = {
-  title: 'Pricing',
-  description: `Start with a ${TRIAL_DAYS}-day free trial of ${brand.name}. No card required.`,
+  title: {
+    absolute: `${brand.name} pricing | ERP software plans for ${locale.country} SMEs`,
+  },
+  description: `Three plans, all with a ${TRIAL_DAYS}-day free trial and no card required. Unlimited customers, printable invoices, CSV export and role-based access on every one.`,
+  alternates: { canonical: '/pricing' },
+  openGraph: {
+    title: `${brand.name} pricing`,
+    description: `${TRIAL_DAYS} days free on the full feature set. No card, no feature gates, no sales call.`,
+    url: '/pricing',
+    type: 'website',
+    images: [
+      { url: '/opengraph-image', width: 1200, height: 630, alt: brand.tagline },
+    ],
+  },
 };
 
 const INCLUDED_EVERYWHERE = [
@@ -60,6 +73,10 @@ const FAQS = [
 export default function PricingPage() {
   return (
     <>
+      <OrganizationSchema />
+      {/* The same array the accordion renders, so the two cannot drift. */}
+      <FaqSchema questions={FAQS} />
+
       <section className="border-b border-border py-16 md:py-20">
         <div className="mx-auto w-full max-w-6xl px-5 md:px-8">
           <div className="mx-auto max-w-2xl text-center">

@@ -1,6 +1,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import {
   AlarmClock,
@@ -34,7 +35,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
-import { brand } from '@/lib/config/brand';
+import { OrganizationSchema, SoftwareSchema } from '@/components/marketing/structured-data';
+import { brand, locale } from '@/lib/config/brand';
+import { TRIAL_DAYS } from '@/lib/config/plans';
 
 const FEATURES = [
   {
@@ -152,9 +155,37 @@ function heroPhotoExists() {
   return existsSync(path.join(process.cwd(), 'public', brand.heroImageUrl));
 }
 
+/**
+ * The home page's own metadata.
+ *
+ * The title says what the product is before it says what it is called, because
+ * almost nobody searching has heard of it yet: "Adwuma360" as the first two
+ * words would be a brand term competing with nothing. The description is
+ * written to be read in a result list, not to hold keywords.
+ */
+export const metadata: Metadata = {
+  title: {
+    absolute: `ERP and accounting software for small businesses in ${locale.country} | ${brand.name}`,
+  },
+  description: `${brand.name} runs invoicing, stock, purchasing, expenses, payroll and reporting from one set of records. Built for SMEs in ${locale.country}, priced in ${locale.currency}. ${TRIAL_DAYS}-day free trial, no card required.`,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: `ERP and accounting software for small businesses in ${locale.country}`,
+    description: brand.description,
+    url: '/',
+    type: 'website',
+    images: [
+      { url: '/opengraph-image', width: 1200, height: 630, alt: brand.tagline },
+    ],
+  },
+};
+
 export default function LandingPage() {
   return (
     <>
+      <OrganizationSchema />
+      <SoftwareSchema />
+
       <Hero hasPhoto={heroPhotoExists()} />
 
       <LookInside />
