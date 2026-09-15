@@ -33,6 +33,15 @@ const db = new PrismaClient({
 const DEMO_PASSWORD = 'Flow360Demo!';
 const now = new Date();
 
+/**
+ * The currency the demo workspaces keep their books in.
+ *
+ * Stamped on every document as well as on the organization: the columns
+ * default to USD in the schema, and a workspace whose invoices claim a
+ * currency it does not use is wrong in a way that only surfaces on export.
+ */
+const CURRENCY = 'GHS';
+
 /** Deterministic pseudo-random so re-seeding produces the same demo numbers. */
 let seedState = 20260912;
 function random() {
@@ -124,7 +133,7 @@ async function main() {
       name: 'Northwind Supply Co.',
       slug: slugify('Northwind Supply Co'),
       ownerUserId: owner.id,
-      currency: 'GHS',
+      currency: CURRENCY,
       country: 'Ghana',
       email: 'accounts@northwindsupply.example',
     }),
@@ -176,7 +185,7 @@ async function main() {
       name: 'Harbour Fitouts Ltd.',
       slug: 'harbour-fitouts',
       ownerUserId: secondUser.id,
-      currency: 'GHS',
+      currency: CURRENCY,
       country: 'Ghana',
       email: 'hello@harbourfitouts.example',
     }),
@@ -278,6 +287,7 @@ async function main() {
       await db.employee.create({
         data: {
           organizationId,
+          currency: CURRENCY,
           employeeNumber: `EMP-${String(index + 1).padStart(4, '0')}`,
           firstName: employee.firstName,
           lastName: employee.lastName,
@@ -337,6 +347,7 @@ async function main() {
     const quotation = await db.quotation.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         customerId: customer.id,
         number: await nextDocumentNumber(db, organizationId, 'quotation', {
           date: issueDate,
@@ -461,6 +472,7 @@ async function main() {
     const invoice = await db.invoice.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         customerId: customer.id,
         number: await nextDocumentNumber(db, organizationId, 'invoice', {
           date: issueDate,
@@ -541,6 +553,7 @@ async function main() {
       const payment = await db.payment.create({
         data: {
           organizationId,
+          currency: CURRENCY,
           number: await nextDocumentNumber(db, organizationId, 'payment', {
             date: paidAt,
           }),
@@ -560,6 +573,7 @@ async function main() {
       await db.transaction.create({
         data: {
           organizationId,
+          currency: CURRENCY,
           accountId: bankAccount.id,
           type: 'INCOME',
           amount: amountPaid,
@@ -612,6 +626,7 @@ async function main() {
     const created = await db.expense.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         number: await nextDocumentNumber(db, organizationId, 'expense', {
           date: spentAt,
         }),
@@ -634,6 +649,7 @@ async function main() {
     await db.transaction.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         accountId: account.id,
         type: 'EXPENSE',
         amount: -round(expense.amount + taxAmount),
@@ -660,6 +676,7 @@ async function main() {
     const created = await db.project.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         customerId: customer?.id ?? null,
         code: project.code,
         name: project.name,
@@ -728,6 +745,7 @@ async function main() {
     await db.payroll.create({
       data: {
         organizationId,
+        currency: CURRENCY,
         employeeId: employee.id,
         number: await nextDocumentNumber(db, organizationId, 'payroll', {
           date: periodEnd,

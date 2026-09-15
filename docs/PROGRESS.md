@@ -13,17 +13,30 @@ Last updated: 15 September 2026.
 | 2 | Customers, products, invoices, quotations, payments | Done |
 | 3 | Inventory, suppliers, expenses, accounts, purchase orders, bills, transactions, income | Done |
 | 4 | Employees, payroll, attendance, projects, tasks, timesheets | Done |
-| 5 | Settings, reports, notifications | Settings done, reports and notifications **in progress** |
+| 5 | Settings, reports, notifications | Done |
 | 6 | Landing page, pricing, responsive polish, security review, performance | Mostly done alongside the rest |
 
 ### Still to build
 
-Everything below currently renders `ModulePending`. That component is the
+- **Platform admin dashboard** — see its own section below
+
+Anything else still rendering `ModulePending` is unbuilt. That component is the
 honest placeholder: a module either works or says plainly that it does not.
 
-- `reports/sales`, `reports/expenses`, `reports/financial`, `reports/inventory`
-- `notifications` — the centre reading the `Notification` model
-- **Platform admin dashboard** — see its own section below
+### Reports and notifications, finished
+
+- `reports/sales` — invoiced against collected, by customer, by item, by status
+- `reports/expenses` — spend by category and by supplier, expenses beside bills
+- `reports/financial` — the profit and loss statement, cash on hand, money in
+  and out
+- `reports/inventory` — holding at cost and at selling price, by category, what
+  moved, what needs reordering
+- `notifications` — the inbox over the `Notification` model: read and unread,
+  filter by type, search, mark, unmark, remove, clear the read ones
+
+All four reports read through `server/services/reports.ts`, share
+`components/reports/report-nav.tsx` so the period survives moving between them,
+and export one flat CSV each with a `Section` column rather than four files.
 
 ### Settings, finished
 
@@ -106,7 +119,12 @@ different digest, and do not swallow it in a page.
 parenthetical. Code comments keep theirs.
 
 **Lists.** `components/data-table`, state in the URL via `lib/query.ts`,
-sortable columns whitelisted through `orderByFor`.
+sortable columns whitelisted through `orderByFor`. A small ranked table inside
+a card uses `components/reports/ranked-table.tsx` instead: it has no URL state,
+no sorting and no pagination, which is the point.
+
+**Reports.** Revenue is what was invoiced, never what was collected. Figures
+are recomputed from the rows they describe. Nothing under `reports/` writes.
 
 ## Things that are true and easy to get wrong
 
@@ -117,6 +135,16 @@ sortable columns whitelisted through `orderByFor`.
   so `refreshOverdueBills` and `refreshExpiredQuotations` run when the list is
   opened.
 - **Employee numbers use the numeric maximum**, not the lexicographic one.
+- **Order by a tiebreaker whenever the sort key can tie.** Notifications raised
+  in one batch share a timestamp to the millisecond, and the planner is then
+  free to return them in any order: the same list comes back shuffled between
+  two renders. `[{ createdAt: 'desc' }, { id: 'desc' }]`.
+- **A grid track has a min-content floor.** A card holding a table with a
+  `min-w-*` widens the track instead of letting the table scroll, so report
+  grids carry `[&>*]:min-w-0`.
+- **CSV guards text, not numbers.** A leading `-` is quoted out of formula
+  range only for strings; guarding a number would turn every negative in a
+  financial export into text, and a column of text will not total.
 - **The invite dialog preselects no role.** The list is ordered most powerful
   first, and a dialog anyone can tap through must not hand out administrator.
 - **An invitation is one use.** Accepting sets the password, confirms the

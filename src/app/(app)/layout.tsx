@@ -31,7 +31,7 @@ export default async function AppLayout({
         organizationId: context.organization.id,
         OR: [{ userId: context.user.id }, { userId: null }],
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: 8,
       select: { id: true, title: true, body: true, href: true, createdAt: true, readAt: true },
     }),

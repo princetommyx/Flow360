@@ -8,8 +8,14 @@ export type CsvColumn<T> = {
 function escapeCell(input: string | number | null | undefined): string {
   if (input === null || input === undefined) return '';
   const value = String(input);
-  // A leading =, +, - or @ is interpreted as a formula by spreadsheet apps.
-  const guarded = /^[=+\-@]/.test(value) ? `'${value}` : value;
+
+  // A leading =, +, - or @ is read as a formula by spreadsheet apps, so text
+  // starting that way is quoted out. A real number is exempt: guarding it
+  // would turn every negative in a financial export into text, and a column
+  // of text will not total.
+  const guarded =
+    typeof input !== 'number' && /^[=+\-@]/.test(value) ? `'${value}` : value;
+
   return /[",\n\r]/.test(guarded) ? `"${guarded.replace(/"/g, '""')}"` : guarded;
 }
 

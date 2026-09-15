@@ -227,7 +227,7 @@ export const NAV_GROUPS: NavGroup[] = [
         permission: 'reports.view',
       },
       {
-        label: 'Financial reports',
+        label: 'Profit and loss',
         href: '/reports/financial',
         icon: 'reportFinancial',
         permission: 'reports.view',

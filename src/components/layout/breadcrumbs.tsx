@@ -20,6 +20,7 @@ const LABEL_OVERRIDES: Record<string, string> = {
   company: 'Company',
   users: 'Users',
   notifications: 'Notifications',
+  financial: 'Profit and loss',
 };
 
 const NAV_LABELS = new Map(
