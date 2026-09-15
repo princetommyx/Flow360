@@ -285,8 +285,10 @@ does not make them rank, which is content and links over months.
   the database.
 - **Payment provider is not wired up.** Plan requests are recorded and a person
   follows up; nothing charges anyone. The billing page says so.
-- **`hero.jpg` carries a rawpixel watermark** and needs a licensed replacement
-  before commercial use.
+- **`hero.jpg`'s licence is unverified.** The watermark noted here earlier is
+  gone, so the file has been replaced at some point, but nobody has recorded
+  where it came from or under what terms. Worth establishing before it is
+  relied on commercially.
 - **No content beyond the landing page and pricing.** Nothing ranks for a
   competitive term on four pages of marketing copy, however well marked up.
 - **Company details in `lib/config/brand.ts` are placeholders** — registered
