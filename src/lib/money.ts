@@ -145,3 +145,38 @@ export function calculateDocumentTotals(
     lines,
   };
 }
+
+export type PayslipInput = {
+  baseSalary: number;
+  allowances?: number;
+  overtime?: number;
+  bonus?: number;
+  taxDeduction?: number;
+  otherDeduction?: number;
+};
+
+export type PayslipTotals = {
+  gross: number;
+  deductions: number;
+  net: number;
+};
+
+/**
+ * Payslip arithmetic.
+ *
+ * Here rather than in the payroll service for the same reason document totals
+ * are here: the figure on the screen, the figure in the database and the
+ * figure on the payslip must come from one implementation. Net is always
+ * derived — never typed — so a payslip cannot disagree with its own sums.
+ */
+export function calculatePayslip(input: PayslipInput): PayslipTotals {
+  const gross = round(
+    input.baseSalary +
+      (input.allowances ?? 0) +
+      (input.overtime ?? 0) +
+      (input.bonus ?? 0),
+  );
+  const deductions = round((input.taxDeduction ?? 0) + (input.otherDeduction ?? 0));
+
+  return { gross, deductions, net: round(gross - deductions) };
+}
