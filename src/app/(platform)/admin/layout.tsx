@@ -12,6 +12,19 @@ import { SignOutButton } from './sign-out-button';
 
 export const dynamic = 'force-dynamic';
 
+/**
+ * How this operator got in, said plainly.
+ *
+ * Worth showing: someone here on the environment list or a domain rule is one
+ * configuration change away from losing access, and that is better known than
+ * discovered.
+ */
+const VIA_LABEL = {
+  flag: 'Staff',
+  address: 'Access from the environment list',
+  domain: 'Access from your email domain',
+} as const;
+
 export const metadata: Metadata = {
   title: { default: 'Operator console', template: `%s · Operator console` },
   robots: { index: false, follow: false },
@@ -56,7 +69,7 @@ export default async function PlatformLayout({
                 {context.user.name}
               </p>
               <p className="text-[11.5px] leading-tight opacity-75">
-                {context.viaBootstrap ? 'Access from the environment list' : 'Staff'}
+                {VIA_LABEL[context.via]}
               </p>
             </div>
             {tenant ? (

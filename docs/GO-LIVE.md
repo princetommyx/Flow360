@@ -92,6 +92,7 @@ Add each one to **all three** environments (Production, Preview, Development):
 | `AUTH_TRUST_HOST` | `true` |
 | `NEXT_PUBLIC_APP_URL` | `https://flow360-puce.vercel.app` |
 | `PLATFORM_ADMIN_EMAILS` | your own sign-in address, so you can open the operator console |
+| `PLATFORM_ADMIN_DOMAINS` | `adwuma360.online`, so anyone on the company domain is staff |
 
 `PLATFORM_ADMIN_EMAILS` is how the first operator of Adwuma360 is created: the
 addresses listed there can open `/admin`, whatever the database says. Everyone
