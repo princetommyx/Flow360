@@ -10,8 +10,17 @@
  * Google tells you not to remove the tag once verified. Leaving the variable
  * set is what keeps that promise.
  */
+/**
+ * Adwuma360's own token, so the deployed site is verified without anybody
+ * setting a variable. A fork or a second brand overrides it in the
+ * environment, exactly as it would override the brand name.
+ */
+const GOOGLE_DEFAULT = 'JSn_i_HG728Snn5FCcUn5qWMIuV5ZpfZTVLy7UHBRoM';
+
 export const verification = {
-  google: (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? '').trim(),
+  google:
+    (process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? '').trim() ||
+    GOOGLE_DEFAULT,
   bing: (process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ?? '').trim(),
 } as const;
 
