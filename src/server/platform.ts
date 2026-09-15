@@ -5,7 +5,7 @@ import { notFound, redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { isBootstrapAdmin } from '@/lib/config/platform';
+import { isBootstrapAdmin, isStaffDomain } from '@/lib/config/platform';
 
 /**
  * The operator console's guard.
@@ -18,8 +18,8 @@ import { isBootstrapAdmin } from '@/lib/config/platform';
 
 export type PlatformContext = {
   user: { id: string; name: string; email: string };
-  /** Granted by the environment list rather than by a flag in the database. */
-  viaBootstrap: boolean;
+  /** How they got in, so the console can say so rather than leave it a mystery. */
+  via: 'flag' | 'address' | 'domain';
 };
 
 export const getPlatformContext = cache(async (): Promise<PlatformContext | null> => {
@@ -29,17 +29,41 @@ export const getPlatformContext = cache(async (): Promise<PlatformContext | null
 
   const user = await db.user.findUnique({
     where: { id: userId },
-    select: { id: true, name: true, email: true, isActive: true, isPlatformAdmin: true },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      isActive: true,
+      isPlatformAdmin: true,
+      emailVerified: true,
+    },
   });
 
   if (!user || !user.isActive) return null;
 
-  const bootstrap = isBootstrapAdmin(user.email);
-  if (!user.isPlatformAdmin && !bootstrap) return null;
+  /*
+    The domain rule carries a condition the other two do not. It is a wildcard:
+    it says "whoever holds an address here is staff", and anyone can type an
+    address into the registration form. Requiring the address to be confirmed
+    means they had to receive the email, which means they really do hold it.
+
+    The named-address list is exempt deliberately. It is the emergency door,
+    it names one address rather than a whole domain, and adding a condition to
+    it would be most likely to fail at exactly the moment it is needed.
+  */
+  const via = user.isPlatformAdmin
+    ? 'flag'
+    : isBootstrapAdmin(user.email)
+      ? 'address'
+      : user.emailVerified && isStaffDomain(user.email)
+        ? 'domain'
+        : null;
+
+  if (!via) return null;
 
   return {
     user: { id: user.id, name: user.name, email: user.email },
-    viaBootstrap: bootstrap && !user.isPlatformAdmin,
+    via,
   };
 });
 

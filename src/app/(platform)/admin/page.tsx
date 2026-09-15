@@ -60,9 +60,9 @@ export default async function PlatformOverviewPage() {
 
       {hasBootstrapAdmins() ? null : (
         <Card className="border-warning/30 bg-warning-soft p-4 text-[13px] leading-relaxed">
-          No addresses are listed in <code>PLATFORM_ADMIN_EMAILS</code>. That is
-          the way back in if the last operator flag is ever revoked, so it is
-          worth setting one.
+          Neither <code>PLATFORM_ADMIN_EMAILS</code> nor{' '}
+          <code>PLATFORM_ADMIN_DOMAINS</code> is set. One of them is the way back
+          in if the last operator flag is ever revoked, so it is worth setting one.
         </Card>
       )}
 

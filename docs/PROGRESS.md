@@ -202,10 +202,16 @@ Built, at `/admin`, in the `(platform)` route group. It is the console for the
 
 1. `users.isPlatformAdmin`, set by the **Create platform operator** workflow
    (`scripts/create-operator.ts`) and by the console's own People page.
-2. `PLATFORM_ADMIN_EMAILS`, a comma-separated list in the environment. It marks
-   an account that already exists, so it is for letting your own customer
-   account into the console, and for getting back in if the last flag is
-   revoked by mistake. It creates nothing.
+2. `PLATFORM_ADMIN_EMAILS`, exact addresses in the environment. It marks an
+   account that already exists, so it is for letting your own customer account
+   into the console, and for getting back in if the last flag is revoked by
+   mistake. It creates nothing.
+3. `PLATFORM_ADMIN_DOMAINS`, whole domains, so everyone at the company is staff
+   without being added one at a time. **This one requires the address to be
+   confirmed**, and the other two do not: it is a wildcard, and anyone can type
+   an address into the registration form, so without that condition claiming
+   `anything@adwuma360.online` would be enough to walk into the console.
+   Subdomains do not count; each has to be named.
 
 **A staff account belongs to no workspace.** `/register` creates a workspace,
 which would leave an operator owning a company inside the list they are
