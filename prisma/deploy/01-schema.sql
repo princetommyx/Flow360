@@ -1,4 +1,4 @@
--- Flow360 — one-file database setup
+-- Adwuma360: one-file database setup
 --
 -- Paste this whole file into your database provider's SQL editor and run it:
 --   Supabase  ->  SQL Editor -> New query

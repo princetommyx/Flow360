@@ -44,7 +44,7 @@ export function DataTablePagination({ info }: { info: PageInfo }) {
       <p className="text-[13px] text-muted-foreground tabular">
         {info.total === 0
           ? 'No results'
-          : `Showing ${info.from}–${info.to} of ${info.total}`}
+          : `Showing ${info.from} to ${info.to} of ${info.total}`}
       </p>
 
       <div className="flex w-full items-center justify-between gap-4 sm:w-auto">

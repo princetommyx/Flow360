@@ -276,7 +276,7 @@ export function PurchaseOrdersTable({
           <EmptyState
             icon={ShoppingCart}
             title="No purchase orders yet"
-            description="Raise an order here and stock arrives against it — the quantities you receive post straight to inventory."
+            description="Raise an order here and stock arrives against it. The quantities you receive post straight to inventory."
             action={
               can.create ? (
                 <Button size="sm" asChild>

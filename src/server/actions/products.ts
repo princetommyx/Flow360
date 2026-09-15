@@ -231,7 +231,7 @@ export async function adjustStockAction(input: unknown): Promise<ActionResult> {
       if (balanceAfter < 0) {
         return {
           ok: false as const,
-          error: `Only ${current} in stock — that would leave a negative balance.`,
+          error: `Only ${current} in stock, so that would leave a negative balance.`,
         };
       }
       if (delta === 0) {

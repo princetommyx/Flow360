@@ -26,7 +26,7 @@ export default function GlobalError({
         Something went wrong
       </h1>
       <p className="mt-2 max-w-sm text-pretty text-[13.5px] leading-relaxed text-muted-foreground">
-        The page failed to load. Try again — if it keeps happening, the reference
+        The page failed to load. Try again, and if it keeps happening the reference
         below will help us track it down.
       </p>
       {error.digest ? (

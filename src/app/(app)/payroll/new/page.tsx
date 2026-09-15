@@ -31,7 +31,7 @@ export default async function NewPayrollPage({
         <Alert>
           <AlertDescription className="text-foreground">
             Payslips are prepared against the people on your team, so add someone
-            first — their contracted pay then comes through as the starting figure.
+            first. Their contracted pay then comes through as the starting figure.
           </AlertDescription>
         </Alert>
         <Button asChild>
@@ -50,7 +50,7 @@ export default async function NewPayrollPage({
     <div className="space-y-6">
       <PageHeader
         title="Prepare a payslip"
-        description="Take-home is worked out from the figures you enter — it is never typed in directly."
+        description="Take-home is worked out from the figures you enter. It is never typed in directly."
       />
       <PayrollForm
         employees={employees}

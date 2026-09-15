@@ -206,7 +206,7 @@ export function CustomerForm({ customerId, defaultValues }: CustomerFormProps) {
                       <SelectContent>
                         <SelectItem value="ACTIVE">Active</SelectItem>
                         <SelectItem value="INACTIVE">Inactive</SelectItem>
-                        <SelectItem value="BLOCKED">Blocked — no new sales</SelectItem>
+                        <SelectItem value="BLOCKED">Blocked (no new sales)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

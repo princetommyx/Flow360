@@ -51,7 +51,7 @@ export function PricingPlans() {
         </div>
         <p className="text-[12.5px] text-muted-foreground">
           {saving === null
-            ? 'Pay monthly or yearly — same features either way'
+            ? 'Pay monthly or yearly. Same features either way.'
             : annual
               ? `Paying yearly saves at least ${saving}%`
               : `Switch to yearly and save at least ${saving}%`}
@@ -105,7 +105,7 @@ export function PricingPlans() {
                         const percent = annualSaving(plan);
                         return percent === null
                           ? 'Billed once a year'
-                          : `Billed once a year — ${percent}% less than monthly`;
+                          : `Billed once a year, ${percent}% less than monthly`;
                       })()
                     : 'Billed every month'}
               </p>

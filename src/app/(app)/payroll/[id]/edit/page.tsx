@@ -36,7 +36,7 @@ export default async function EditPayrollPage({
         />
         <Alert variant="warning">
           <AlertDescription className="text-foreground">
-            Only drafts can be changed — an approved payslip is a figure someone has
+            Only drafts can be changed. An approved payslip is a figure someone has
             been told they are getting. Cancel this one and prepare another if the
             numbers were wrong, so both are on the record.
           </AlertDescription>

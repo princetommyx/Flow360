@@ -14,7 +14,7 @@ export default async function NewSupplierPage() {
     <div className="space-y-6">
       <PageHeader
         title="Add supplier"
-        description="Only a contact name is required — everything else can be filled in later."
+        description="Only a contact name is required. Everything else can be filled in later."
       />
       <SupplierForm />
     </div>

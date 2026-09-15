@@ -30,7 +30,7 @@ export default async function RegisterPage({
     <AuthPanel
       showcase={{
         headline: 'Set up once, and every module already knows about it',
-        sub: 'Your company details, tax rates and numbering flow into quotes, invoices, stock and the books — so nothing is configured twice.',
+        sub: 'Your company details, tax rates and numbering flow into quotes, invoices, stock and the books, so nothing is configured twice.',
       }}
     >
       <Logo size={32} />

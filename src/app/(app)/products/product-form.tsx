@@ -160,8 +160,8 @@ export function ProductForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="GOOD">Good — physical item</SelectItem>
-                        <SelectItem value="SERVICE">Service — labour or time</SelectItem>
+                        <SelectItem value="GOOD">Good (physical item)</SelectItem>
+                        <SelectItem value="SERVICE">Service (labour or time)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -353,9 +353,9 @@ export function ProductForm({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="ACTIVE">Active — available to sell</SelectItem>
-                        <SelectItem value="INACTIVE">Inactive — hidden from pickers</SelectItem>
-                        <SelectItem value="BLOCKED">Blocked — cannot be sold</SelectItem>
+                        <SelectItem value="ACTIVE">Active (available to sell)</SelectItem>
+                        <SelectItem value="INACTIVE">Inactive (hidden from pickers)</SelectItem>
+                        <SelectItem value="BLOCKED">Blocked (cannot be sold)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

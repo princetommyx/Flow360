@@ -55,7 +55,7 @@ export function verificationCodeEmail(input: {
     ],
     action: { label: 'Confirm my email', url: input.url },
     footnote:
-      'If you did not create this account, you can ignore this message — nothing will happen until the code is used.',
+      'If you did not create this account, you can ignore this message. Nothing will happen until the code is used.',
   };
 }
 
@@ -111,7 +111,7 @@ export function passwordResetEmail(input: {
     ],
     action: { label: 'Choose a new password', url: input.url },
     footnote:
-      'If this was not you, no action is needed — the link cannot change anything on its own, and your password has not changed.',
+      'If this was not you, no action is needed. The link cannot change anything on its own, and your password has not changed.',
   };
 }
 
@@ -130,7 +130,7 @@ export function trialStartedEmail(input: {
     preheader: `Full access until ${formatDate(input.trialEndsAt)}. No card needed.`,
     heading: `${TRIAL_DAYS} days on us, ${firstName(input.name)}.`,
     body: [
-      `${input.organizationName} has the complete ${input.plan.name} feature set for the next ${TRIAL_DAYS} days. No card was taken and nothing renews on its own — when the trial ends the workspace simply waits for you to pick a plan.`,
+      `${input.organizationName} has the complete ${input.plan.name} feature set for the next ${TRIAL_DAYS} days. No card was taken and nothing renews on its own. When the trial ends the workspace simply waits for you to pick a plan.`,
       facts([
         { label: 'Workspace', value: input.organizationName },
         { label: 'Trial', value: `${TRIAL_DAYS} days, full access` },
@@ -171,7 +171,7 @@ export function subscriptionRequestedEmail(input: {
     preheader: `We have your request for the ${input.plan.name} plan. Nothing has been charged.`,
     heading: `Your ${input.plan.name} plan request is in.`,
     body: [
-      `Thanks ${firstName(input.name)} — we have recorded that ${input.organizationName} wants to move to ${input.plan.name}.`,
+      `Thanks ${firstName(input.name)}. We have recorded that ${input.organizationName} wants to move to ${input.plan.name}.`,
       facts([
         { label: 'Workspace', value: input.organizationName },
         { label: 'Plan', value: input.plan.name },

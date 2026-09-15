@@ -418,7 +418,7 @@ export function EmployeeForm({
                   <FormControl>
                     <Textarea
                       rows={3}
-                      placeholder="Anything worth knowing — contract terms, next of kin, review dates."
+                      placeholder="Anything worth knowing: contract terms, next of kin, review dates."
                       {...field}
                     />
                   </FormControl>

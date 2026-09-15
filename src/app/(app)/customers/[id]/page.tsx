@@ -347,7 +347,7 @@ export default async function CustomerDetailPage({
             <div>
               <CardTitle>Internal notes</CardTitle>
               <CardDescription>
-                Visible to your team only — never printed on documents.
+                Visible to your team only. Never printed on documents.
               </CardDescription>
             </div>
           </CardHeader>

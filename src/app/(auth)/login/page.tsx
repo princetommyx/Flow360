@@ -20,7 +20,7 @@ export default async function LoginPage() {
     <AuthPanel
       showcase={{
         headline: 'Everything your business runs on, in one workspace',
-        sub: 'Sales, purchasing, stock, money and people — reading from the same records, so every report reflects the work your team actually did.',
+        sub: 'Sales, purchasing, stock, money and people, all reading from the same records, so every report reflects the work your team actually did.',
       }}
     >
       <Logo size={32} />

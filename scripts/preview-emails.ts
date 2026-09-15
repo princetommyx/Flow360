@@ -69,7 +69,7 @@ async function main() {
     await writeFile(join(out, `${slug}.html`), renderHtml(message), 'utf8');
     await writeFile(join(out, `${slug}.txt`), renderText(message), 'utf8');
     index.push(
-      `<li><a href="./${slug}.html">${message.subject}</a> — <a href="./${slug}.txt">plain text</a></li>`,
+      `<li><a href="./${slug}.html">${message.subject}</a> (<a href="./${slug}.txt">plain text</a>)</li>`,
     );
   }
 

@@ -55,7 +55,7 @@ export const currencyChangeSchema = z
     confirmation: z.string().trim(),
   })
   .refine((data) => data.mode !== 'convert' || data.rate !== 1, {
-    message: 'A conversion at a rate of 1 would change nothing — relabel instead',
+    message: 'A conversion at a rate of 1 would change nothing. Relabel instead.',
     path: ['rate'],
   });
 

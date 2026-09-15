@@ -118,7 +118,7 @@ export async function createExpenseAction(
       action: 'create',
       entityType: 'expense',
       entityId: expense.id,
-      summary: `Recorded expense ${expense.number} — ${data.title}`,
+      summary: `Recorded expense ${expense.number}: ${data.title}`,
       metadata: { total },
     });
 

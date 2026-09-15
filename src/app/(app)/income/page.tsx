@@ -62,7 +62,7 @@ export default async function IncomePage({
     <div className="space-y-6">
       <PageHeader
         title="Income"
-        description="Everything that came in over the period — invoiced or not."
+        description="Everything that came in over the period, invoiced or not."
         actions={
           <>
             <DateRangeFilter preset={preset} />

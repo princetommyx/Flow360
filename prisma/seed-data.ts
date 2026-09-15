@@ -122,7 +122,7 @@ export const CUSTOMERS = [
     postalCode: '02115',
     taxId: 'US-119-887-455',
     paymentTermDays: 45,
-    notes: 'Public sector terms — invoices must quote the framework reference.',
+    notes: 'Public sector terms. Invoices must quote the framework reference.',
     tags: ['education', 'public sector'],
   },
   {
@@ -202,7 +202,7 @@ export const CUSTOMERS = [
     postalCode: '97205',
     taxId: 'US-410-775-236',
     paymentTermDays: 30,
-    notes: 'Fits out serviced offices. Slow payer — chase at day 35.',
+    notes: 'Fits out serviced offices. Slow payer, so chase at day 35.',
     tags: ['real estate'],
   },
 ];
@@ -265,10 +265,10 @@ export const RECURRING_EXPENSES = [
 ] as const;
 
 export const EXPENSE_ROWS = [
-  { title: 'Warehouse rent — quarter', category: 'Rent & facilities', amount: 8400, vendorName: 'Bayfront Industrial Estates', method: 'BANK_TRANSFER', daysAgo: 12 },
+  { title: 'Warehouse rent, quarterly', category: 'Rent & facilities', amount: 8400, vendorName: 'Bayfront Industrial Estates', method: 'BANK_TRANSFER', daysAgo: 12 },
   { title: 'Delivery van fuel and tolls', category: 'Travel', amount: 612.4, vendorName: 'Fleet Fuel Card', method: 'CARD', daysAgo: 5 },
   { title: 'Design software licences (5 seats)', category: 'Software & subscriptions', amount: 745, vendorName: 'Formline CAD', method: 'CARD', daysAgo: 19 },
-  { title: 'Trade show stand — Workspace Expo', category: 'Marketing', amount: 3250, vendorName: 'Workspace Expo Ltd.', method: 'BANK_TRANSFER', daysAgo: 27 },
+  { title: 'Trade show stand at Workspace Expo', category: 'Marketing', amount: 3250, vendorName: 'Workspace Expo Ltd.', method: 'BANK_TRANSFER', daysAgo: 27 },
   { title: 'Warehouse electricity', category: 'Utilities', amount: 486.15, vendorName: 'Pacific Grid Energy', method: 'BANK_TRANSFER', daysAgo: 8 },
   { title: 'Forklift annual service', category: 'Equipment', amount: 1180, vendorName: 'Halton Materials Handling', method: 'BANK_TRANSFER', daysAgo: 34 },
   { title: 'Accountancy retainer', category: 'Professional services', amount: 1450, vendorName: 'Grainger & Mills Accountants', method: 'BANK_TRANSFER', daysAgo: 15 },
@@ -280,7 +280,7 @@ export const EXPENSE_ROWS = [
 export const PROJECTS = [
   {
     code: 'PRJ-LUMEN-01',
-    name: 'Lumen Health — Mission Bay clinic refit',
+    name: 'Lumen Health, Mission Bay clinic refit',
     customer: 'Lumen Health Group',
     description: 'Full furniture package for a 42-desk clinical admin floor, phased over two weekends.',
     budget: 96000,
@@ -291,7 +291,7 @@ export const PROJECTS = [
   },
   {
     code: 'PRJ-ASTER-01',
-    name: 'Aster Biotech — Torrey Pines office expansion',
+    name: 'Aster Biotech, Torrey Pines office expansion',
     customer: 'Aster Biotech',
     description: 'New 28-person office adjacent to the lab, including acoustic treatment and two phone booths.',
     budget: 64000,
@@ -302,7 +302,7 @@ export const PROJECTS = [
   },
   {
     code: 'PRJ-COBRE-01',
-    name: 'Cobre Coffee — East 6th flagship',
+    name: 'Cobre Coffee, East 6th flagship',
     customer: 'Cobre Coffee Roasters',
     description: 'Back-of-house office and staff room fitout alongside the new roastery build.',
     budget: 28500,
@@ -325,7 +325,7 @@ export const TASKS = [
   { project: 'PRJ-COBRE-01', title: 'Final handover pack and warranties', status: 'DONE', priority: 'LOW', dueInDays: -46, hours: 2 },
   { project: null, title: 'Refresh the 2026 price list', status: 'IN_PROGRESS', priority: 'MEDIUM', dueInDays: 14, hours: 8 },
   { project: null, title: 'Chase overdue balances above 30 days', status: 'TODO', priority: 'HIGH', dueInDays: 2, hours: 2 },
-  { project: null, title: 'Stock count — acoustics aisle', status: 'TODO', priority: 'LOW', dueInDays: 21, hours: 4 },
+  { project: null, title: 'Stock count in the acoustics aisle', status: 'TODO', priority: 'LOW', dueInDays: 21, hours: 4 },
 ];
 
 export const PAYMENT_NOTES = [

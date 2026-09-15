@@ -70,7 +70,7 @@ export default async function PayrollDetailPage({
     <div className="space-y-6">
       <PageHeader
         title={payroll.number}
-        description={`${name} · ${formatDate(payroll.periodStart)} – ${formatDate(payroll.periodEnd)}`}
+        description={`${name} · ${formatDate(payroll.periodStart)} to ${formatDate(payroll.periodEnd)}`}
         meta={<StatusBadge status={payroll.status} />}
         actions={
           canEdit && payroll.status === 'DRAFT' ? (

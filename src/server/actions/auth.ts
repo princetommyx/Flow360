@@ -55,7 +55,7 @@ export async function loginAction(
       return {
         ok: false,
         error:
-          'We could not reach the service to sign you in. This is not your password — please try again shortly.',
+          'We could not reach the service to sign you in. This is not your password, so please try again shortly.',
       };
     }
     throw error;

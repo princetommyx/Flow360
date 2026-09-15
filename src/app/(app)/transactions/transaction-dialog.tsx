@@ -67,7 +67,7 @@ export function TransactionDialog({
             {transactionId ? 'Edit ledger entry' : 'Record a movement'}
           </DialogTitle>
           <DialogDescription>
-            Money that does not come from an invoice, a bill or an expense —
+            Money that does not come from an invoice, a bill or an expense:
             takings, a bank charge, or moving funds between your own accounts.
           </DialogDescription>
         </DialogHeader>
@@ -288,7 +288,7 @@ function TransactionFields({
                       />
                     </FormControl>
                     <FormDescription>
-                      Always a positive figure — the kind decides the direction.
+                      Always a positive figure. The kind decides the direction.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

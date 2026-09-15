@@ -81,7 +81,7 @@ export function CurrencyCard({
         <CardTitle className="text-[14px]">Currency</CardTitle>
         <CardDescription>
           This workspace keeps its books in <strong>{current}</strong>. Everything
-          you record — invoices, bills, wages, balances — is in that currency.
+          you record is in that currency: invoices, bills, wages and balances.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -119,7 +119,7 @@ export function CurrencyCard({
                     description:
                       result.data.mode === 'convert'
                         ? `Every figure was restated at ${result.data.rate}.`
-                        : 'No figure was changed — only the label.',
+                        : 'No figure was changed, only the label.',
                   },
                 );
                 setOpen(false);
@@ -143,7 +143,7 @@ export function CurrencyCard({
                     {CURRENCIES.filter((currency) => currency.code !== current).map(
                       (currency) => (
                         <SelectItem key={currency.code} value={currency.code}>
-                          {currency.code} — {currency.name}
+                          {currency.code} · {currency.name}
                         </SelectItem>
                       ),
                     )}
@@ -163,7 +163,7 @@ export function CurrencyCard({
                   <SelectContent>
                     <SelectItem value="convert">Convert them at a rate</SelectItem>
                     <SelectItem value="relabel">
-                      Leave them — the label was wrong
+                      Leave them (the label was wrong)
                     </SelectItem>
                   </SelectContent>
                 </Select>
@@ -172,7 +172,7 @@ export function CurrencyCard({
               {mode === 'convert' ? (
                 <div className="grid gap-2">
                   <Label htmlFor="currency-rate">
-                    Rate — 1 {current} buys how many {to || '…'}
+                    Rate: 1 {current} buys how many {to || '…'}
                   </Label>
                   <Input
                     id="currency-rate"
@@ -209,14 +209,14 @@ export function CurrencyCard({
                 {mode === 'convert' ? (
                   <>
                     Every amount in this workspace will be multiplied by the rate and
-                    the label changed. This restates your own books — it does not
+                    the label changed. This restates your own books. It does not
                     change what was agreed with anyone, so an invoice raised for{' '}
                     {current} is still owed as it was written. There is no undo beyond
                     converting back.
                   </>
                 ) : (
                   <>
-                    No figure will change — only the label. Use this only when the
+                    No figure will change, only the label. Use this only when the
                     amounts were already in {to || 'the new currency'} and the
                     workspace was set up with the wrong one. If the figures really are{' '}
                     {current}, this makes every total in the workspace wrong.
