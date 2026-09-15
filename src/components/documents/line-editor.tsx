@@ -41,7 +41,8 @@ type LineFormValues = {
     quantity: number;
     unit: string;
     unitPrice: number;
-    discountRate: number;
+    /* Optional: purchase documents keep no per-line discount. */
+    discountRate?: number;
     taxRate: number;
   }>;
 };
@@ -70,18 +71,32 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
   products,
   currency,
   error,
+  /*
+    Purchase orders and bills have no per-line discount to keep: what a
+    supplier gives you is negotiated into the unit price before it reaches the
+    document. Offering the field there would take a number the record cannot
+    store and quietly drop it.
+  */
+  showDiscount = true,
+  addLabel,
 }: {
   control: Control<TFieldValues>;
   setValue: UseFormSetValue<TFieldValues>;
   products: ProductOption[];
   currency: string;
   error?: string;
+  showDiscount?: boolean;
+  addLabel?: string;
 }) {
   // React Hook Form's `Control` is invariant in its field-values type, so a
   // shared component cannot accept one structurally. The generic keeps call
   // sites type-checked; the narrowing happens once, here.
   const control = outerControl as unknown as Control<LineFormValues>;
   const setValue = outerSetValue as unknown as UseFormSetValue<LineFormValues>;
+
+  const columns = showDiscount
+    ? 'lg:grid-cols-[minmax(0,1fr)_5rem_7rem_5rem_5rem_7rem_2.25rem]'
+    : 'lg:grid-cols-[minmax(0,1fr)_5rem_7rem_5rem_7rem_2.25rem]';
 
   const { fields, append, remove } = useFieldArray({ control, name: 'items' });
   const items = useWatch({ control, name: 'items' }) ?? [];
@@ -116,11 +131,14 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
     <div className="space-y-3">
       <div className="overflow-hidden rounded-xl border border-border">
         {/* Column headings — desktop only; each row is self-labelling on mobile */}
-        <div className="hidden gap-3 border-b border-border bg-surface-subtle px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid lg:grid-cols-[minmax(0,1fr)_5rem_7rem_5rem_5rem_7rem_2.25rem]">
+        <div className={cn(
+            'hidden gap-3 border-b border-border bg-surface-subtle px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground lg:grid',
+            columns,
+          )}>
           <span>Item</span>
           <span className="text-right">Qty</span>
           <span className="text-right">Unit price</span>
-          <span className="text-right">Disc %</span>
+          {showDiscount ? <span className="text-right">Disc %</span> : null}
           <span className="text-right">Tax %</span>
           <span className="text-right">Total</span>
           <span className="sr-only">Remove</span>
@@ -148,7 +166,7 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
             return (
               <li
                 key={field.id}
-                className="grid gap-3 px-4 py-3.5 lg:grid-cols-[minmax(0,1fr)_5rem_7rem_5rem_5rem_7rem_2.25rem] lg:items-start lg:gap-3"
+                className={cn('grid gap-3 px-4 py-3.5 lg:items-start lg:gap-3', columns)}
               >
                 <div className="min-w-0 space-y-2">
                   <div className="flex items-center gap-2">
@@ -198,14 +216,16 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
                   min={0}
                   step="0.01"
                 />
-                <NumberField
-                  control={control}
-                  name={`items.${index}.discountRate`}
-                  label="Discount %"
-                  min={0}
-                  max={100}
-                  step="0.01"
-                />
+                {showDiscount ? (
+                  <NumberField
+                    control={control}
+                    name={`items.${index}.discountRate`}
+                    label="Discount %"
+                    min={0}
+                    max={100}
+                    step="0.01"
+                  />
+                ) : null}
                 <NumberField
                   control={control}
                   name={`items.${index}.taxRate`}
@@ -250,7 +270,7 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
           size="sm"
           onClick={() => append({ ...EMPTY_LINE })}
         >
-          <Plus /> Add line
+          <Plus /> {addLabel ?? 'Add line'}
         </Button>
         {error ? <FormMessage>{error}</FormMessage> : null}
       </div>
