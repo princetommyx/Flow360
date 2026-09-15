@@ -278,7 +278,7 @@ async function main() {
       await db.employee.create({
         data: {
           organizationId,
-          employeeNumber: `EMP-${String(index + 1).padStart(3, '0')}`,
+          employeeNumber: `EMP-${String(index + 1).padStart(4, '0')}`,
           firstName: employee.firstName,
           lastName: employee.lastName,
           email: employee.email,
