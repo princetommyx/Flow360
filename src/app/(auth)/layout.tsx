@@ -1,4 +1,17 @@
+import type { Metadata } from 'next';
+
 import { ThemeToggle } from '@/components/layout/theme-toggle';
+
+/**
+ * Sign-in, registration and everything token-shaped.
+ *
+ * `/login` and `/register` are worth indexing and set their own robots value
+ * back; the rest of this group is a password reset or an invitation, which
+ * should never appear in a result list.
+ */
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 /** Page ground for every auth screen. The card itself comes from `AuthPanel`. */
 export default function AuthLayout({

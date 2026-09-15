@@ -8,7 +8,7 @@ import { NavigationProgress } from '@/components/layout/navigation-progress';
 import { ThemeProvider, ThemeScript } from '@/components/layout/theme-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { brand } from '@/lib/config/brand';
+import { brand, locale } from '@/lib/config/brand';
 import { appUrl } from '@/lib/url';
 
 import './globals.css';
@@ -40,7 +40,16 @@ export const metadata: Metadata = {
     description: brand.description,
     siteName: brand.name,
     type: 'website',
+    locale: locale.locale.replace('-', '_'),
   },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${brand.name} · ${brand.tagline}`,
+    description: brand.description,
+  },
+  // Every marketing page names its own; this is the fallback for anything
+  // that forgets, so no page is ever its own duplicate.
+  alternates: { canonical: '/' },
 };
 
 export const viewport: Viewport = {

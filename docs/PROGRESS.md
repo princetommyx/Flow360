@@ -250,6 +250,31 @@ a tenant's records.
 **Suspension** takes away sign-in and touches no data, so restoring is one flag
 and everything is where they left it.
 
+## Search
+
+Technical groundwork only. It makes the marketing pages eligible to rank; it
+does not make them rank, which is content and links over months.
+
+- `app/robots.ts` opens up **only** on `brand.domain`. Every other host,
+  including `*.vercel.app` and every preview, returns `Disallow: /`, because two
+  copies of the same copy on two hostnames splits a ranking between them.
+  Changing the domain without changing `NEXT_PUBLIC_BRAND_DOMAIN` would take the
+  site out of the index, so the two must move together.
+- `app/sitemap.ts` lists the six public pages by hand. The router is almost
+  entirely the signed-in product, and a sitemap full of pages that redirect to a
+  login screen is worse than none.
+- Every page under `(app)` and `(auth)` sends `noindex, nofollow`, with `/login`
+  and `/register` setting it back because they are worth finding. `robots.txt`
+  asks a crawler not to fetch; the meta tag tells one that fetched anyway not to
+  index. They are different promises and a page that matters needs both.
+- `components/marketing/structured-data.tsx` holds Organization,
+  SoftwareApplication and FAQPage. The FAQ schema is fed from the same array the
+  page renders, because marking up an answer a reader cannot see is against
+  Google's guidelines and costs the enhanced result.
+- `app/opengraph-image.tsx` draws the share card from the brand config. Its
+  renderer refuses any element with more than one child and no explicit
+  `display`, so text and expressions are composed into a string first.
+
 ## Known gaps, deliberately left
 
 - **No trial-ending reminder.** The trial email says days remaining are on the
@@ -262,5 +287,7 @@ and everything is where they left it.
   follows up; nothing charges anyone. The billing page says so.
 - **`hero.jpg` carries a rawpixel watermark** and needs a licensed replacement
   before commercial use.
+- **No content beyond the landing page and pricing.** Nothing ranks for a
+  competitive term on four pages of marketing copy, however well marked up.
 - **Company details in `lib/config/brand.ts` are placeholders** — registered
   name, address and tax number appear on invoices and should be replaced.

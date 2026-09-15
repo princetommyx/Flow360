@@ -10,7 +10,13 @@ import { brand } from '@/lib/config/brand';
 
 import { LoginForm } from './login-form';
 
-export const metadata: Metadata = { title: 'Sign in' };
+export const metadata: Metadata = {
+  title: { absolute: `Sign in to ${brand.name}` },
+  description: `Sign in to your ${brand.name} workspace to manage invoicing, stock, expenses and payroll.`,
+  alternates: { canonical: '/login' },
+  // Overrides the group's blanket refusal: this one is worth finding.
+  robots: { index: true, follow: true },
+};
 
 export default async function LoginPage() {
   const session = await auth();

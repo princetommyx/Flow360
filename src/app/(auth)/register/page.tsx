@@ -6,12 +6,22 @@ import { Logo } from '@/components/brand/logo';
 import { AuthPanel } from '@/components/marketing/auth-panel';
 import { StepIndicator } from '@/components/shared/step-indicator';
 import { auth, googleEnabled } from '@/lib/auth';
+import { brand, locale } from '@/lib/config/brand';
 import { SIGNUP_STEPS } from '@/lib/config/signup-steps';
 import { TRIAL_DAYS, findPlan } from '@/lib/config/plans';
 
 import { RegisterForm } from './register-form';
 
-export const metadata: Metadata = { title: 'Create your workspace' };
+export const metadata: Metadata = {
+  title: {
+    absolute: `Start a free ${TRIAL_DAYS}-day trial | ${brand.name} ERP for ${locale.country} SMEs`,
+  },
+  description: `Create your ${brand.name} workspace in a minute. Invoicing, stock, purchasing, expenses and payroll on one system, priced in ${locale.currency}. No card required.`,
+  alternates: { canonical: '/register' },
+  // Overrides the group's blanket refusal: this is the page a search should
+  // land on when somebody is ready to start.
+  robots: { index: true, follow: true },
+};
 
 export default async function RegisterPage({
   searchParams,
