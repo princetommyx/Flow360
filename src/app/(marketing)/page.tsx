@@ -87,7 +87,7 @@ const MODULES = [
 const STEPS = [
   {
     title: 'Set up your company once',
-    body: 'Add your details, currency, tax rates and invoice numbering. Everything downstream inherits it — you never retype a tax rate again.',
+    body: 'Add your details, currency, tax rates and invoice numbering. Everything downstream inherits it, so you never retype a tax rate again.',
   },
   {
     title: 'Bring in customers and your catalogue',
@@ -99,7 +99,7 @@ const STEPS = [
   },
   {
     title: 'Watch the numbers move',
-    body: 'The dashboard and reports read from the same records, so revenue, spend, stock and profit are always current — no reconciliation ritual.',
+    body: 'The dashboard and reports read from the same records, so revenue, spend, stock and profit are always current. No reconciliation ritual.',
   },
 ];
 
@@ -128,7 +128,7 @@ const FAQS = [
   },
   {
     q: 'How does invoice numbering work?',
-    a: 'You choose the prefix, whether the year is included and how many digits the counter uses — for example INV-2026-00001. Numbers are issued atomically, so two people creating invoices at the same moment can never collide.',
+    a: 'You choose the prefix, whether the year is included and how many digits the counter uses, for example INV-2026-00001. Numbers are issued atomically, so two people creating invoices at the same moment can never collide.',
   },
   {
     q: 'What happens to stock when I sell something?',
@@ -200,7 +200,7 @@ export default function LandingPage() {
           <SectionHeading
             eyebrow="Modules"
             title="Twenty modules that already know about each other"
-            lead="Turn on what you need today and switch the rest on later — nothing has to be configured twice."
+            lead="Turn on what you need today and switch the rest on later. Nothing has to be configured twice."
           />
           </Reveal>
 
@@ -271,7 +271,7 @@ export default function LandingPage() {
               <SectionHeading
                 eyebrow="Why teams switch"
                 title="Less admin, fewer surprises"
-                lead="The cost of scattered tools is not the subscriptions — it is the hours spent reconciling them and the decisions made on stale numbers."
+                lead="The cost of scattered tools is not the subscriptions. It is the hours spent reconciling them, and the decisions made on stale numbers."
               />
             </Reveal>
 

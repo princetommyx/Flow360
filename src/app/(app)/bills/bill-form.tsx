@@ -133,7 +133,7 @@ export function BillForm({
             <span className="font-mono font-medium text-foreground">
               {linkedOrderNumber}
             </span>
-            . Its lines are copied below — change them to match what the supplier
+            . Its lines are copied below, so change them to match what the supplier
             actually invoiced.
           </p>
         ) : null}
@@ -246,7 +246,7 @@ export function BillForm({
                     <FormControl>
                       <Textarea
                         rows={4}
-                        placeholder="Anything to remember when this is paid — a query, a credit expected, who approved it."
+                        placeholder="Anything to remember when this is paid: a query, a credit expected, who approved it."
                         {...field}
                       />
                     </FormControl>

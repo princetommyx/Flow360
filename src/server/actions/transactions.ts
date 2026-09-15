@@ -118,7 +118,7 @@ export async function createTransactionAction(
       action: 'create',
       entityType: 'transaction',
       entityId: created.id,
-      summary: `Recorded ${data.type.toLowerCase()} of ${data.amount} — ${data.description}`,
+      summary: `Recorded ${data.type.toLowerCase()} of ${data.amount}: ${data.description}`,
     });
 
     revalidatePath('/transactions');
@@ -233,7 +233,7 @@ export async function updateTransactionAction(
       action: 'update',
       entityType: 'transaction',
       entityId: id,
-      summary: `Updated ledger entry — ${data.description}`,
+      summary: `Updated ledger entry: ${data.description}`,
     });
 
     revalidatePath('/transactions');
@@ -301,7 +301,7 @@ export async function deleteTransactionAction(id: string): Promise<ActionResult>
       action: 'delete',
       entityType: 'transaction',
       entityId: id,
-      summary: `Removed ledger entry — ${existing.description}`,
+      summary: `Removed ledger entry: ${existing.description}`,
     });
 
     revalidatePath('/transactions');

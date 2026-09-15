@@ -67,7 +67,7 @@ function logToConsole(message: MailMessage): void {
   const lines = [
     '',
     rule,
-    `✉  ${brand.name} — ${message.subject}`,
+    `✉  ${brand.name}: ${message.subject}`,
     `   to: ${message.to}`,
     rule,
     message.heading,

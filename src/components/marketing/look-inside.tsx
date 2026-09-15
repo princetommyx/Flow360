@@ -21,7 +21,7 @@ const SHOWCASES: Showcase[] = [
   {
     eyebrow: 'Dashboard',
     title: 'Know where the business stands before anyone asks',
-    body: 'Revenue, outstanding balances, spend and net profit for any period you choose — today, this quarter, or a range you type in. Every figure is read from the same records your team works in, so there is nothing to reconcile.',
+    body: 'Revenue, outstanding balances, spend and net profit for any period you choose: today, this quarter, or a range you type in. Every figure is read from the same records your team works in, so there is nothing to reconcile.',
     src: '/product/dashboard.png',
     alt: `${brand.name} dashboard showing metric tiles, a revenue and expense trend chart, invoice status breakdown and recent activity.`,
   },

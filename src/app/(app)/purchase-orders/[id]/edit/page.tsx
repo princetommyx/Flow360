@@ -45,7 +45,7 @@ export default async function EditPurchaseOrderPage({
         <Alert variant="warning">
           <AlertDescription className="text-foreground">
             Only draft and sent orders can be changed. Cancel this one and raise a
-            replacement if the supplier has agreed to something different — the stock
+            replacement if the supplier has agreed to something different. The stock
             already received against it stays where it is.
           </AlertDescription>
         </Alert>

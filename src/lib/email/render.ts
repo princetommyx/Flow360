@@ -294,9 +294,11 @@ export function renderText(message: MailMessage): string {
     parts.push('', message.footnote);
   }
 
+  // A blank line is enough to set the footer apart in plain text; a rule made
+  // of punctuation reads as decoration in a client that has no styling at all.
   parts.push(
     '',
-    '—',
+    '',
     `${company.legalName} · ${companyAddress()}`,
     `Questions? Write to ${brand.supportEmail}.`,
   );

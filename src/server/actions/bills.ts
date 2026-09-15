@@ -414,7 +414,7 @@ export async function recordBillPaymentAction(
           // rest of the ledger uses: money out is negative.
           amount: -data.amount,
           currency: organization.currency,
-          description: `Paid supplier — ${bill.number}`,
+          description: `Paid supplier ${bill.number}`,
           category: 'Purchases',
           occurredAt: paidAt,
           reference: payment.number,

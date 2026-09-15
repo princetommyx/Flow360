@@ -185,7 +185,7 @@ export function ProjectForm({
                       onChange={(value) =>
                         form.setValue('customerId', value, { shouldDirty: true })
                       }
-                      placeholder="Internal project — no customer"
+                      placeholder="Internal project (no customer)"
                       searchPlaceholder="Search customers…"
                       emptyMessage="No customer matches that search."
                     />
@@ -317,7 +317,7 @@ export function ProjectForm({
               name="progress"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Progress — {progress}%</FormLabel>
+                  <FormLabel>Progress: {progress}%</FormLabel>
                   <FormControl>
                     <input
                       type="range"

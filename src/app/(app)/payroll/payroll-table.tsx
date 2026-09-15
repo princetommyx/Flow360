@@ -62,7 +62,7 @@ export function PayrollTable({
         <StatusBadge status={payroll.status} size="sm" />
       </p>
       <p className="mt-0.5 truncate text-[12px] text-muted-foreground">
-        {payroll.number} · {formatDate(payroll.periodStart, 'dd MMM')} –{' '}
+        {payroll.number} · {formatDate(payroll.periodStart, 'dd MMM')} to{' '}
         {formatDate(payroll.periodEnd, 'dd MMM yyyy')}
       </p>
     </div>

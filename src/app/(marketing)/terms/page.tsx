@@ -19,7 +19,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: 'Your workspace and your data',
     paragraphs: [
-      'The records you enter — customers, invoices, stock, payroll, everything — belong to you. We store and process them so the product can do its job, and for no other purpose. We do not sell them, and we do not use them to train anything.',
+      'The records you enter belong to you: customers, invoices, stock, payroll, everything. We store and process them so the product can do its job, and for no other purpose. We do not sell them, and we do not use them to train anything.',
       'Every list and report exports to CSV and every document prints to PDF, so you can take a full copy out at any time, including after you stop paying.',
     ],
   },
@@ -62,7 +62,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: 'Ending the agreement',
     paragraphs: [
-      'You can stop using the service and close your workspace whenever you like. Export what you need first — closure removes the data on a defined schedule and it cannot be recovered afterwards.',
+      'You can stop using the service and close your workspace whenever you like. Export what you need first, because closure removes the data on a defined schedule and it cannot be recovered afterwards.',
       'We can suspend an account that is being used in breach of these terms, and will say what the problem is and give you a chance to fix it unless doing so would put others at risk.',
     ],
   },

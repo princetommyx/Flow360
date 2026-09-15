@@ -139,7 +139,7 @@ export async function recordPaymentAction(
           type: 'INCOME',
           amount: data.amount,
           currency: organization.currency,
-          description: `Payment received — ${invoice.number}`,
+          description: `Payment received for ${invoice.number}`,
           category: 'Sales',
           occurredAt: paidAt,
           reference: payment.number,

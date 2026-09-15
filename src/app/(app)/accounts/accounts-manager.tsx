@@ -183,7 +183,7 @@ export function AccountsManager({
         description={
           <>
             <strong className="text-foreground">{deleteConfirm.target?.name}</strong>{' '}
-            will be removed. Accounts with movements against them cannot be deleted —
+            will be removed. Accounts with movements against them cannot be deleted, so
             mark those inactive instead.
           </>
         }

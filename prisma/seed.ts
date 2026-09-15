@@ -563,7 +563,7 @@ async function main() {
           accountId: bankAccount.id,
           type: 'INCOME',
           amount: amountPaid,
-          description: `Payment received — ${invoice.number}`,
+          description: `Payment received for ${invoice.number}`,
           category: 'Sales',
           occurredAt: paidAt,
           reference: payment.number,
@@ -598,7 +598,7 @@ async function main() {
     ...Array.from({ length: 6 }).flatMap((_, monthsBack) =>
       RECURRING_EXPENSES.map((expense) => ({
         ...expense,
-        title: `${expense.title} — ${monthsBack === 0 ? 'current month' : `${monthsBack} month${monthsBack === 1 ? '' : 's'} ago`}`,
+        title: `${expense.title}, ${monthsBack === 0 ? 'current month' : `${monthsBack} month${monthsBack === 1 ? '' : 's'} ago`}`,
         daysAgo: monthsBack * 30 + between(1, 20),
       })),
     ),
@@ -618,7 +618,7 @@ async function main() {
         categoryId: categoryByName.get(expense.category) ?? null,
         accountId: account.id,
         title: expense.title,
-        description: `${expense.title} — recorded from supplier documentation.`,
+        description: `${expense.title}, recorded from supplier documentation.`,
         amount: expense.amount,
         taxAmount,
         total: round(expense.amount + taxAmount),

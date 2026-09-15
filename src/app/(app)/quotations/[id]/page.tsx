@@ -119,7 +119,7 @@ export default async function QuotationDetailPage({
         <Alert variant="info">
           <AlertDescription className="text-foreground">
             Accepted and ready to bill. Converting copies these lines into a draft
-            invoice — nothing is sent and no stock moves until you send that invoice.
+            invoice. Nothing is sent and no stock moves until you send that invoice.
           </AlertDescription>
         </Alert>
       ) : null}

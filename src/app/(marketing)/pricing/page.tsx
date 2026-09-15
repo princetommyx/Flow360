@@ -33,7 +33,7 @@ const INCLUDED_EVERYWHERE = [
 const FAQS = [
   {
     q: `What happens after the ${TRIAL_DAYS} days?`,
-    a: `The trial runs for ${TRIAL_DAYS} days on the full Business feature set — not a cut-down version — so you are evaluating the real product. Near the end we will prompt you to pick a plan. Nothing is charged automatically, because you never gave us a card to charge.`,
+    a: `The trial runs for ${TRIAL_DAYS} days on the full Business feature set, not a cut-down version, so you are evaluating the real product. Near the end we will prompt you to pick a plan. Nothing is charged automatically, because you never gave us a card to charge.`,
   },
   {
     q: 'Do I need a card to start?',
@@ -53,7 +53,7 @@ const FAQS = [
   },
   {
     q: 'Can I run more than one company?',
-    a: 'Starter covers a single company. Business covers three, and Enterprise is unlimited. Each company is fully separate — its own customers, stock and books — and you switch between them from the sidebar.',
+    a: 'Starter covers a single company. Business covers three, and Enterprise is unlimited. Each company is fully separate, with its own customers, stock and books, and you switch between them from the sidebar.',
   },
 ];
 
@@ -70,9 +70,9 @@ export default function PricingPage() {
               Free for a month. Then only if it earns its place.
             </h1>
             <p className="mx-auto mt-5 max-w-xl text-pretty text-[15px] leading-relaxed text-muted-foreground md:text-base">
-              Every workspace starts with {TRIAL_DAYS} days of the full Business plan —
-              no card, no feature gates, no sales call. Decide at the end, on the
-              strength of a month of your own real data.
+              Every workspace starts with {TRIAL_DAYS} days of the full Business
+              plan. No card, no feature gates, no sales call. Decide at the end, on
+              the strength of a month of your own real data.
             </p>
           </div>
 

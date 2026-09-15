@@ -105,7 +105,7 @@ export function AccountDialog({
         <DialogHeader>
           <DialogTitle>{accountId ? 'Edit account' : 'Add an account'}</DialogTitle>
           <DialogDescription>
-            Somewhere money sits — a bank account, petty cash, or a mobile wallet.
+            Somewhere money sits: a bank account, petty cash, or a mobile wallet.
           </DialogDescription>
         </DialogHeader>
 

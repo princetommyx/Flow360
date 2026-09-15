@@ -181,7 +181,7 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
                         onChange={(value) => applyProduct(index, value)}
                         placeholder="Pick from catalogue, or type below"
                         searchPlaceholder="Search products and services…"
-                        emptyMessage="No catalogue match — type a description instead."
+                        emptyMessage="No catalogue match. Type a description instead."
                         className="h-8 text-[13px]"
                       />
                     </div>
@@ -197,7 +197,7 @@ export function LineEditor<TFieldValues extends FieldValues & LineFormValues>({
                   {shortfall ? (
                     <p className="text-[11.5px] font-medium text-warning-foreground">
                       Only {formatNumber(product.stockQuantity, 0)} {product.unit} in
-                      stock — sending this will be blocked until stock is received.
+                      stock, so sending this will be blocked until more arrives.
                     </p>
                   ) : null}
                 </div>

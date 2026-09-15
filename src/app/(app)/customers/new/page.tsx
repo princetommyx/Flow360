@@ -14,7 +14,7 @@ export default async function NewCustomerPage() {
     <div className="mx-auto max-w-4xl space-y-6">
       <PageHeader
         title="Add customer"
-        description="Only a contact name is required — everything else can be filled in later."
+        description="Only a contact name is required. Everything else can be filled in later."
       />
       <CustomerForm />
     </div>

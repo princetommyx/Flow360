@@ -190,7 +190,7 @@ export function TimesheetsTable({
             allLabel: 'All projects',
             options: choices.projects.map((project) => ({
               value: project.id,
-              label: `${project.code} — ${project.name}`,
+              label: `${project.code} · ${project.name}`,
             })),
           },
           {

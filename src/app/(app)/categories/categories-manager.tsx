@@ -282,7 +282,7 @@ export function CategoriesManager({
         description={
           <>
             <strong className="text-foreground">{confirm.target?.name}</strong> will be
-            removed. Categories still in use cannot be deleted — move those products
+            removed. Categories still in use cannot be deleted, so move those products
             first.
           </>
         }

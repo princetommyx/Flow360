@@ -250,7 +250,7 @@ export async function payPayrollAction(
           // Signed relative to the account it left, like the rest of the ledger.
           amount: -net,
           currency: organization.currency,
-          description: `Wages — ${payroll.employee.firstName} ${payroll.employee.lastName} (${payroll.number})`,
+          description: `Wages for ${payroll.employee.firstName} ${payroll.employee.lastName} (${payroll.number})`,
           category: 'Payroll',
           occurredAt: paidAt,
           reference: payroll.number,

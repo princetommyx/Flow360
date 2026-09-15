@@ -187,7 +187,7 @@ function TimesheetFields({
                 <SelectContent>
                   {choices.projects.map((project) => (
                     <SelectItem key={project.id} value={project.id}>
-                      {project.code} — {project.name}
+                      {project.code} · {project.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -323,7 +323,7 @@ function TimesheetFields({
               <div>
                 <FormLabel className="cursor-pointer">Billable</FormLabel>
                 <FormDescription>
-                  Unbillable time is still recorded — it just does not add to the
+                  Unbillable time is still recorded. It just does not add to the
                   project&rsquo;s cost.
                 </FormDescription>
               </div>

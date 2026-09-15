@@ -86,7 +86,7 @@ export function TaskDialog({
         <DialogHeader>
           <DialogTitle>{task ? 'Edit task' : 'Add a task'}</DialogTitle>
           <DialogDescription>
-            Tasks can stand alone or sit under a project — hours booked against
+            Tasks can stand alone or sit under a project, and hours booked against
             them roll up to what that project has cost.
           </DialogDescription>
         </DialogHeader>
@@ -198,7 +198,7 @@ function TaskFields({
                     <SelectItem value={NONE}>No project</SelectItem>
                     {choices.projects.map((project) => (
                       <SelectItem key={project.id} value={project.id}>
-                        {project.code} — {project.name}
+                        {project.code} · {project.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

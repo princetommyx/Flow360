@@ -28,7 +28,7 @@ const jetbrains = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: `${brand.name} — ${brand.tagline}`,
+    default: `${brand.name} · ${brand.tagline}`,
     template: `%s · ${brand.name}`,
   },
   description: brand.description,
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   icons: { icon: brand.faviconUrl },
   metadataBase: appUrl(),
   openGraph: {
-    title: `${brand.name} — ${brand.tagline}`,
+    title: `${brand.name} · ${brand.tagline}`,
     description: brand.description,
     siteName: brand.name,
     type: 'website',

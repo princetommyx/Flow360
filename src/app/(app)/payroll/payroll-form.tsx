@@ -273,7 +273,7 @@ export function PayrollForm({
                       <FormControl>
                         <Textarea
                           rows={3}
-                          placeholder="Anything the payslip should explain — a one-off adjustment, a correction."
+                          placeholder="Anything the payslip should explain, such as a one-off adjustment or a correction."
                           {...field}
                         />
                       </FormControl>

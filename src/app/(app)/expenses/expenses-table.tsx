@@ -226,8 +226,8 @@ export function ExpensesTable({
         confirmLabel="Delete expense"
         description={
           <>
-            <strong className="text-foreground">{deleteConfirm.target?.number}</strong> —{' '}
-            {deleteConfirm.target?.title} will be removed and stop counting towards your
+            <strong className="text-foreground">{deleteConfirm.target?.number}</strong>,{' '}
+            {deleteConfirm.target?.title}, will be removed and stop counting towards your
             spend. This cannot be undone.
           </>
         }

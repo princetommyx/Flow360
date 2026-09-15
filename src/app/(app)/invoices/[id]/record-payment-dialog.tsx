@@ -108,7 +108,7 @@ export function RecordPaymentDialog({
         <DialogHeader>
           <DialogTitle>Record a payment</DialogTitle>
           <DialogDescription>
-            {invoiceNumber} — {formatCurrency(outstanding, { currency })} outstanding.
+            {invoiceNumber} has {formatCurrency(outstanding, { currency })} outstanding.
           </DialogDescription>
         </DialogHeader>
 
@@ -141,7 +141,7 @@ export function RecordPaymentDialog({
                         />
                       </FormControl>
                       <FormDescription>
-                        Part payments are fine — the balance stays open.
+                        Part payments are fine. The balance stays open.
                       </FormDescription>
                       <FormMessage />
                     </FormItem>

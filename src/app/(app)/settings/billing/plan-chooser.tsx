@@ -60,7 +60,7 @@ export function PlanChooser({
     }
 
     toast.success(`${planName} requested`, {
-      description: `Recorded at the ${annual ? 'yearly' : 'monthly'} price — nothing has been charged. A confirmation is on its way to your inbox.`,
+      description: `Recorded at the ${annual ? 'yearly' : 'monthly'} price. Nothing has been charged, and a confirmation is on its way to your inbox.`,
     });
     router.refresh();
   }
@@ -131,7 +131,7 @@ export function PlanChooser({
             {requestedPeriod
               ? `, billed ${requestedPeriod === 'annual' ? 'yearly' : 'monthly'},`
               : ''}{' '}
-            is requested. Nothing has been charged — we will be in touch to set it up.
+            is requested. Nothing has been charged, and we will be in touch to set it up.
           </p>
           {isOwner ? (
             <Button
@@ -196,7 +196,7 @@ export function PlanChooser({
                         const percent = annualSaving(plan);
                         return percent === null
                           ? 'Billed once a year'
-                          : `Billed once a year — ${percent}% less`;
+                          : `Billed once a year, ${percent}% less`;
                       })()
                     : 'Billed every month'}
               </p>

@@ -104,7 +104,7 @@ export function Hero({ hasPhoto = false }: { hasPhoto?: boolean }) {
 
             <p className="motion-safe:reveal-mask-delayed mt-5 max-w-xl text-pretty text-[15.5px] leading-relaxed text-white/70 md:text-[17px]">
               {brand.name} runs sales, purchasing, stock, money and people from a
-              single set of records — so the number you see in a report is the
+              single set of records, so the number you see in a report is the
               same number the work actually produced.
             </p>
 

@@ -70,7 +70,7 @@ export async function createProjectAction(
       action: 'create',
       entityType: 'project',
       entityId: project.id,
-      summary: `Opened project ${project.code} — ${data.name}`,
+      summary: `Opened project ${project.code}: ${data.name}`,
     });
 
     revalidatePath('/projects');
@@ -369,7 +369,7 @@ export async function createTaskAction(
       action: 'create',
       entityType: 'task',
       entityId: task.id,
-      summary: `Added task — ${data.title}`,
+      summary: `Added task: ${data.title}`,
     });
 
     revalidatePath('/tasks');
@@ -437,7 +437,7 @@ export async function updateTaskAction(
       action: 'update',
       entityType: 'task',
       entityId: id,
-      summary: `Updated task — ${data.title}`,
+      summary: `Updated task: ${data.title}`,
     });
 
     revalidatePath('/tasks');
@@ -507,7 +507,7 @@ export async function deleteTaskAction(id: string): Promise<ActionResult> {
       action: 'delete',
       entityType: 'task',
       entityId: id,
-      summary: `Deleted task — ${task.title}`,
+      summary: `Deleted task: ${task.title}`,
     });
 
     revalidatePath('/tasks');

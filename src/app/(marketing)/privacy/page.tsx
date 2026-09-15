@@ -21,7 +21,7 @@ const SECTIONS: LegalSection[] = [
     paragraphs: ['Only what the service needs to work:'],
     list: [
       'Name, email address, phone number and job title, so colleagues can tell each other apart and we can reach you about the account.',
-      'A hashed password. The original is never stored and cannot be recovered — only reset.',
+      'A hashed password. The original is never stored and cannot be recovered, only reset.',
       'Sign-in times and the actions taken inside a workspace, kept as an audit trail its owner can inspect.',
       'Basic technical details of each request, such as browser type and approximate location, used to keep accounts secure.',
     ],
@@ -36,7 +36,7 @@ const SECTIONS: LegalSection[] = [
   {
     heading: 'Who else sees it',
     paragraphs: [
-      'People you have invited to your workspace, with the visibility their role allows. Beyond that, a small number of service providers who make the product run — hosting, database, email delivery — each handling data only on our instructions.',
+      'People you have invited to your workspace, with the visibility their role allows. Beyond that, a small number of service providers who make the product run: hosting, database and email delivery, each handling data only on our instructions.',
       'Our own staff access workspace contents only when you ask us to look at something, or where it is unavoidable to fix a fault, and that access is logged.',
       'We disclose data to an authority only where the law requires it, and we will tell you unless we are legally prevented from doing so.',
     ],
@@ -59,7 +59,7 @@ const SECTIONS: LegalSection[] = [
     heading: 'Your choices',
     paragraphs: ['You can, at any time:'],
     list: [
-      'Export everything — every list and report writes CSV, and documents print to PDF.',
+      'Export everything. Every list and report writes CSV, and documents print to PDF.',
       'Correct your own account details from your profile page.',
       'Ask us to delete your account, or your whole workspace if you own it.',
       'Ask what we hold about you and receive a copy.',

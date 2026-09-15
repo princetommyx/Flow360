@@ -102,7 +102,7 @@ export default async function EmployeeDetailPage({
                             <StatusBadge status={payroll.status} size="sm" />
                           </p>
                           <p className="mt-0.5 text-[12px] text-muted-foreground">
-                            {formatDate(payroll.periodStart)} –{' '}
+                            {formatDate(payroll.periodStart)} to{' '}
                             {formatDate(payroll.periodEnd)}
                           </p>
                         </div>

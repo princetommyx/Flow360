@@ -93,7 +93,7 @@ export default async function VerifyEmailPage({
       </div>
 
       <h1 className="mt-5 text-[1.75rem] font-semibold tracking-[-0.03em]">
-        {delivered ? 'Check your inbox' : "You're in — no provider connected"}
+        {delivered ? 'Check your inbox' : "You're in, but no provider is connected"}
       </h1>
 
       {delivered ? (
@@ -119,7 +119,7 @@ export default async function VerifyEmailPage({
           ) : (
             ' your inbox'
           )}
-          , because this deployment has no email provider connected — the code
+          , because this deployment has no email provider connected. The code
           below was printed to the server log instead, and it works just the
           same.
         </p>
@@ -145,13 +145,13 @@ export default async function VerifyEmailPage({
           <Link href="/dashboard" className="font-medium text-primary hover:underline">
             Skip for now
           </Link>{' '}
-          — you can confirm later from any page.
+          . You can confirm later from any page.
         </p>
       ) : null}
 
       <p className="mt-6 border-t border-border pt-5 text-center text-[12.5px] leading-relaxed text-muted-foreground">
         {delivered
-          ? 'You can start working right away — confirming just secures password recovery and account notifications.'
+          ? 'You can start working right away. Confirming just secures password recovery and account notifications.'
           : 'Set EMAIL_TRANSPORT and RESEND_API_KEY to have this arrive by email instead of in the log.'}
       </p>
     </AuthPanel>

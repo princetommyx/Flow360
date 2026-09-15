@@ -116,7 +116,7 @@ export function StockAdjustDialog({
         <DialogHeader>
           <DialogTitle>Adjust stock</DialogTitle>
           <DialogDescription>
-            {productName} — currently {formatNumber(currentStock, 0)} {unit} on hand.
+            {productName}. Currently {formatNumber(currentStock, 0)} {unit} on hand.
           </DialogDescription>
         </DialogHeader>
 
@@ -138,9 +138,9 @@ export function StockAdjustDialog({
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="STOCK_IN">Stock in — received</SelectItem>
-                        <SelectItem value="STOCK_OUT">Stock out — used or written off</SelectItem>
-                        <SelectItem value="ADJUSTMENT">Correction — set counted total</SelectItem>
+                        <SelectItem value="STOCK_IN">Stock in (received)</SelectItem>
+                        <SelectItem value="STOCK_OUT">Stock out (used or written off)</SelectItem>
+                        <SelectItem value="ADJUSTMENT">Correction (set counted total)</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />

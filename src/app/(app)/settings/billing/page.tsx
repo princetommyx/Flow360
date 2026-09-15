@@ -132,7 +132,7 @@ export default async function BillingPage() {
             <p className="flex items-start gap-2">
               <Download className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
               <span>
-                Your data stays yours either way — every list and report exports to
+                Your data stays yours either way. Every list and report exports to
                 CSV, and invoices print to PDF.
               </span>
             </p>
