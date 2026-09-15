@@ -75,38 +75,47 @@ model VerificationToken {
 }
 
 model Organization {
-  id                 String    @id @default(cuid())
-  name               String
-  slug               String    @unique
-  legalName          String?
-  email              String?
-  phone              String?
-  website            String?
-  taxId              String?
-  logoUrl            String?
-  addressLine1       String?
-  addressLine2       String?
-  city               String?
-  state              String?
-  postalCode         String?
-  country            String    @default("Ghana")
-  currency           String    @default("GHS")
-  timezone           String    @default("Africa/Accra")
-  industry           String?
-  plan               String    @default("starter")
+  id                   String    @id @default(cuid())
+  name                 String
+  slug                 String    @unique
+  legalName            String?
+  email                String?
+  phone                String?
+  website              String?
+  taxId                String?
+  logoUrl              String?
+  addressLine1         String?
+  addressLine2         String?
+  city                 String?
+  state                String?
+  postalCode           String?
+  country              String    @default("Ghana")
+  currency             String    @default("GHS")
+  timezone             String    @default("Africa/Accra")
+  industry             String?
+  plan                 String    @default("starter")
   /// Free trial ends here. Null means the workspace never had one.
-  trialEndsAt        DateTime?
+  trialEndsAt          DateTime?
   /// trialing | active | past_due | cancelled — set by billing once wired up.
-  subscriptionStatus String    @default("trialing")
-  /// Plan the owner asked to move to, pending a payment provider.
-  requestedPlan      String?
+  subscriptionStatus   String    @default("trialing")
+  /// Plan the owner asked to move to, for plans that are not self-service.
+  requestedPlan        String?
+  /// Paystack's identifier for this workspace as a paying customer.
+  paystackCustomer     String?
+  /// The live subscription. Null once cancelled or never started.
+  paystackSubscription String?
+  /// Paystack requires this alongside the subscription code to manage it.
+  paystackEmailToken   String?
+  /// End of the period already paid for. Access continues until then even
+  /// after a cancellation, because they have paid for it.
+  subscriptionEndsAt   DateTime?
   /// monthly | annual — which price they asked for. Kept with the request so
   /// the confirmation, the billing page and the eventual invoice agree.
-  requestedBilling   String?
-  isActive           Boolean   @default(true)
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
+  requestedBilling     String?
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  deletedAt            DateTime?
 
   settings       CompanySettings?
   members        OrganizationMember[]
@@ -136,6 +145,7 @@ model Organization {
   taxRates       TaxRate[]
   sequences      NumberSequence[]
   activities     ActivityLog[]
+  billingEvents  BillingEvent[]
 
   @@index([slug])
   @@map("organizations")
@@ -1295,6 +1305,38 @@ model Notification {
   @@index([organizationId, userId, readAt])
   @@index([createdAt])
   @@map("notifications")
+}
+
+/// What Adwuma360 has charged a workspace, and what the provider said about it.
+///
+/// Separate from `Payment`, which is a customer's own money moving in their own
+/// books. This is our side of the relationship and no workspace ever sees it.
+/// Append-only: a refund is a new row, never an edit to the charge.
+model BillingEvent {
+  id             String   @id @default(cuid())
+  organizationId String
+  /// Paystack's event name: charge.success, invoice.payment_failed, and so on.
+  type           String
+  /// Paystack's own reference. Unique, which is what makes replaying a webhook
+  /// safe: the second delivery of the same event writes nothing.
+  reference      String   @unique
+  status         String
+  /// Major units, as displayed. Paystack quotes minor units and the conversion
+  /// happens once, on the way in.
+  amount         Decimal  @default(0) @db.Decimal(18, 2)
+  currency       String   @default("GHS")
+  plan           String?
+  period         String?
+  /// The provider's payload, kept verbatim for anything a dispute needs later.
+  payload        Json?
+  occurredAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, occurredAt])
+  @@index([type])
+  @@map("billing_events")
 }
 
 /// Operator actions, which belong to no workspace.

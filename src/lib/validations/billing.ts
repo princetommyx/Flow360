@@ -3,8 +3,10 @@ import { z } from 'zod';
 import { BILLING_PERIODS, PLAN_IDS } from '@/lib/config/plans';
 
 /**
- * A plan request, not a purchase. No payment provider is connected yet, so the
- * workspace records which plan the owner asked for and nothing is charged.
+ * Which plan, on which price. The same shape serves both routes out of the
+ * chooser: a Paystack checkout for a plan that can be bought outright, and a
+ * recorded request for one that has to be arranged (Enterprise, and anything
+ * without a Paystack plan configured yet).
  */
 export const planRequestSchema = z.object({
   plan: z.enum(PLAN_IDS, { message: 'Choose one of the available plans' }),

@@ -275,6 +275,51 @@ does not make them rank, which is content and links over months.
   renderer refuses any element with more than one child and no explicit
   `display`, so text and expressions are composed into a string first.
 
+## Payments
+
+Paystack subscriptions, wired end to end. See [PAYMENTS.md](PAYMENTS.md) for the
+setup, which is four Plans in the Paystack dashboard, five environment variables
+and a webhook URL.
+
+**The webhook is the authority**, not the page the customer comes back to. A
+browser gets closed on the way back from a checkout, and a renewal twelve months
+from now involves no browser at all. `/settings/billing/complete` verifies the
+reference so it can tell the person what happened, and writes nothing.
+
+**Two prices, one figure.** The price on the screen lives in
+`lib/config/plans.ts`; Paystack holds its own copy on each Plan. Before anybody
+reaches a checkout the server reads the live plan and refuses if the two
+disagree, so a misconfiguration stops a sale rather than charging a number
+nobody was shown. `PLATFORM_CURRENCY` is `GHS` and a plan in any other currency
+is refused rather than converted.
+
+**Every event is idempotent.** `billing_events.reference` is unique, so a
+redelivery — Paystack retries — collides and is answered as a duplicate before
+any handler runs. Only that collision counts as "seen before": every other
+database failure answers 500 so the retry is a real retry. Anything
+unrecognised is recorded and acknowledged, because a 4xx would have Paystack
+resend an event we will never understand, forever.
+
+**Nothing is a dead control.** A plan is purchasable only when a Paystack plan
+code is configured for that plan and period; the server works that out and the
+chooser renders "Subscribe" or falls back to the request route accordingly.
+With no secret key at all the billing page behaves exactly as it did before
+payments existed. Enterprise stays on the request route by design.
+
+**Cancelling** stops the renewal and cuts nothing short: the period already paid
+for is kept, which is Paystack's behaviour and the fair one. It is offered while
+a renewal is failing too, so somebody past due can stop it rather than waiting
+out the retries.
+
+**A subscription ends the trial.** `trialState` returns "none" for any workspace
+that has been through one, so the sidebar countdown and the banner stop
+counting down a trial at somebody whose card was just declined.
+
+**The operator console** shows the ledger per workspace — every event as it
+arrived, failures included — plus the subscription state and Paystack customer
+code. Setting a plan from the console charges nobody and does not touch a
+Paystack subscription.
+
 ## Known gaps, deliberately left
 
 - **No trial-ending reminder.** The trial email says days remaining are on the
@@ -283,8 +328,15 @@ does not make them rank, which is content and links over months.
 - **Ownership cannot be transferred.** The owner row is immovable from
   `settings/users`, which is safe but means a departing founder needs a hand at
   the database.
-- **Payment provider is not wired up.** Plan requests are recorded and a person
-  follows up; nothing charges anyone. The billing page says so.
+- **Plan prices are placeholders.** `lib/config/plans.ts` still carries the
+  figures used while building (Starter 1/3, Business 2/7). They are now in GHS
+  and must be set to the real numbers before the Paystack plans are created,
+  because the two have to match exactly.
+- **No dunning beyond the first notice.** A failed renewal marks the workspace
+  past due and notifies the owner once. Paystack's own retries continue; we send
+  nothing further and take nothing away.
+- **No invoice or receipt of our own.** Paystack emails the receipt. Adwuma360
+  keeps the ledger but does not issue a document for it.
 - **`hero.jpg`'s licence is unverified.** The watermark noted here earlier is
   gone, so the file has been replaced at some point, but nobody has recorded
   where it came from or under what terms. Worth establishing before it is

@@ -17,14 +17,46 @@ import { DetailList } from '@/components/shared/detail-list';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { RankedTable } from '@/components/reports/ranked-table';
 import { formatDate, formatRelative } from '@/lib/date';
-import { formatNumber } from '@/lib/money';
+import { formatCurrency, formatNumber } from '@/lib/money';
 import { PLANS } from '@/lib/config/plans';
 import { requirePlatformAdmin } from '@/server/platform';
-import { getOrganizationDetail, listPlatformAudit } from '@/server/services/platform';
+import {
+  getOrganizationDetail,
+  listBillingEvents,
+  listPlatformAudit,
+} from '@/server/services/platform';
 
 import { WorkspaceActions } from './workspace-actions';
 
 export const metadata: Metadata = { title: 'Workspace' };
+
+/**
+ * Paystack's event names, in English.
+ *
+ * Anything unrecognised is shown as it arrived rather than as "Other": an
+ * event we have not seen before is exactly the one an operator needs to read
+ * literally.
+ */
+function billingEventLabel(type: string): string {
+  switch (type) {
+    case 'charge.success':
+      return 'Payment received';
+    case 'subscription.create':
+      return 'Subscription started';
+    case 'invoice.payment_failed':
+      return 'Renewal declined';
+    case 'subscription.not_renew':
+      return 'Renewal stopped';
+    case 'subscription.disable':
+      return 'Subscription ended';
+    case 'invoice.create':
+      return 'Renewal invoice raised';
+    case 'refund.processed':
+      return 'Refund processed';
+    default:
+      return type;
+  }
+}
 
 export default async function OrganizationDetailPage({
   params,
@@ -37,7 +69,10 @@ export default async function OrganizationDetailPage({
   const organization = await getOrganizationDetail(id);
   if (!organization) notFound();
 
-  const audit = await listPlatformAudit({ targetId: id, limit: 20 });
+  const [audit, billing] = await Promise.all([
+    listPlatformAudit({ targetId: id, limit: 20 }),
+    listBillingEvents(id),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -106,6 +141,20 @@ export default async function OrganizationDetailPage({
                     value: organization.lastActivityAt
                       ? formatRelative(organization.lastActivityAt)
                       : 'Nothing recorded yet',
+                  },
+                  {
+                    label: 'Subscription',
+                    value: organization.subscribed
+                      ? organization.subscriptionEndsAt
+                        ? `Renews ${formatDate(organization.subscriptionEndsAt)}`
+                        : 'Renewing'
+                      : organization.subscriptionEndsAt
+                        ? `Not renewing, paid to ${formatDate(organization.subscriptionEndsAt)}`
+                        : 'Never subscribed',
+                  },
+                  {
+                    label: 'Paystack customer',
+                    value: organization.paystackCustomer ?? 'None',
                   },
                 ]}
               />
@@ -182,6 +231,58 @@ export default async function OrganizationDetailPage({
                     numeric: true,
                     cell: (row) =>
                       row.lastLoginAt ? formatRelative(row.lastLoginAt) : 'Never',
+                  },
+                ]}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-[14px]">What we have charged</CardTitle>
+              <CardDescription>
+                Every event the payment provider has sent about this workspace, as it
+                arrived. Failures included — a decline is the thing somebody writes in
+                about.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <RankedTable
+                rows={billing}
+                keyOf={(row) => row.id}
+                emptyTitle="No payments yet"
+                emptyDescription="This workspace has never been charged. A checkout, a renewal or a decline would each leave a line."
+                columns={[
+                  {
+                    header: 'Event',
+                    cell: (row) => (
+                      <div className="min-w-0">
+                        <p className="truncate">{billingEventLabel(row.type)}</p>
+                        <p className="truncate font-mono text-[11px] text-muted-foreground">
+                          {row.reference}
+                        </p>
+                      </div>
+                    ),
+                  },
+                  {
+                    header: 'Plan',
+                    cell: (row) =>
+                      row.planLabel
+                        ? `${row.planLabel}${row.period === 'annual' ? ' · yearly' : row.period === 'monthly' ? ' · monthly' : ''}`
+                        : '—',
+                  },
+                  {
+                    header: 'Amount',
+                    numeric: true,
+                    cell: (row) =>
+                      row.amount > 0
+                        ? formatCurrency(row.amount, { currency: row.currency })
+                        : '—',
+                  },
+                  {
+                    header: 'When',
+                    numeric: true,
+                    cell: (row) => formatRelative(row.occurredAt),
                   },
                 ]}
               />

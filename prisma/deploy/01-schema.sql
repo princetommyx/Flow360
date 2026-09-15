@@ -1439,6 +1439,43 @@ CREATE INDEX "platform_audit_logs_targetType_targetId_idx" ON "platform_audit_lo
 -- AddForeignKey
 ALTER TABLE "platform_audit_logs" ADD CONSTRAINT "platform_audit_logs_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- ===== migration: 20260915152416_paystack_billing =====
+-- AlterTable
+ALTER TABLE "organizations" ADD COLUMN     "paystackCustomer" TEXT,
+ADD COLUMN     "paystackEmailToken" TEXT,
+ADD COLUMN     "paystackSubscription" TEXT,
+ADD COLUMN     "subscriptionEndsAt" TIMESTAMP(3);
+
+-- CreateTable
+CREATE TABLE "billing_events" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "reference" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
+    "currency" TEXT NOT NULL DEFAULT 'GHS',
+    "plan" TEXT,
+    "period" TEXT,
+    "payload" JSONB,
+    "occurredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "billing_events_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "billing_events_reference_key" ON "billing_events"("reference");
+
+-- CreateIndex
+CREATE INDEX "billing_events_organizationId_occurredAt_idx" ON "billing_events"("organizationId", "occurredAt");
+
+-- CreateIndex
+CREATE INDEX "billing_events_type_idx" ON "billing_events"("type");
+
+-- AddForeignKey
+ALTER TABLE "billing_events" ADD CONSTRAINT "billing_events_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1456,5 +1493,6 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'fe1cf463d627d8e7193c2d3e585a3db9e0b65aa700dfed34eeb263c1089de5f3', now(), '20260914203552_requested_billing_period', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '6582b5b3a17f2c15c17aa5b26edf7e58f4f6c6201f94176619c43fab1ee37e8b', now(), '20260915020536_ghana_defaults', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'f3c124c9589ca4dc8b46ff6825fa796f5c239cfe9b1cb6a5d0708278684d4c29', now(), '20260915112928_platform_admin', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '961af8efdd69fc547ec35762c420b49b3d90d95b2a11b3ebba3ee9f5b32dc826', now(), '20260915152416_paystack_billing', now(), 1);
 
 COMMIT;

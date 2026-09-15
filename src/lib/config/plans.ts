@@ -3,8 +3,13 @@
  *
  * Every workspace starts on a free trial of `TRIAL_DAYS`, on the Business
  * feature set, so people evaluate the product rather than a cut-down version of
- * it. Prices are the display prices; no payment provider is wired up yet, so
- * nothing here charges anyone.
+ * it.
+ *
+ * The prices here are the ones on the screen. Paystack holds its own copy on
+ * each Plan in its dashboard, and the two have to agree to the pesewa: before
+ * anyone is sent to a checkout, `startCheckoutAction` reads the live plan and
+ * refuses if the figures differ, rather than charging a number nobody was
+ * shown. Changing a price therefore means changing it in both places.
  */
 
 export const TRIAL_DAYS = 30;
@@ -12,12 +17,16 @@ export const TRIAL_DAYS = 30;
 /**
  * What Adwuma360 charges in, which is not what a workspace trades in.
  *
- * A Ghanaian workshop keeps its books in cedis; the subscription it pays us
- * for the software is priced separately. Leaving the plan prices to fall back
- * on the global currency would relabel them every time that default moved,
- * turning $2 a month into GH₵2 a month without anyone deciding to.
+ * A workspace keeps its own books in whatever currency it sells in; the
+ * subscription it pays us for the software is priced separately. Leaving the
+ * plan prices to fall back on the global currency would relabel them every
+ * time that default moved, turning 2 cedis a month into 2 dollars a month
+ * without anyone deciding to.
+ *
+ * Paystack settles Ghanaian accounts in cedis, so this is also the currency
+ * every Plan in the dashboard must be created in.
  */
-export const PLATFORM_CURRENCY = 'USD';
+export const PLATFORM_CURRENCY = 'GHS';
 
 export const PLAN_IDS = ['starter', 'business', 'enterprise'] as const;
 
@@ -157,6 +166,13 @@ export type TrialState = {
  *
  * Days remaining is rounded up, so the last partial day still reads as "1 day
  * left" rather than "0" while the trial is genuinely still running.
+ *
+ * A workspace that has been through a subscription has no trial left to speak
+ * of, whatever date is still sitting on the row. Its `trialEndsAt` is a
+ * leftover, and counting it down at somebody whose renewal has just been
+ * declined — or who cancelled last week — is both wrong and alarming, so every
+ * subscription state other than none at all ends the trial here, once, rather
+ * than in each of the three places that ask.
  */
 export function trialState(
   organization: {
@@ -168,6 +184,13 @@ export function trialState(
 ): TrialState {
   if (organization.subscriptionStatus === 'active') {
     return { status: 'active', daysRemaining: 0, endsAt: null, endingSoon: false };
+  }
+
+  if (
+    organization.subscriptionStatus === 'past_due' ||
+    organization.subscriptionStatus === 'cancelled'
+  ) {
+    return { status: 'none', daysRemaining: 0, endsAt: null, endingSoon: false };
   }
 
   if (!organization.trialEndsAt) {

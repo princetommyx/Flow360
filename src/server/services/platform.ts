@@ -3,7 +3,7 @@ import 'server-only';
 import { addDays, differenceInCalendarDays, startOfMonth, subMonths } from 'date-fns';
 
 import { db } from '@/lib/db';
-import { round } from '@/lib/money';
+import { round, toNumber } from '@/lib/money';
 import { percentChange } from '@/lib/utils';
 import { findPlan, planPrice, type BillingPeriod } from '@/lib/config/plans';
 import { pageInfo, paginationFor, type ListQuery, type PageInfo } from '@/lib/query';
@@ -284,6 +284,11 @@ export type OrganizationDetail = OrganizationRow & {
     lastLoginAt: string | null;
   }>;
   lastActivityAt: string | null;
+  /** Whether Paystack holds a subscription that will charge this one again. */
+  subscribed: boolean;
+  /** End of the period already paid for. */
+  subscriptionEndsAt: string | null;
+  paystackCustomer: string | null;
 };
 
 export async function getOrganizationDetail(
@@ -307,6 +312,9 @@ export async function getOrganizationDetail(
       trialEndsAt: true,
       requestedPlan: true,
       requestedBilling: true,
+      subscriptionEndsAt: true,
+      paystackCustomer: true,
+      paystackSubscription: true,
       createdAt: true,
       members: {
         where: { deletedAt: null },
@@ -382,7 +390,66 @@ export async function getOrganizationDetail(
       lastLoginAt: member.user.lastLoginAt?.toISOString() ?? null,
     })),
     lastActivityAt: lastActivity?.createdAt.toISOString() ?? null,
+    subscribed: org.paystackSubscription !== null,
+    subscriptionEndsAt: org.subscriptionEndsAt?.toISOString() ?? null,
+    paystackCustomer: org.paystackCustomer,
   };
+}
+
+export type BillingEventRow = {
+  id: string;
+  type: string;
+  status: string;
+  reference: string;
+  amount: number;
+  currency: string;
+  plan: string | null;
+  planLabel: string | null;
+  period: string | null;
+  occurredAt: string;
+};
+
+/**
+ * What the payment provider has told us about one workspace.
+ *
+ * The ledger, not a summary of it: every event as it arrived, including the
+ * failures. When a customer writes in about a charge, this is the page that
+ * answers them, and a row that had been quietly rolled up into a total would
+ * be no use at all.
+ */
+export async function listBillingEvents(
+  organizationId: string,
+  limit = 25,
+): Promise<BillingEventRow[]> {
+  const rows = await db.billingEvent.findMany({
+    where: { organizationId },
+    orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+    take: limit,
+    select: {
+      id: true,
+      type: true,
+      status: true,
+      reference: true,
+      amount: true,
+      currency: true,
+      plan: true,
+      period: true,
+      occurredAt: true,
+    },
+  });
+
+  return rows.map((row) => ({
+    id: row.id,
+    type: row.type,
+    status: row.status,
+    reference: row.reference,
+    amount: toNumber(row.amount),
+    currency: row.currency,
+    plan: row.plan,
+    planLabel: row.plan ? (findPlan(row.plan)?.name ?? row.plan) : null,
+    period: row.period,
+    occurredAt: row.occurredAt.toISOString(),
+  }));
 }
 
 export type PlanRequest = {
