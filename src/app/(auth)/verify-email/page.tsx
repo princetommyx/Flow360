@@ -81,7 +81,7 @@ export default async function VerifyEmailPage({
       <div
         className={
           delivered
-            ? 'mt-7 flex size-11 items-center justify-center rounded-xl bg-info-soft text-info'
+            ? 'mt-7 flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary'
             : 'mt-7 flex size-11 items-center justify-center rounded-xl bg-warning-soft text-warning-foreground'
         }
       >
@@ -175,7 +175,7 @@ function Panel({
 }) {
   const toneClass =
     tone === 'success'
-      ? 'bg-success-soft text-success'
+      ? 'bg-primary-soft text-primary'
       : 'bg-destructive-soft text-destructive';
 
   return (

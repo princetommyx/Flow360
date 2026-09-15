@@ -46,7 +46,7 @@ export function ResetPasswordForm({ token }: { token: string }) {
   if (done) {
     return (
       <div className="rounded-xl border border-border bg-card p-6 text-center shadow-sm">
-        <div className="mx-auto mb-4 flex size-11 items-center justify-center rounded-xl bg-success-soft text-success">
+        <div className="mx-auto mb-4 flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
           <ShieldCheck className="size-5" aria-hidden />
         </div>
         <p className="text-[15px] font-semibold">Password updated</p>

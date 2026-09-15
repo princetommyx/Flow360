@@ -86,3 +86,32 @@ export const DIAL_CODES = Array.from(
     ]),
   ).values(),
 ).sort((a, b) => Number(a.dialCode) - Number(b.dialCode));
+
+export type Currency = { code: string; name: string };
+
+/**
+ * Currencies a workspace can keep its books in.
+ *
+ * Derived from the countries above rather than listed separately, so the two
+ * cannot drift apart — a country the product supports always has its currency
+ * available, and nothing else is offered.
+ */
+export const CURRENCY_NAMES: Record<string, string> = {
+  KES: 'Kenyan shilling',
+  NGN: 'Nigerian naira',
+  GHS: 'Ghanaian cedi',
+  TZS: 'Tanzanian shilling',
+  UGX: 'Ugandan shilling',
+  RWF: 'Rwandan franc',
+  CLP: 'Chilean peso',
+  COP: 'Colombian peso',
+  USD: 'US dollar',
+  EUR: 'Euro',
+  GBP: 'Pound sterling',
+};
+
+export const CURRENCIES: Currency[] = Array.from(
+  new Set([...COUNTRIES.map((country) => country.currency), 'USD', 'EUR', 'GBP']),
+)
+  .map((code) => ({ code, name: CURRENCY_NAMES[code] ?? code }))
+  .sort((a, b) => a.name.localeCompare(b.name));

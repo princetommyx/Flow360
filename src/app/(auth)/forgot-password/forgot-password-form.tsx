@@ -53,7 +53,7 @@ export function ForgotPasswordForm({
         <div
           className={
             mailDelivered
-              ? 'mx-auto mb-4 flex size-11 items-center justify-center rounded-xl bg-success-soft text-success'
+              ? 'mx-auto mb-4 flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary'
               : 'mx-auto mb-4 flex size-11 items-center justify-center rounded-xl bg-warning-soft text-warning-foreground'
           }
         >
