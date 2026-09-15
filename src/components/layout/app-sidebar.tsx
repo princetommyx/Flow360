@@ -12,9 +12,11 @@ import type { TenantContext } from '@/server/tenant';
 export function AppSidebar({
   navGroups,
   context,
+  isPlatformAdmin = false,
 }: {
   navGroups: NavGroup[];
   context: TenantContext;
+  isPlatformAdmin?: boolean;
 }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-30 hidden w-[15.5rem] flex-col border-r border-sidebar-border bg-sidebar lg:flex">
@@ -37,7 +39,11 @@ export function AppSidebar({
 
       <div className="border-t border-sidebar-border px-2 py-2">
         <TrialCard organization={context.organization} className="mx-1 mb-2" />
-        <UserMenu user={context.user} roleName={context.role.name} />
+        <UserMenu
+          user={context.user}
+          roleName={context.role.name}
+          isPlatformAdmin={isPlatformAdmin}
+        />
       </div>
     </aside>
   );

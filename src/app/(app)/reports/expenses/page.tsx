@@ -16,7 +16,7 @@ import { ReportNav } from '@/components/reports/report-nav';
 import { RankedTable } from '@/components/reports/ranked-table';
 import { ShareBar } from '@/components/reports/share-bar';
 import { ReportSeriesChart } from '@/components/charts/report-series-chart';
-import { formatCurrency, formatNumber, formatPercent } from '@/lib/money';
+import { formatCurrency, formatNumber, formatRatio } from '@/lib/money';
 import { formatDate, parsePreset, previousDateRange, resolveDateRange } from '@/lib/date';
 import { hasPermission } from '@/lib/permissions';
 import { requirePermission } from '@/server/tenant';
@@ -102,7 +102,7 @@ export default async function ExpenseReportPage({
           footer={
             <span className="text-[11.5px] text-muted-foreground">
               {biggest
-                ? `${biggest.name}, ${formatPercent(biggest.share)} of spend`
+                ? `${biggest.name}, ${formatRatio(biggest.share)} of spend`
                 : 'Nothing spent in this period'}
             </span>
           }
@@ -157,7 +157,7 @@ export default async function ExpenseReportPage({
                   ),
                 },
                 { header: 'Count', numeric: true, cell: (row) => row.count },
-                { header: 'Share', numeric: true, cell: (row) => formatPercent(row.share) },
+                { header: 'Share', numeric: true, cell: (row) => formatRatio(row.share) },
                 {
                   header: 'Total',
                   numeric: true,

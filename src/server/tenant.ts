@@ -146,11 +146,20 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
   };
 });
 
-/** Use in app-shell layouts, pages and server actions. Redirects when signed out. */
+/**
+ * Use in app-shell layouts, pages and server actions.
+ *
+ * Signed out goes to sign in. Signed in with nothing to sign in *to* goes
+ * somewhere that says so: sending them to `/login` would bounce them straight
+ * back here, because a signed-in visitor on the login page is redirected to the
+ * dashboard. That loop is what a suspended workspace used to produce.
+ */
 export async function requireTenant(): Promise<TenantContext> {
   const context = await getTenantContext();
-  if (!context) redirect('/login');
-  return context;
+  if (context) return context;
+
+  const session = await auth();
+  redirect(session?.user?.id ? '/no-workspace' : '/login');
 }
 
 /** Convenience: the active organization id, already authorised. */

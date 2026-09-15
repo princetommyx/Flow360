@@ -15,7 +15,7 @@ import { ExportButton } from '@/components/shared/export-button';
 import { ReportNav } from '@/components/reports/report-nav';
 import { RankedTable } from '@/components/reports/ranked-table';
 import { ReportSeriesChart } from '@/components/charts/report-series-chart';
-import { formatCurrency, formatPercent } from '@/lib/money';
+import { formatCurrency, formatRatio } from '@/lib/money';
 import { formatDate, parsePreset, resolveDateRange } from '@/lib/date';
 import { hasPermission } from '@/lib/permissions';
 import { cn } from '@/lib/utils';
@@ -128,7 +128,7 @@ export default async function FinancialReportPage({
           icon={Scale}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
-              {formatPercent(pnl.grossMargin)} margin
+              {formatRatio(pnl.grossMargin)} margin
             </span>
           }
         />
@@ -138,7 +138,7 @@ export default async function FinancialReportPage({
           icon={Wallet}
           footer={
             <span className="text-[11.5px] text-muted-foreground">
-              {formatPercent(pnl.netMargin)} of revenue
+              {formatRatio(pnl.netMargin)} of revenue
             </span>
           }
         />
@@ -220,7 +220,7 @@ export default async function FinancialReportPage({
                 </p>
               </div>
               <p className="mt-1 text-[11.5px] text-muted-foreground">
-                {formatPercent(pnl.netMargin)} of revenue over this period.
+                {formatRatio(pnl.netMargin)} of revenue over this period.
               </p>
             </div>
           </CardContent>

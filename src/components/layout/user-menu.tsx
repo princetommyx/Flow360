@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { ChevronsUpDown, LogOut, Moon, Sun, User2 } from 'lucide-react';
+import { ChevronsUpDown, LogOut, Moon, ShieldCheck, Sun, User2 } from 'lucide-react';
 
 import {
   DropdownMenu,
@@ -21,9 +21,16 @@ type UserMenuProps = {
   user: { name: string; email: string; avatarUrl: string | null };
   roleName: string;
   variant?: 'sidebar' | 'header';
+  /** Operators of Adwuma360 itself get a way in. Nobody else sees it. */
+  isPlatformAdmin?: boolean;
 };
 
-export function UserMenu({ user, roleName, variant = 'sidebar' }: UserMenuProps) {
+export function UserMenu({
+  user,
+  roleName,
+  variant = 'sidebar',
+  isPlatformAdmin = false,
+}: UserMenuProps) {
   const { theme, toggle } = useTheme();
   const [pending, startTransition] = React.useTransition();
 
@@ -75,6 +82,14 @@ export function UserMenu({ user, roleName, variant = 'sidebar' }: UserMenuProps)
             Profile & password
           </a>
         </DropdownMenuItem>
+        {isPlatformAdmin ? (
+          <DropdownMenuItem asChild>
+            <a href="/admin">
+              <ShieldCheck aria-hidden />
+              Operator console
+            </a>
+          </DropdownMenuItem>
+        ) : null}
         <DropdownMenuItem onSelect={(event) => { event.preventDefault(); toggle(); }}>
           {theme === 'dark' ? <Sun aria-hidden /> : <Moon aria-hidden />}
           {theme === 'dark' ? 'Light appearance' : 'Dark appearance'}

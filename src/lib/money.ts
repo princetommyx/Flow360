@@ -48,9 +48,23 @@ export function formatNumber(
   );
 }
 
+/**
+ * A change, signed. The leading plus is the point: it says "up on last time".
+ */
 export function formatPercent(value: number | null | undefined, digits = 1): string {
   if (value === null || value === undefined || !Number.isFinite(value)) return '—';
   return `${value > 0 ? '+' : ''}${value.toFixed(digits)}%`;
+}
+
+/**
+ * A proportion: a share of spend, a margin, a percentage of revenue.
+ *
+ * Unsigned, because a plus in front of one reads as growth that is not being
+ * claimed. A negative margin keeps its minus, which is doing real work.
+ */
+export function formatRatio(value: number | null | undefined, digits = 1): string {
+  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+  return `${value.toFixed(digits)}%`;
 }
 
 export type LineInput = {

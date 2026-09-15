@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/popover';
 import { EmptyState } from '@/components/shared/empty-state';
 import { markAllNotificationsRead, markNotificationRead } from '@/server/actions/notifications';
-import { formatRelative } from '@/lib/date';
+import { TimeAgo } from '@/components/shared/time-ago';
 import { cn } from '@/lib/utils';
 
 export type NotificationItem = {
@@ -116,9 +116,10 @@ export function NotificationsMenu({
                     <span className="mt-0.5 block text-[12.5px] leading-relaxed text-muted-foreground">
                       {notification.body}
                     </span>
-                    <span className="mt-1 block text-[11px] text-muted-foreground/80">
-                      {formatRelative(notification.createdAt)}
-                    </span>
+                    <TimeAgo
+                      value={notification.createdAt}
+                      className="mt-1 block text-[11px] text-muted-foreground/80"
+                    />
                   </span>
                 </button>
               </li>

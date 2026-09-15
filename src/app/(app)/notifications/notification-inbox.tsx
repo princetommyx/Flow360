@@ -20,7 +20,7 @@ import { DataTableToolbar, DataTablePagination } from '@/components/data-table/d
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { EmptyState } from '@/components/shared/empty-state';
 import { RowActions, type RowAction } from '@/components/shared/row-actions';
-import { formatRelative } from '@/lib/date';
+import { TimeAgo } from '@/components/shared/time-ago';
 import { runAction } from '@/lib/client-action';
 import { cn } from '@/lib/utils';
 import {
@@ -217,9 +217,10 @@ export function NotificationInbox({
                   <p className="mt-1 text-pretty text-[12.5px] leading-relaxed text-muted-foreground">
                     {row.body}
                   </p>
-                  <p className="mt-1 text-[11.5px] text-muted-foreground/80">
-                    {formatRelative(row.createdAt)}
-                  </p>
+                  <TimeAgo
+                    value={row.createdAt}
+                    className="mt-1 block text-[11.5px] text-muted-foreground/80"
+                  />
                 </div>
               </div>
             );

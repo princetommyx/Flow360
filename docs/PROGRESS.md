@@ -15,13 +15,13 @@ Last updated: 15 September 2026.
 | 4 | Employees, payroll, attendance, projects, tasks, timesheets | Done |
 | 5 | Settings, reports, notifications | Done |
 | 6 | Landing page, pricing, responsive polish, security review, performance | Mostly done alongside the rest |
+| — | Operator console for Adwuma360 itself | Done |
 
 ### Still to build
 
-- **Platform admin dashboard** — see its own section below
-
-Anything else still rendering `ModulePending` is unbuilt. That component is the
-honest placeholder: a module either works or says plainly that it does not.
+Nothing from the six phases. Anything still rendering `ModulePending` is
+unbuilt, and that component is the honest placeholder: a module either works or
+says plainly that it does not.
 
 ### Reports and notifications, finished
 
@@ -142,6 +142,13 @@ are recomputed from the rows they describe. Nothing under `reports/` writes.
 - **A grid track has a min-content floor.** A card holding a table with a
   `min-w-*` widens the track instead of letting the table scroll, so report
   grids carry `[&>*]:min-w-0`.
+- **A signed-in visitor with no workspace has somewhere to go.** Every
+  workspace suspended, or the last membership removed, used to redirect
+  `/dashboard` to `/login`, which redirects a signed-in visitor back to
+  `/dashboard`. `requireTenant` now sends them to `/no-workspace`.
+- **Relative times need `TimeAgo`.** The clock moves between the server
+  rendering and the browser hydrating, so `formatRelative` inside a client
+  component is a hydration mismatch. Server components can call it directly.
 - **CSV guards text, not numbers.** A leading `-` is quoted out of formula
   range only for strings; guarding a number would turn every negative in a
   financial export into text, and a column of text will not total.
@@ -150,10 +157,9 @@ are recomputed from the rows they describe. Nothing under `reports/` writes.
 - **An invitation is one use.** Accepting sets the password, confirms the
   address and activates every outstanding `INVITED` membership for that
   account, then retires all its invitation tokens.
-- **The seed and `prisma/deploy/*.sql` must agree.** The SQL snapshot is edited
-  in place rather than regenerated, because the setup workflow depends on its
-  ids. After editing it, apply it to an empty database and run
-  `prisma migrate deploy` to confirm it reports nothing pending.
+- **The seed and `prisma/deploy/*.sql` must agree**, and `npm run deploy:sql`
+  is what keeps them in step. The seed's reset also has to delete anything
+  pointing at `users` with a RESTRICT constraint before it deletes the users.
 
 ## Deployment
 
@@ -164,7 +170,10 @@ are recomputed from the rows they describe. Nothing under `reports/` writes.
   build cannot apply them. After any schema change: run the **Set up database**
   workflow from the Actions tab, on `main`, with *load demo data* unticked.
 - Applied so far: `init`, `add_trial_and_subscription`, `verification_codes`,
-  `requested_billing_period`, `ghana_defaults`.
+  `requested_billing_period`, `ghana_defaults`, `platform_admin`.
+- **`prisma/deploy/*.sql` is generated**, by `npm run deploy:sql` against a
+  scratch database. Run it after any migration or seed change, and prove it by
+  restoring into an empty database (see `prisma/deploy/README.md`).
 - Six transactional emails live in `lib/email/templates.ts`: confirmation code,
   welcome, password reset, trial started, plan requested, workspace invitation.
   Preview them with `npm run email:preview`, no provider needed.
@@ -172,22 +181,43 @@ are recomputed from the rows they describe. Nothing under `reports/` writes.
   `RESEND_API_KEY`; without both, `mailIsDelivered()` is false and the product
   says so rather than pointing at an empty inbox.
 
-## The platform admin dashboard
+## The operator console
 
-Not started. The agreed shape, so it is not rebuilt as the wrong thing:
+Built, at `/admin`, in the `(platform)` route group. It is the console for the
+**operator of Adwuma360**, not an admin area inside a workspace.
 
-A console for the **operator of Adwuma360**, not an admin area inside a
-workspace. It shows every organization on the platform, their plan, trial and
-subscription status, sign-ups over time, and the plan requests that currently
-sit in `organizations.requestedPlan` where nobody can see them.
+**Getting in.** Two routes, both checked by `requirePlatformAdmin()` in
+`server/platform.ts`:
 
-It needs a **platform-level role separate from tenant RBAC** — being an owner of
-one workspace must not grant sight of another. Expect a new column or table for
-that, a guard alongside `requireTenant`, and a route group outside `(app)` so
-the tenant sidebar and the active-organization cookie play no part.
+1. `users.isPlatformAdmin`, granted and revoked from the console's People page.
+2. `PLATFORM_ADMIN_EMAILS`, a comma-separated list in the environment. This is
+   the bootstrap, because a fresh deployment has no operator and something has
+   to make the first one, and it is the way back in if the last flag is revoked
+   by mistake.
 
-The hard rule: it must never leak one tenant's business data into another's. It
-reports *about* organizations — counts, plans, dates — not *from inside* them.
+Neither grants anything inside a customer's workspace, and being an owner or an
+administrator of a workspace grants nothing here. The guard shares no code with
+`server/tenant`: no active-organization cookie, no membership, no permission
+keys.
+
+**What it does.** Overview (sign-ups, plans, trials, committed monthly value),
+Workspaces (list and a detail page per company), Plan requests (the queue that
+`organizations.requestedPlan` was previously invisible in), People (every
+account across every workspace) and Activity.
+
+**What it changes.** Set a plan, decline a request, extend a trial, suspend and
+restore a workspace, grant and revoke operator access, disable and enable an
+account. Every one writes a row to `platform_audit_logs`, which is append-only
+and visible to no workspace. `ActivityLog` could not hold these: it is tenant
+scoped by design and some of these actions belong to no tenant.
+
+**The hard rule, kept.** It reports *about* organizations: names, plans, dates,
+counts. The workspace detail page shows how many customers and invoices a
+company holds and never what is in one. There is no route from the console into
+a tenant's records.
+
+**Suspension** takes away sign-in and touches no data, so restoring is one flag
+and everything is where they left it.
 
 ## Known gaps, deliberately left
 

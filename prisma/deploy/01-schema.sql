@@ -1412,6 +1412,33 @@ ALTER TABLE "organizations" ALTER COLUMN "country" SET DEFAULT 'Ghana',
 ALTER COLUMN "currency" SET DEFAULT 'GHS',
 ALTER COLUMN "timezone" SET DEFAULT 'Africa/Accra';
 
+-- ===== migration: 20260915112928_platform_admin =====
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN     "isPlatformAdmin" BOOLEAN NOT NULL DEFAULT false;
+
+-- CreateTable
+CREATE TABLE "platform_audit_logs" (
+    "id" TEXT NOT NULL,
+    "actorUserId" TEXT NOT NULL,
+    "action" TEXT NOT NULL,
+    "targetType" TEXT NOT NULL,
+    "targetId" TEXT NOT NULL,
+    "summary" TEXT NOT NULL,
+    "metadata" JSONB,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "platform_audit_logs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "platform_audit_logs_createdAt_idx" ON "platform_audit_logs"("createdAt");
+
+-- CreateIndex
+CREATE INDEX "platform_audit_logs_targetType_targetId_idx" ON "platform_audit_logs"("targetType", "targetId");
+
+-- AddForeignKey
+ALTER TABLE "platform_audit_logs" ADD CONSTRAINT "platform_audit_logs_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1428,5 +1455,6 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'b37c9fd0ded3213b306118ad5b24b18dc712dc0a8d5f6da20d725e66a5f7b6e4', now(), '20260914203514_verification_codes', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'fe1cf463d627d8e7193c2d3e585a3db9e0b65aa700dfed34eeb263c1089de5f3', now(), '20260914203552_requested_billing_period', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '6582b5b3a17f2c15c17aa5b26edf7e58f4f6c6201f94176619c43fab1ee37e8b', now(), '20260915020536_ghana_defaults', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'f3c124c9589ca4dc8b46ff6825fa796f5c239cfe9b1cb6a5d0708278684d4c29', now(), '20260915112928_platform_admin', now(), 1);
 
 COMMIT;

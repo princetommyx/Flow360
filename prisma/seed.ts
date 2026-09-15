@@ -90,6 +90,9 @@ async function main() {
     db.companySettings.deleteMany(),
     db.organization.deleteMany(),
     db.verificationToken.deleteMany(),
+    // Operator actions reference the account that took them, and the
+    // constraint is RESTRICT, so this has to go before the users do.
+    db.platformAuditLog.deleteMany(),
     db.user.deleteMany(),
   ]);
 
