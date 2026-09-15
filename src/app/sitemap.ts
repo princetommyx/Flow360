@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { absoluteUrl } from '@/lib/url';
+import { siteLink } from '@/lib/url';
 
 /**
  * The pages worth indexing.
@@ -18,37 +18,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return [
     {
-      url: absoluteUrl('/'),
+      url: siteLink('/'),
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 1,
     },
     {
-      url: absoluteUrl('/pricing'),
+      url: siteLink('/pricing'),
       lastModified: now,
       changeFrequency: 'weekly',
       priority: 0.9,
     },
     {
-      url: absoluteUrl('/register'),
+      url: siteLink('/register'),
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: absoluteUrl('/login'),
+      url: siteLink('/login'),
       lastModified: now,
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
-      url: absoluteUrl('/terms'),
+      url: siteLink('/terms'),
       lastModified: now,
       changeFrequency: 'yearly',
       priority: 0.2,
     },
     {
-      url: absoluteUrl('/privacy'),
+      url: siteLink('/privacy'),
       lastModified: now,
       changeFrequency: 'yearly',
       priority: 0.2,

@@ -1,6 +1,6 @@
 import { brand, locale } from '@/lib/config/brand';
 import { PLANS, PLATFORM_CURRENCY, TRIAL_DAYS, planPrice } from '@/lib/config/plans';
-import { absoluteUrl, appOrigin } from '@/lib/url';
+import { siteLink, siteOrigin } from '@/lib/url';
 
 /**
  * Structured data, the machine-readable half of a page.
@@ -28,10 +28,10 @@ export function OrganizationSchema() {
       data={{
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        '@id': `${appOrigin()}/#organization`,
+        '@id': `${siteOrigin()}/#organization`,
         name: brand.name,
-        url: appOrigin(),
-        logo: absoluteUrl(brand.logoUrl ?? '/brand/logomark.png'),
+        url: siteOrigin(),
+        logo: siteLink(brand.logoUrl ?? '/brand/logomark.png'),
         description: brand.description,
         email: brand.supportEmail,
         areaServed: locale.country,
@@ -65,14 +65,14 @@ export function SoftwareSchema() {
       data={{
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
-        '@id': `${appOrigin()}/#software`,
+        '@id': `${siteOrigin()}/#software`,
         name: brand.name,
         applicationCategory: 'BusinessApplication',
         applicationSubCategory: 'Enterprise Resource Planning',
         operatingSystem: 'Web browser',
-        url: appOrigin(),
+        url: siteOrigin(),
         description: brand.description,
-        publisher: { '@id': `${appOrigin()}/#organization` },
+        publisher: { '@id': `${siteOrigin()}/#organization` },
         featureList: [
           'Invoicing and quotations',
           'Customer and supplier records',
@@ -91,7 +91,7 @@ export function SoftwareSchema() {
                 price: lowest,
                 priceCurrency: PLATFORM_CURRENCY,
                 category: 'subscription',
-                url: absoluteUrl('/pricing'),
+                url: siteLink('/pricing'),
                 description: `${TRIAL_DAYS}-day free trial, no card required.`,
               },
             }),
