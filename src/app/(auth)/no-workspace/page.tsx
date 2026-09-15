@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Building2 } from 'lucide-react';
+import { Building2, ShieldCheck } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Logo } from '@/components/brand/logo';
@@ -9,6 +9,7 @@ import { AuthPanel } from '@/components/marketing/auth-panel';
 import { auth } from '@/lib/auth';
 import { brand } from '@/lib/config/brand';
 import { getTenantContext } from '@/server/tenant';
+import { getPlatformContext } from '@/server/platform';
 
 import { SignOutButton } from './sign-out-button';
 
@@ -29,6 +30,37 @@ export default async function NoWorkspacePage() {
   // Access restored while they sat on this page. Send them in.
   const context = await getTenantContext();
   if (context) redirect('/dashboard');
+
+  // An Adwuma360 staff account is meant to have no workspace, so for them this
+  // is not a problem to explain, it is simply the way in.
+  const platform = await getPlatformContext();
+
+  if (platform) {
+    return (
+      <AuthPanel>
+        <Logo size={32} />
+
+        <div className="mt-8 flex size-11 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <ShieldCheck className="size-5" aria-hidden />
+        </div>
+
+        <h1 className="mt-5 text-[1.65rem] font-semibold tracking-[-0.03em]">
+          Welcome back, {platform.user.name.split(' ')[0]}
+        </h1>
+        <p className="mt-2 text-pretty text-[13.5px] leading-relaxed text-muted-foreground">
+          This is a staff account, so it has no workspace of its own and no
+          company to open. It operates {brand.name} itself.
+        </p>
+
+        <div className="mt-7 grid gap-2.5">
+          <Button asChild size="xl" className="w-full rounded-full">
+            <Link href="/admin">Open the operator console</Link>
+          </Button>
+          <SignOutButton />
+        </div>
+      </AuthPanel>
+    );
+  }
 
   return (
     <AuthPanel>

@@ -5,8 +5,10 @@ import { ArrowUpRight, ShieldCheck } from 'lucide-react';
 import { LogoMark } from '@/components/brand/logo';
 import { brand } from '@/lib/config/brand';
 import { requirePlatformAdmin } from '@/server/platform';
+import { getTenantContext } from '@/server/tenant';
 
 import { ConsoleNav } from './console-nav';
+import { SignOutButton } from './sign-out-button';
 
 export const dynamic = 'force-dynamic';
 
@@ -27,6 +29,10 @@ export default async function PlatformLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   const context = await requirePlatformAdmin();
+
+  // A staff account has no workspace, so offering it a way into one would be
+  // a link to a page telling them they have none.
+  const tenant = await getTenantContext();
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface-subtle">
@@ -53,12 +59,16 @@ export default async function PlatformLayout({
                 {context.viaBootstrap ? 'Access from the environment list' : 'Staff'}
               </p>
             </div>
-            <Link
-              href="/dashboard"
-              className="flex items-center gap-1 text-[12.5px] font-medium opacity-90 transition-opacity hover:opacity-100"
-            >
-              My workspace <ArrowUpRight className="size-3.5" aria-hidden />
-            </Link>
+            {tenant ? (
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-1 text-[12.5px] font-medium opacity-90 transition-opacity hover:opacity-100"
+              >
+                My workspace <ArrowUpRight className="size-3.5" aria-hidden />
+              </Link>
+            ) : (
+              <SignOutButton />
+            )}
           </div>
         </div>
 

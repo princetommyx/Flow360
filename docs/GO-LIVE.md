@@ -109,6 +109,30 @@ prefix.
 
 ---
 
+## Creating a staff account
+
+Staff are not customers. `/register` creates a *workspace*, so an account made
+that way owns a company that then sits in the list it is supposed to be
+policing. A staff account belongs to no workspace at all.
+
+1. **Settings → Secrets and variables → Actions → New repository secret.**
+   Name it `PLATFORM_ADMIN_PASSWORD`, and set it to the password the operator
+   will sign in with: at least 10 characters, with a capital, a small letter
+   and a number. A secret rather than a form field, because workflow inputs are
+   shown in plain text on the run page and kept in its history.
+
+2. **Actions → Create platform operator → Run workflow.** Give the email
+   address and the person's name. The address does not need to exist yet.
+
+3. Sign in at `/login` with that address and the password. There is no
+   workspace to land in, so it goes to a page that says so and offers a link
+   straight into the console.
+
+Running it again for the same address updates that account, so it is also how
+you reset a forgotten staff password: change the secret, run it again.
+
+---
+
 ## 4. Redeploy
 
 Environment variables only reach a build that starts after they are saved, so
