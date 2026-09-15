@@ -12,6 +12,9 @@ type Formatter = (value: number) => string;
  */
 type ChartTooltipProps = Partial<TooltipContentProps<number, string>> & {
   formatter?: Formatter;
+  /** The workspace's currency. Without it the tooltip would show the global
+      default, which is not necessarily the one these figures are in. */
+  currency?: string;
 };
 
 /**
@@ -22,7 +25,8 @@ export function ChartTooltip({
   active,
   payload,
   label,
-  formatter = (value) => formatCurrency(value),
+  currency,
+  formatter = (value) => formatCurrency(value, { currency }),
 }: ChartTooltipProps) {
   if (!active || !payload?.length) return null;
 

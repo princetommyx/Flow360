@@ -140,15 +140,15 @@ export const brand: BrandConfig = {
 };
 
 export const locale: LocaleConfig = {
-  locale: env('NEXT_PUBLIC_LOCALE', 'en-US'),
-  currency: env('NEXT_PUBLIC_CURRENCY', 'USD'),
-  currencySymbol: env('NEXT_PUBLIC_CURRENCY_SYMBOL', '$'),
+  locale: env('NEXT_PUBLIC_LOCALE', 'en-GH'),
+  currency: env('NEXT_PUBLIC_CURRENCY', 'GHS'),
+  currencySymbol: env('NEXT_PUBLIC_CURRENCY_SYMBOL', 'GH₵'),
   country: env('NEXT_PUBLIC_COUNTRY', 'Ghana'),
   countryCode: env('NEXT_PUBLIC_COUNTRY_CODE', 'GH'),
-  timezone: env('NEXT_PUBLIC_TIMEZONE', 'UTC'),
+  timezone: env('NEXT_PUBLIC_TIMEZONE', 'Africa/Accra'),
   dateFormat: env('NEXT_PUBLIC_DATE_FORMAT', 'dd MMM yyyy'),
   defaultTaxRate: Number(env('NEXT_PUBLIC_DEFAULT_TAX_RATE', '10')),
-  taxLabel: env('NEXT_PUBLIC_TAX_LABEL', 'Sales Tax'),
+  taxLabel: env('NEXT_PUBLIC_TAX_LABEL', 'VAT'),
 };
 
 export const numbering: DocumentNumberingConfig = {

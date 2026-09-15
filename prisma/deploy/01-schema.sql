@@ -1403,6 +1403,15 @@ ADD COLUMN     "codeHash" TEXT;
 -- AlterTable
 ALTER TABLE "organizations" ADD COLUMN     "requestedBilling" TEXT;
 
+-- ===== migration: 20260915020536_ghana_defaults =====
+-- AlterTable
+ALTER TABLE "company_settings" ALTER COLUMN "taxLabel" SET DEFAULT 'VAT';
+
+-- AlterTable
+ALTER TABLE "organizations" ALTER COLUMN "country" SET DEFAULT 'Ghana',
+ALTER COLUMN "currency" SET DEFAULT 'GHS',
+ALTER COLUMN "timezone" SET DEFAULT 'Africa/Accra';
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1418,5 +1427,6 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '502c661c3ff28ba12a62d2d0e47ff9c701aee8e8279cdac51cf0c424963d678e', now(), '20260913230103_add_trial_and_subscription', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'b37c9fd0ded3213b306118ad5b24b18dc712dc0a8d5f6da20d725e66a5f7b6e4', now(), '20260914203514_verification_codes', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'fe1cf463d627d8e7193c2d3e585a3db9e0b65aa700dfed34eeb263c1089de5f3', now(), '20260914203552_requested_billing_period', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '6582b5b3a17f2c15c17aa5b26edf7e58f4f6c6201f94176619c43fab1ee37e8b', now(), '20260915020536_ghana_defaults', now(), 1);
 
 COMMIT;

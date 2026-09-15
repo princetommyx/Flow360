@@ -2,6 +2,7 @@ import { brand } from '@/lib/config/brand';
 import {
   expandedIncludes,
   planPrice,
+  PLATFORM_CURRENCY,
   TRIAL_DAYS,
   type BillingPeriod,
   type Plan,
@@ -160,7 +161,9 @@ export function subscriptionRequestedEmail(input: {
   const price =
     amount === null
       ? 'Priced with you'
-      : `${formatCurrency(amount)} ${input.period === 'annual' ? 'a year' : 'a month'}`;
+      : `${formatCurrency(amount, { currency: PLATFORM_CURRENCY })} ${
+          input.period === 'annual' ? 'a year' : 'a month'
+        }`;
 
   return {
     to: input.to,

@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
   PLANS,
+  PLATFORM_CURRENCY,
   annualSaving,
   type BillingPeriod,
   type PlanId,
@@ -179,7 +180,7 @@ export function PlanChooser({
                 ) : (
                   <>
                     <span className="text-[1.6rem] font-semibold tracking-[-0.025em] tabular">
-                      {formatCurrency(price, { compact: false }).replace(/\.00$/, '')}
+                      {formatCurrency(price, { compact: false, currency: PLATFORM_CURRENCY }).replace(/\.00$/, '')}
                     </span>
                     <span className="text-[12.5px] text-muted-foreground">
                       {annual ? '/ year' : '/ month'}

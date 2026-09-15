@@ -84,9 +84,9 @@ model Organization {
   city               String?
   state              String?
   postalCode         String?
-  country            String    @default("United States")
-  currency           String    @default("USD")
-  timezone           String    @default("UTC")
+  country            String    @default("Ghana")
+  currency           String    @default("GHS")
+  timezone           String    @default("Africa/Accra")
   industry           String?
   plan               String    @default("starter")
   /// Free trial ends here. Null means the workspace never had one.
@@ -262,7 +262,7 @@ model CompanySettings {
   invoiceFooter          String?
 
   // Tax
-  taxLabel         String  @default("Sales Tax")
+  taxLabel         String  @default("VAT")
   defaultTaxRate   Decimal @default(0) @db.Decimal(6, 3)
   pricesIncludeTax Boolean @default(false)
 

@@ -170,7 +170,7 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             {hasTrendData ? (
-              <RevenueTrendChart data={trend} />
+              <RevenueTrendChart data={trend} currency={currency} />
             ) : (
               <EmptyState
                 compact
@@ -196,7 +196,7 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             {statusBreakdown.length > 0 ? (
-              <SalesOverviewChart data={statusBreakdown} />
+              <SalesOverviewChart data={statusBreakdown} currency={currency} />
             ) : (
               <EmptyState
                 compact
@@ -281,7 +281,7 @@ export default async function DashboardPage({
           </CardHeader>
           <CardContent>
             {topProducts.length > 0 ? (
-              <TopProductsChart data={topProducts} />
+              <TopProductsChart data={topProducts} currency={currency} />
             ) : (
               <EmptyState
                 compact

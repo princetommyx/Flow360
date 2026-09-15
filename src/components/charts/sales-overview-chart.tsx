@@ -23,7 +23,13 @@ const STATUS_COLOR: Record<string, string> = {
  * Colour here is *status*, not a categorical series, so it reuses the reserved
  * state palette and every bar is labelled on the axis.
  */
-export function SalesOverviewChart({ data }: { data: StatusSlice[] }) {
+export function SalesOverviewChart({
+  data,
+  currency,
+}: {
+  data: StatusSlice[];
+  currency: string;
+}) {
   const rows = data.map((slice) => ({
     ...slice,
     label: statusMeta(slice.status).label,
@@ -45,7 +51,7 @@ export function SalesOverviewChart({ data }: { data: StatusSlice[] }) {
             tickLine={false}
             axisLine={false}
             tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-            tickFormatter={(value: number) => formatCurrency(value, { compact: true })}
+            tickFormatter={(value: number) => formatCurrency(value, { compact: true, currency })}
           />
           <YAxis
             type="category"
@@ -55,7 +61,7 @@ export function SalesOverviewChart({ data }: { data: StatusSlice[] }) {
             width={96}
             tick={{ fontSize: 11.5, fill: 'var(--foreground)' }}
           />
-          <Tooltip cursor={{ fill: 'var(--muted)' }} content={<ChartTooltip />} />
+          <Tooltip cursor={{ fill: 'var(--muted)' }} content={<ChartTooltip currency={currency} />} />
           <Bar
             dataKey="amount"
             name="Invoiced"

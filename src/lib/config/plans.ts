@@ -9,6 +9,16 @@
 
 export const TRIAL_DAYS = 30;
 
+/**
+ * What Adwuma360 charges in, which is not what a workspace trades in.
+ *
+ * A Ghanaian workshop keeps its books in cedis; the subscription it pays us
+ * for the software is priced separately. Leaving the plan prices to fall back
+ * on the global currency would relabel them every time that default moved,
+ * turning $2 a month into GH₵2 a month without anyone deciding to.
+ */
+export const PLATFORM_CURRENCY = 'USD';
+
 export const PLAN_IDS = ['starter', 'business', 'enterprise'] as const;
 
 export type PlanId = (typeof PLAN_IDS)[number];
