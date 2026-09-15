@@ -1,7 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-import { brand } from '@/lib/config/brand';
-import { appOrigin, appUrl } from '@/lib/url';
+import { isProductionSite, siteOrigin } from '@/lib/url';
 
 /**
  * What a crawler may read.
@@ -16,10 +15,10 @@ import { appOrigin, appUrl } from '@/lib/url';
  * copy on two hostnames is the textbook way to split your own ranking.
  */
 export default function robots(): MetadataRoute.Robots {
-  // `brand.domain` is the one hostname this product is meant to be found at.
-  const production = appUrl().hostname.replace(/^www\./, '') === brand.domain;
-
-  if (!production) {
+  // Decided from the platform's own environment rather than from a URL
+  // somebody pasted, because getting that wrong hides the entire site from
+  // search and says nothing about having done so.
+  if (!isProductionSite()) {
     return { rules: [{ userAgent: '*', disallow: '/' }] };
   }
 
@@ -64,7 +63,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: `${appOrigin()}/sitemap.xml`,
-    host: appOrigin(),
+    sitemap: `${siteOrigin()}/sitemap.xml`,
+    host: siteOrigin(),
   };
 }

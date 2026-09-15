@@ -10,7 +10,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { brand, locale } from '@/lib/config/brand';
 import { verificationMeta } from '@/lib/config/verification';
-import { appUrl } from '@/lib/url';
+import { siteUrl } from '@/lib/url';
 
 import './globals.css';
 
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   description: brand.description,
   applicationName: brand.name,
   icons: { icon: brand.faviconUrl },
-  metadataBase: appUrl(),
+  metadataBase: siteUrl(),
   openGraph: {
     title: `${brand.name} · ${brand.tagline}`,
     description: brand.description,
