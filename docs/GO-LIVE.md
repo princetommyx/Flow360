@@ -91,6 +91,14 @@ Add each one to **all three** environments (Production, Preview, Development):
 | `AUTH_URL` | `https://flow360-puce.vercel.app` |
 | `AUTH_TRUST_HOST` | `true` |
 | `NEXT_PUBLIC_APP_URL` | `https://flow360-puce.vercel.app` |
+| `PLATFORM_ADMIN_EMAILS` | your own sign-in address, so you can open the operator console |
+
+`PLATFORM_ADMIN_EMAILS` is how the first operator of Adwuma360 is created: the
+addresses listed there can open `/admin`, whatever the database says. Everyone
+else is granted from inside the console, which sets a flag on their account.
+Keep at least one address listed, because it is also the way back in if the
+last flag is ever revoked by mistake. It grants nothing inside a customer's
+workspace.
 
 That `AUTH_SECRET` was generated for this deployment. Treat it as a password —
 if it ever leaks, replace it with `openssl rand -base64 32` and redeploy.

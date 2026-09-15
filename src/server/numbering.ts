@@ -1,6 +1,7 @@
 // Pure transaction helpers with no request context, so the seed script can use
 // the same implementation the application does. Deliberately not `server-only`.
 import type { Prisma } from '@/generated/prisma/client';
+import { formatDocumentNumber } from '@/lib/document-number';
 
 export type DocType =
   | 'invoice'
@@ -72,10 +73,8 @@ export async function nextDocumentNumber(
   const padding = options?.padding ?? settings?.numberPadding ?? 5;
   const includeYear = options?.includeYear ?? settings?.numberIncludeYear ?? true;
 
-  const format = (value: number) => {
-    const serial = String(value).padStart(padding, '0');
-    return includeYear ? `${prefix}-${year}-${serial}` : `${prefix}-${serial}`;
-  };
+  const format = (value: number) =>
+    formatDocumentNumber({ prefix, year, serial: value, padding, includeYear });
 
   // The counter is the source of truth, but rows can be introduced by other
   // means — a migration, an import, a seed — leaving it behind the numbers

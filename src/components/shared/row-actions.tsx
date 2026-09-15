@@ -33,11 +33,13 @@ export function RowActions({
   actions: RowAction[];
   label?: string;
 }) {
+  const [open, setOpen] = React.useState(false);
+
   const visible = actions.filter(Boolean);
   if (visible.length === 0) return null;
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -59,7 +61,14 @@ export function RowActions({
               onSelect={
                 action.onSelect
                   ? (event) => {
+                      // Radix closes the menu itself, but it does that in the
+                      // same commit the handler's refresh or dialog triggers,
+                      // and the two race: the menu can unmount before Radix
+                      // puts `pointer-events` back on the body, leaving the
+                      // whole page unclickable. Closing it deliberately first,
+                      // then handing over, keeps the teardown in one place.
                       event.preventDefault();
+                      setOpen(false);
                       action.onSelect?.();
                     }
                   : undefined

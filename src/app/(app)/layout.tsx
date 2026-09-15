@@ -6,6 +6,7 @@ import { TrialBanner } from '@/components/billing/trial-banner';
 import { NAV_GROUPS, filterNavByPermissions } from '@/lib/navigation';
 import { hasPermission, type PermissionKey } from '@/lib/permissions';
 import { requireTenant } from '@/server/tenant';
+import { getPlatformContext } from '@/server/platform';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,6 +22,11 @@ export default async function AppLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   const context = await requireTenant();
 
+  // Only so the account menu can offer a way in. It grants nothing: the
+  // console re-checks for itself on every page and every action.
+  const platform = await getPlatformContext();
+  const isPlatformAdmin = platform !== null;
+
   const navGroups = filterNavByPermissions(NAV_GROUPS, (permission?: PermissionKey) =>
     permission ? hasPermission(context.permissions, permission) : true,
   );
@@ -31,7 +37,7 @@ export default async function AppLayout({
         organizationId: context.organization.id,
         OR: [{ userId: context.user.id }, { userId: null }],
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: 8,
       select: { id: true, title: true, body: true, href: true, createdAt: true, readAt: true },
     }),
@@ -55,13 +61,18 @@ export default async function AppLayout({
         secondary={settings?.secondaryColor}
       />
       <div className="min-h-dvh bg-background">
-        <AppSidebar navGroups={navGroups} context={context} />
+        <AppSidebar
+          navGroups={navGroups}
+          context={context}
+          isPlatformAdmin={isPlatformAdmin}
+        />
 
         <div className="lg:pl-[15.5rem]">
           <AppHeader
             navGroups={navGroups}
             context={context}
             unreadCount={unreadCount}
+            isPlatformAdmin={isPlatformAdmin}
             notifications={notifications.map((notification) => ({
               id: notification.id,
               title: notification.title,

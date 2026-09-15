@@ -227,7 +227,7 @@ export const NAV_GROUPS: NavGroup[] = [
         permission: 'reports.view',
       },
       {
-        label: 'Financial reports',
+        label: 'Profit and loss',
         href: '/reports/financial',
         icon: 'reportFinancial',
         permission: 'reports.view',
@@ -253,21 +253,21 @@ export const NAV_GROUPS: NavGroup[] = [
         keywords: ['team members', 'invite'],
       },
       {
-        label: 'Roles & permissions',
+        label: 'Roles and permissions',
         href: '/settings/roles',
         icon: 'roles',
         permission: 'users.view',
         keywords: ['access control', 'rbac'],
       },
       {
-        label: 'Invoice settings',
+        label: 'Invoicing',
         href: '/settings/invoicing',
         icon: 'invoiceSettings',
         permission: 'settings.view',
         keywords: ['numbering', 'terms'],
       },
       {
-        label: 'Tax settings',
+        label: 'Tax',
         href: '/settings/tax',
         icon: 'tax',
         permission: 'settings.view',

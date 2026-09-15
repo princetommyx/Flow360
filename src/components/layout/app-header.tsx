@@ -15,11 +15,13 @@ export function AppHeader({
   context,
   notifications,
   unreadCount,
+  isPlatformAdmin = false,
 }: {
   navGroups: NavGroup[];
   context: TenantContext;
   notifications: NotificationItem[];
   unreadCount: number;
+  isPlatformAdmin?: boolean;
 }) {
   return (
     <header className="sticky top-0 z-20 border-b border-border bg-background/85 backdrop-blur-md">
@@ -42,7 +44,12 @@ export function AppHeader({
           <QuickCreate permissions={context.permissions} />
           <NotificationsMenu notifications={notifications} unreadCount={unreadCount} />
           <div className="lg:hidden">
-            <UserMenu user={context.user} roleName={context.role.name} variant="header" />
+            <UserMenu
+              user={context.user}
+              roleName={context.role.name}
+              variant="header"
+              isPlatformAdmin={isPlatformAdmin}
+            />
           </div>
         </div>
       </div>

@@ -13,13 +13,14 @@ const LABEL_OVERRIDES: Record<string, string> = {
   settings: 'Settings',
   'purchase-orders': 'Purchase orders',
   'stock-adjustments': 'Stock adjustments',
-  invoicing: 'Invoice settings',
-  tax: 'Tax settings',
-  roles: 'Roles & permissions',
+  invoicing: 'Invoicing',
+  tax: 'Tax',
+  roles: 'Roles and permissions',
   profile: 'My profile',
   company: 'Company',
   users: 'Users',
   notifications: 'Notifications',
+  financial: 'Profit and loss',
 };
 
 const NAV_LABELS = new Map(

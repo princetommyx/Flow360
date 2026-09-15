@@ -179,3 +179,65 @@ export async function completeEmailVerification(userId: string): Promise<void> {
     console.error('Welcome email could not be sent', error);
   }
 }
+
+export type InvitationSummary = {
+  name: string;
+  email: string;
+  organizationName: string;
+  roleName: string;
+};
+
+/**
+ * What an invitation link is for, read before anything is changed.
+ *
+ * Returns `null` for a token that is unknown, spent or expired, so the page
+ * can say so once rather than letting the reader fill in a password that was
+ * never going to be accepted.
+ */
+export async function invitationSummary(
+  rawToken: string,
+): Promise<InvitationSummary | null> {
+  const record = await db.verificationToken.findUnique({
+    where: { token: hashToken(rawToken) },
+    select: {
+      type: true,
+      usedAt: true,
+      expiresAt: true,
+      user: {
+        select: {
+          name: true,
+          email: true,
+          memberships: {
+            where: { status: 'INVITED', deletedAt: null },
+            orderBy: { invitedAt: 'desc' },
+            take: 1,
+            select: {
+              organization: { select: { name: true } },
+              role: { select: { name: true } },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (
+    !record ||
+    !record.user ||
+    record.type !== 'INVITATION' ||
+    record.usedAt ||
+    record.expiresAt < new Date()
+  ) {
+    return null;
+  }
+
+  const membership = record.user.memberships[0];
+  if (!membership) return null;
+
+  return {
+    name: record.user.name,
+    email: record.user.email,
+    organizationName: membership.organization.name,
+    roleName: membership.role.name,
+  };
+}

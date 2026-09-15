@@ -388,3 +388,57 @@ export async function resendVerificationAction(): Promise<ActionResult> {
 
   return { ok: true, data: undefined };
 }
+
+/**
+ * Accepting an invitation.
+ *
+ * The link proves control of the address, so it does three things at once: it
+ * sets the first password, marks the address confirmed, and turns every
+ * outstanding invitation for that account into a live membership. Someone
+ * invited to two workspaces on the same address wanted both; one link is
+ * enough to prove the address for either.
+ */
+export async function acceptInviteAction(input: unknown): Promise<ActionResult> {
+  const parsed = resetPasswordSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid request.' };
+  }
+
+  const record = await db.verificationToken.findUnique({
+    where: { token: hashToken(parsed.data.token) },
+    select: { id: true, userId: true, type: true, expiresAt: true, usedAt: true },
+  });
+
+  if (
+    !record ||
+    !record.userId ||
+    record.type !== 'INVITATION' ||
+    record.usedAt ||
+    record.expiresAt < new Date()
+  ) {
+    return {
+      ok: false,
+      error: 'That invitation is no longer valid. Ask for a new one to be sent.',
+    };
+  }
+
+  const passwordHash = await hash(parsed.data.password, 12);
+  const now = new Date();
+
+  await db.$transaction([
+    db.user.update({
+      where: { id: record.userId },
+      data: { passwordHash, emailVerified: now, isActive: true },
+    }),
+    db.organizationMember.updateMany({
+      where: { userId: record.userId, status: 'INVITED', deletedAt: null },
+      data: { status: 'ACTIVE', joinedAt: now },
+    }),
+    db.verificationToken.updateMany({
+      where: { userId: record.userId, type: 'INVITATION', usedAt: null },
+      data: { usedAt: now },
+    }),
+  ]);
+
+  return { ok: true, data: undefined };
+}

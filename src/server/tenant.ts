@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { FORBIDDEN_DIGEST } from '@/lib/forbidden';
 import {
   WILDCARD,
   hasAnyPermission,
@@ -20,7 +21,12 @@ import {
  */
 export const ACTIVE_ORG_COOKIE = 'flow360.org';
 
+export { FORBIDDEN_DIGEST };
+
+/** Refused by the member's role, not a fault. See `lib/forbidden.ts`. */
 export class AuthorizationError extends Error {
+  digest = FORBIDDEN_DIGEST;
+
   constructor(message = 'You do not have permission to do that.') {
     super(message);
     this.name = 'AuthorizationError';
@@ -140,11 +146,20 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
   };
 });
 
-/** Use in app-shell layouts, pages and server actions. Redirects when signed out. */
+/**
+ * Use in app-shell layouts, pages and server actions.
+ *
+ * Signed out goes to sign in. Signed in with nothing to sign in *to* goes
+ * somewhere that says so: sending them to `/login` would bounce them straight
+ * back here, because a signed-in visitor on the login page is redirected to the
+ * dashboard. That loop is what a suspended workspace used to produce.
+ */
 export async function requireTenant(): Promise<TenantContext> {
   const context = await getTenantContext();
-  if (!context) redirect('/login');
-  return context;
+  if (context) return context;
+
+  const session = await auth();
+  redirect(session?.user?.id ? '/no-workspace' : '/login');
 }
 
 /** Convenience: the active organization id, already authorised. */

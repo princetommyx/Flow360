@@ -1,15 +1,41 @@
 import type { Metadata } from 'next';
 
-import { ModulePending } from '@/components/shared/module-pending';
+import { PageHeader } from '@/components/shared/page-header';
+import { hasPermission } from '@/lib/permissions';
+import { mailIsDelivered } from '@/lib/mailer';
+import { requirePermission } from '@/server/tenant';
+import { listMembers, listRoles } from '@/server/services/settings';
 
-export const metadata: Metadata = { title: "Users" };
+import { UsersList } from './users-list';
 
-export default function Page() {
+export const metadata: Metadata = { title: 'Users' };
+
+export default async function UsersSettingsPage() {
+  const context = await requirePermission('users.view');
+
+  const [members, roles] = await Promise.all([
+    listMembers(context.organization.id),
+    listRoles(context.organization.id),
+  ]);
+
   return (
-    <ModulePending
-      title="Users"
-      description="Invite teammates and manage their access."
-      phase="Phase 5"
-    />
+    <div className="space-y-6">
+      <PageHeader
+        title="Users"
+        description="Who can get into this workspace, and what their role lets them do once they are in."
+      />
+
+      <UsersList
+        members={members}
+        roles={roles
+          .filter((role) => role.key !== 'owner')
+          .map((role) => ({ id: role.id, name: role.name, description: role.description }))}
+        currentUserId={context.user.id}
+        canInvite={hasPermission(context.permissions, 'users.create')}
+        canEdit={hasPermission(context.permissions, 'users.edit')}
+        canRemove={hasPermission(context.permissions, 'users.delete')}
+        emailIsLive={mailIsDelivered()}
+      />
+    </div>
   );
 }

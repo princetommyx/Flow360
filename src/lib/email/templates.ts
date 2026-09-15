@@ -192,3 +192,57 @@ export function subscriptionRequestedEmail(input: {
     footnote: `Changed your mind? You can withdraw the request on the billing page, or reply to ${brand.supportEmail}.`,
   };
 }
+
+/* ── 6. Invited to a workspace ───────────────────────────────────────────── */
+
+export function teamInviteEmail(input: {
+  to: string;
+  name: string;
+  invitedBy: string;
+  organizationName: string;
+  roleName: string;
+  /**
+   * Where the button goes. A brand new account is sent to set a password; an
+   * address that already signs in is sent to the sign-in page, because being
+   * added to a second workspace must not disturb the first.
+   */
+  url: string;
+  existingAccount: boolean;
+  expiresInHours?: number;
+}): MailMessage {
+  const hours = input.expiresInHours ?? 0;
+  const days = Math.round(hours / 24);
+  const window = hours >= 48 ? `${days} days` : `${hours} hours`;
+
+  return {
+    to: input.to,
+    subject: `${input.invitedBy} added you to ${input.organizationName} on ${brand.name}`,
+    preheader: input.existingAccount
+      ? `Sign in and ${input.organizationName} will be waiting in your workspace switcher.`
+      : `Set a password and you are in. The link is good for ${window}.`,
+    heading: `You have been added to ${input.organizationName}`,
+    body: [
+      input.existingAccount
+        ? `Hi ${firstName(input.name)}, ${input.invitedBy} has given you access to the ${input.organizationName} workspace on ${brand.name}. Sign in with this address as usual and pick it from the workspace switcher at the top of the sidebar. Your password has not changed.`
+        : `Hi ${firstName(input.name)}, ${input.invitedBy} has given you access to the ${input.organizationName} workspace on ${brand.name}. Choose a password with the button below and you can sign in straight away.`,
+      facts([
+        { label: 'Workspace', value: input.organizationName },
+        { label: 'Your role', value: input.roleName },
+        { label: 'Sign in with', value: input.to },
+        ...(input.existingAccount
+          ? []
+          : [{ label: 'Link valid for', value: window }]),
+      ]),
+      callout(
+        'What you can see and change is set by your role, and whoever invited you can adjust it at any time.',
+      ),
+    ],
+    action: {
+      label: input.existingAccount ? 'Open the workspace' : 'Set my password',
+      url: input.url,
+    },
+    footnote: input.existingAccount
+      ? `Not expecting this? Ask ${input.invitedBy} to remove you, or reply to ${brand.supportEmail}.`
+      : 'Not expecting this? You can ignore the message. The invitation does nothing until the link is used, and it expires on its own.',
+  };
+}

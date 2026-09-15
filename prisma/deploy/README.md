@@ -13,19 +13,24 @@ credential is stored here.
 
 ## Regenerating it
 
-Against a local database that has been migrated and seeded:
+All three files are generated. After adding a migration or changing the seed:
 
 ```bash
-npx prisma migrate deploy
-npm run db:seed
-pg_dump "$DATABASE_URL" --data-only --inserts --column-inserts \
-  --no-owner --no-privileges --exclude-table=_prisma_migrations -f /tmp/data.sql
+npm run deploy:sql -- "postgresql://postgres:postgres@localhost:5432/scratch"
 ```
 
-Then rebuild the file: the migration SQL from `prisma/migrations/*/migration.sql`
-in order, the `_prisma_migrations` rows (ids, checksums and names must match
-those migrations), and `/tmp/data.sql`, all wrapped in one `BEGIN`/`COMMIT`.
+The database you name is **dropped and rebuilt**, so point it at a scratch one.
+The script migrates it, seeds it, dumps the data and writes `01-schema.sql`,
+`02-demo-data.sql` and `flow360-setup.sql` from the migrations on disk. The
+checksums in the `_prisma_migrations` rows are SHA-256 of each `migration.sql`,
+which is what lets a later `prisma migrate deploy` recognise them as applied
+rather than trying to run them again.
 
-After changing it, prove it: restore into an empty database with
-`psql -v ON_ERROR_STOP=1 -f flow360-setup.sql`, then confirm
-`npx prisma migrate deploy` reports no pending migrations.
+Then prove it, into an empty database:
+
+```bash
+createdb adwuma_verify
+psql "postgresql://…/adwuma_verify" -v ON_ERROR_STOP=1 -f flow360-setup.sql
+DATABASE_URL="postgresql://…/adwuma_verify" npx prisma migrate deploy   # no pending migrations
+DATABASE_URL="postgresql://…/adwuma_verify" npm run db:check
+```

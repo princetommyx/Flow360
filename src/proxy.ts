@@ -40,6 +40,10 @@ const PROTECTED_PREFIXES = [
   '/settings',
   '/notifications',
   '/onboarding',
+  // The operator console. Listed for the same reason as the rest: to save a
+  // render for a visitor with no session at all. Whether that session belongs
+  // to an operator is decided server-side, in `requirePlatformAdmin`.
+  '/admin',
 ];
 
 export default function proxy(request: NextRequest) {

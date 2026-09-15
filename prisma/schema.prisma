@@ -16,18 +16,22 @@ datasource db {
 // ───────────────────────────── Identity & access ────────────────────────────
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  name          String
-  passwordHash  String
-  avatarUrl     String?
-  phone         String?
-  jobTitle      String?
-  emailVerified DateTime?
-  lastLoginAt   DateTime?
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  passwordHash    String
+  avatarUrl       String?
+  phone           String?
+  jobTitle        String?
+  emailVerified   DateTime?
+  lastLoginAt     DateTime?
+  isActive        Boolean   @default(true)
+  /// Operator of Adwuma360 itself, not of any workspace. Completely separate
+  /// from tenant RBAC: owning a workspace grants nothing here, and this grants
+  /// nothing inside anyone's workspace.
+  isPlatformAdmin Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   memberships   OrganizationMember[]
   notifications Notification[]
@@ -35,6 +39,7 @@ model User {
   activities    ActivityLog[]
   assignedTasks Task[]               @relation("TaskAssignee")
   timesheets    Timesheet[]
+  platformAudit PlatformAuditLog[]   @relation("PlatformAuditActor")
 
   @@index([email])
   @@map("users")
@@ -1290,6 +1295,30 @@ model Notification {
   @@index([organizationId, userId, readAt])
   @@index([createdAt])
   @@map("notifications")
+}
+
+/// Operator actions, which belong to no workspace.
+///
+/// `ActivityLog` is tenant scoped by design and cannot hold an action taken
+/// across tenants or on an account that belongs to none. Everything the
+/// console changes is recorded here instead, and nothing deletes from it.
+model PlatformAuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String
+  action      String
+  /// organization | user
+  targetType  String
+  targetId    String
+  /// A human sentence, written where the action is taken.
+  summary     String
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  actor User @relation("PlatformAuditActor", fields: [actorUserId], references: [id])
+
+  @@index([createdAt])
+  @@index([targetType, targetId])
+  @@map("platform_audit_logs")
 }
 
 model ActivityLog {
