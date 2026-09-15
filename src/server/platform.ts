@@ -1,12 +1,11 @@
 import 'server-only';
 
 import { cache } from 'react';
-import { redirect } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { isBootstrapAdmin } from '@/lib/config/platform';
-import { AuthorizationError } from '@/server/tenant';
 
 /**
  * The operator console's guard.
@@ -47,18 +46,22 @@ export const getPlatformContext = cache(async (): Promise<PlatformContext | null
 /**
  * Guard for every page and every action under the console.
  *
- * Signed out redirects to sign in. Signed in but not an operator throws, so
- * the refusal is a refusal: a redirect would tell anyone who tried that the
- * address is worth trying again from another account.
+ * A signed-in visitor who is not an operator gets the ordinary not-found page,
+ * the same one a mistyped address gets. Saying "this area is for staff" would
+ * be answering a question nobody is entitled to ask: it confirms that a
+ * console exists, that this is its address, and that the only thing between
+ * them and it is the right account. For anyone who should not be here, the
+ * honest answer is that there is nothing here.
+ *
+ * Signed out still goes to sign in, which is what every protected address in
+ * the product does and so singles this one out for nothing.
  */
 export async function requirePlatformAdmin(): Promise<PlatformContext> {
   const session = await auth();
   if (!session?.user?.id) redirect('/login?next=/admin');
 
   const context = await getPlatformContext();
-  if (!context) {
-    throw new AuthorizationError('This area is for Adwuma360 staff.');
-  }
+  if (!context) notFound();
 
   return context;
 }

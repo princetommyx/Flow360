@@ -214,6 +214,12 @@ organization, password from the `PLATFORM_ADMIN_PASSWORD` secret so it never
 reaches a log. Signing in then lands on `/no-workspace`, which recognises staff
 and offers the console instead of explaining a problem.
 
+**It does not announce itself.** A signed-in visitor who is not an operator
+gets the ordinary not-found page, byte for byte what a mistyped address gets.
+Saying "this area is for staff" answers a question nobody is entitled to ask:
+it confirms a console exists, that this is its address, and that the only thing
+in the way is the right account. Do not reintroduce a friendlier refusal.
+
 Neither grants anything inside a customer's workspace, and being an owner or an
 administrator of a workspace grants nothing here. The guard shares no code with
 `server/tenant`: no active-organization cookie, no membership, no permission
