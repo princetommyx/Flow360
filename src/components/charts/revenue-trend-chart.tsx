@@ -26,7 +26,13 @@ const AXIS_STYLE = {
  * Both series share one y-axis (money) — never a second scale — so the gap
  * between the bands reads directly as profit.
  */
-export function RevenueTrendChart({ data }: { data: TrendPoint[] }) {
+export function RevenueTrendChart({
+  data,
+  currency,
+}: {
+  data: TrendPoint[];
+  currency: string;
+}) {
   return (
     <div>
       <ChartLegend
@@ -68,11 +74,11 @@ export function RevenueTrendChart({ data }: { data: TrendPoint[] }) {
               axisLine={false}
               tick={AXIS_STYLE}
               width={64}
-              tickFormatter={(value: number) => formatCurrency(value, { compact: true })}
+              tickFormatter={(value: number) => formatCurrency(value, { compact: true, currency })}
             />
             <Tooltip
               cursor={{ stroke: 'var(--border-strong)', strokeWidth: 1 }}
-              content={<ChartTooltip />}
+              content={<ChartTooltip currency={currency} />}
             />
             <Area
               type="monotone"

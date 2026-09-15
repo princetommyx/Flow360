@@ -7,7 +7,7 @@ import { ArrowRight, Check } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PLANS, TRIAL_DAYS, annualSaving, headlineAnnualSaving } from '@/lib/config/plans';
+import { PLATFORM_CURRENCY, PLANS, TRIAL_DAYS, annualSaving, headlineAnnualSaving } from '@/lib/config/plans';
 import { brand } from '@/lib/config/brand';
 import { formatCurrency } from '@/lib/money';
 import { cn } from '@/lib/utils';
@@ -89,7 +89,7 @@ export function PricingPlans() {
                 ) : (
                   <>
                     <span className="text-[2rem] font-semibold tracking-[-0.03em] tabular">
-                      {formatCurrency(price, { compact: false }).replace(/\.00$/, '')}
+                      {formatCurrency(price, { compact: false, currency: PLATFORM_CURRENCY }).replace(/\.00$/, '')}
                     </span>
                     <span className="text-[13px] text-muted-foreground">
                       {annual ? 'per year' : 'per month'}

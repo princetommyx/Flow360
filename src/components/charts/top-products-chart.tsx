@@ -17,7 +17,13 @@ import { truncate } from '@/lib/utils';
 import type { TopProduct } from '@/server/services/dashboard';
 
 /** Ranked magnitudes read best horizontally — the labels stay horizontal too. */
-export function TopProductsChart({ data }: { data: TopProduct[] }) {
+export function TopProductsChart({
+  data,
+  currency,
+}: {
+  data: TopProduct[];
+  currency: string;
+}) {
   const rows = data.map((product) => ({
     ...product,
     shortName: truncate(product.name, 22),
@@ -38,7 +44,7 @@ export function TopProductsChart({ data }: { data: TopProduct[] }) {
             tickLine={false}
             axisLine={false}
             tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-            tickFormatter={(value: number) => formatCurrency(value, { compact: true })}
+            tickFormatter={(value: number) => formatCurrency(value, { compact: true, currency })}
           />
           <YAxis
             type="category"
@@ -50,7 +56,7 @@ export function TopProductsChart({ data }: { data: TopProduct[] }) {
           />
           <Tooltip
             cursor={{ fill: 'var(--muted)' }}
-            content={<ChartTooltip />}
+            content={<ChartTooltip currency={currency} />}
           />
           <Bar dataKey="revenue" name="Revenue" radius={[0, 4, 4, 0]} barSize={16}>
             {rows.map((row) => (

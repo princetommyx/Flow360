@@ -124,8 +124,8 @@ async function main() {
       name: 'Northwind Supply Co.',
       slug: slugify('Northwind Supply Co'),
       ownerUserId: owner.id,
-      currency: 'USD',
-      country: 'United States',
+      currency: 'GHS',
+      country: 'Ghana',
       email: 'accounts@northwindsupply.example',
     }),
   );
@@ -176,8 +176,8 @@ async function main() {
       name: 'Harbour Fitouts Ltd.',
       slug: 'harbour-fitouts',
       ownerUserId: secondUser.id,
-      currency: 'USD',
-      country: 'United States',
+      currency: 'GHS',
+      country: 'Ghana',
       email: 'hello@harbourfitouts.example',
     }),
   );
