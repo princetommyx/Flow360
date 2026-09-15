@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
 import { db } from '@/lib/db';
+import { FORBIDDEN_DIGEST } from '@/lib/forbidden';
 import {
   WILDCARD,
   hasAnyPermission,
@@ -20,7 +21,12 @@ import {
  */
 export const ACTIVE_ORG_COOKIE = 'flow360.org';
 
+export { FORBIDDEN_DIGEST };
+
+/** Refused by the member's role, not a fault. See `lib/forbidden.ts`. */
 export class AuthorizationError extends Error {
+  digest = FORBIDDEN_DIGEST;
+
   constructor(message = 'You do not have permission to do that.') {
     super(message);
     this.name = 'AuthorizationError';
