@@ -50,7 +50,7 @@ export function LoginForm({ googleEnabled }: { googleEnabled: boolean }) {
       return;
     }
 
-    toast.success('Signed in', { description: 'Taking you to your workspace…' });
+    toast.success('Signed in', { description: 'One moment…' });
     startNavigation(() => {
       router.push(next?.startsWith('/') ? next : result.data.redirectTo);
       router.refresh();

@@ -1,0 +1,98 @@
+# Creates an Adwuma360 staff account, by hand, from the Actions tab.
+#
+# Staff are not customers. The account this creates belongs to no workspace and
+# owns no company: it exists only to open the operator console at /admin.
+# Registering on the site cannot make one, because registering creates a
+# workspace, and an operator with a company of their own sitting in the list
+# they are supposed to be policing is the wrong shape.
+#
+# The password is read from the PLATFORM_ADMIN_PASSWORD repository secret
+# rather than typed into the form, because workflow inputs are shown in plain
+# text on the run page and kept in its history. A secret is masked everywhere.
+#
+# Running it again for the same address updates that account, so it is also the
+# way to reset a forgotten staff password.
+name: Create platform operator
+
+on:
+  workflow_dispatch:
+    inputs:
+      email:
+        description: 'Email address they will sign in with'
+        required: true
+        type: string
+      name:
+        description: 'Their name, shown beside their actions in the operator log'
+        required: true
+        type: string
+
+# One at a time: two runs against one database would race on the same row.
+concurrency:
+  group: create-operator
+  cancel-in-progress: false
+
+jobs:
+  create:
+    runs-on: ubuntu-latest
+    # Nothing here reads or writes the repository.
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Check the secrets are set
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PLATFORM_ADMIN_PASSWORD: ${{ secrets.PLATFORM_ADMIN_PASSWORD }}
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::The DATABASE_URL repository secret is not set."
+            echo "Add it under Settings -> Secrets and variables -> Actions."
+            exit 1
+          fi
+
+          if [ -z "$PLATFORM_ADMIN_PASSWORD" ]; then
+            echo "::error::The PLATFORM_ADMIN_PASSWORD repository secret is not set."
+            echo "Add it under Settings -> Secrets and variables -> Actions -> New repository secret."
+            echo "At least 10 characters, with a capital, a small letter and a number."
+            echo "It is masked in these logs and is the password the operator signs in with."
+            exit 1
+          fi
+
+          echo "Both secrets are set."
+
+      - name: Generate the Prisma client
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx prisma generate
+
+      - name: Create or update the account
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPERATOR_EMAIL: ${{ inputs.email }}
+          OPERATOR_NAME: ${{ inputs.name }}
+          OPERATOR_PASSWORD: ${{ secrets.PLATFORM_ADMIN_PASSWORD }}
+        run: npm run operator
+
+      - name: Summary
+        run: |
+          {
+            echo "### Platform operator"
+            echo ""
+            echo "\`${{ inputs.email }}\` can now sign in and open \`/admin\`."
+            echo ""
+            echo "The password is the \`PLATFORM_ADMIN_PASSWORD\` secret. Change it by"
+            echo "updating the secret and running this workflow again for the same address."
+            echo ""
+            echo "This account belongs to no workspace, so signing in lands on a page"
+            echo "saying so, with a link straight into the console."
+          } >> "$GITHUB_STEP_SUMMARY"

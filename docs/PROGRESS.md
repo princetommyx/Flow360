@@ -189,11 +189,19 @@ Built, at `/admin`, in the `(platform)` route group. It is the console for the
 **Getting in.** Two routes, both checked by `requirePlatformAdmin()` in
 `server/platform.ts`:
 
-1. `users.isPlatformAdmin`, granted and revoked from the console's People page.
-2. `PLATFORM_ADMIN_EMAILS`, a comma-separated list in the environment. This is
-   the bootstrap, because a fresh deployment has no operator and something has
-   to make the first one, and it is the way back in if the last flag is revoked
-   by mistake.
+1. `users.isPlatformAdmin`, set by the **Create platform operator** workflow
+   (`scripts/create-operator.ts`) and by the console's own People page.
+2. `PLATFORM_ADMIN_EMAILS`, a comma-separated list in the environment. It marks
+   an account that already exists, so it is for letting your own customer
+   account into the console, and for getting back in if the last flag is
+   revoked by mistake. It creates nothing.
+
+**A staff account belongs to no workspace.** `/register` creates a workspace,
+which would leave an operator owning a company inside the list they are
+policing, so the workflow writes the user row directly: no membership, no
+organization, password from the `PLATFORM_ADMIN_PASSWORD` secret so it never
+reaches a log. Signing in then lands on `/no-workspace`, which recognises staff
+and offers the console instead of explaining a problem.
 
 Neither grants anything inside a customer's workspace, and being an owner or an
 administrator of a workspace grants nothing here. The guard shares no code with
