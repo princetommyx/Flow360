@@ -109,6 +109,33 @@ prefix.
 
 ---
 
+## Turning on Google sign-in
+
+Optional. Without it the button simply does not appear, rather than failing.
+
+1. **console.cloud.google.com** → APIs & Services → Credentials → Create
+   credentials → **OAuth client ID** → Web application.
+
+2. Under **Authorised redirect URIs**, add one line per origin you sign in
+   from. The path is fixed by Auth.js and must match exactly:
+
+   ```
+   https://adwuma360.online/api/auth/callback/google
+   https://flow360-puce.vercel.app/api/auth/callback/google
+   http://localhost:3000/api/auth/callback/google
+   ```
+
+3. Put the two values in Vercel as `AUTH_GOOGLE_ID` and `AUTH_GOOGLE_SECRET`,
+   in all three environments, and redeploy.
+
+Only an address Google has verified is accepted. A first sign-in creates the
+account and lands on `/onboarding`, which asks for the business name, country
+and phone and then builds the workspace. An address that already has an
+Adwuma360 account signs into that account instead, so somebody who registered
+with a password can start using the Google button and keep everything.
+
+---
+
 ## Creating a staff account
 
 Staff are not customers. `/register` creates a *workspace*, so an account made
