@@ -153,13 +153,23 @@ export const getTenantContext = cache(async (): Promise<TenantContext | null> =>
  * somewhere that says so: sending them to `/login` would bounce them straight
  * back here, because a signed-in visitor on the login page is redirected to the
  * dashboard. That loop is what a suspended workspace used to produce.
+ *
+ * Which of the two depends on whether they have ever had a workspace. Someone
+ * arriving through Google has no account here until the moment they sign in,
+ * and telling them they have lost access to something they never had would be
+ * nonsense: they are sent to set their business up. Someone whose workspace
+ * was suspended, or whose access was removed, is told exactly that.
  */
 export async function requireTenant(): Promise<TenantContext> {
   const context = await getTenantContext();
   if (context) return context;
 
   const session = await auth();
-  redirect(session?.user?.id ? '/no-workspace' : '/login');
+  const userId = session?.user?.id;
+  if (!userId) redirect('/login');
+
+  const belonged = await db.organizationMember.count({ where: { userId } });
+  redirect(belonged > 0 ? '/no-workspace' : '/onboarding');
 }
 
 /** Convenience: the active organization id, already authorised. */

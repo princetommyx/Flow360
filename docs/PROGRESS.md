@@ -142,6 +142,17 @@ are recomputed from the rows they describe. Nothing under `reports/` writes.
 - **A grid track has a min-content floor.** A card holding a table with a
   `min-w-*` widens the track instead of letting the table scroll, so report
   grids carry `[&>*]:min-w-0`.
+- **There are two ways into a workspace, and they differ.** Registering with
+  an email address creates the account and the workspace in one transaction.
+  Google creates only the account, so `requireTenant` sends anyone with no
+  membership at all to `/onboarding` to name their business. Anyone who *had* a
+  membership goes to `/no-workspace` instead, because they have lost something
+  rather than never having had it.
+- **Google sign-in needs its own callback.** There is no Auth.js adapter, so
+  without `resolveGoogleUser` the JWT would carry Google's identifier, no
+  membership would resolve, and the button would lead nowhere. Matching an
+  existing account by email is allowed only when Google reports the address
+  verified.
 - **A signed-in visitor with no workspace has somewhere to go.** Every
   workspace suspended, or the last membership removed, used to redirect
   `/dashboard` to `/login`, which redirects a signed-in visitor back to
