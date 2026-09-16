@@ -12,6 +12,7 @@ import {
   FolderKanban,
   Gauge,
   HandCoins,
+  Import,
   LayoutDashboard,
   ListChecks,
   Package,
@@ -80,6 +81,7 @@ export const ICONS = {
   settings: Settings2,
   card: CreditCard,
   gauge: Gauge,
+  import: Import,
 } as const satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof ICONS;

@@ -146,6 +146,7 @@ model Organization {
   sequences      NumberSequence[]
   activities     ActivityLog[]
   billingEvents  BillingEvent[]
+  imports        ImportRun[]
 
   @@index([slug])
   @@map("organizations")
@@ -347,6 +348,10 @@ enum PartyStatus {
 model Customer {
   id              String      @id @default(cuid())
   organizationId  String
+  /// This record's id in the system it was imported from, if it was. Lets an
+  /// import be re-run without duplicating, and lets an imported invoice find
+  /// its customer by the name that system knew it by.
+  externalId      String?
   name            String
   companyName     String?
   email           String?
@@ -376,6 +381,7 @@ model Customer {
   projects     Project[]
   transactions Transaction[]
 
+  @@unique([organizationId, externalId])
   @@index([organizationId, status])
   @@index([organizationId, name])
   @@map("customers")
@@ -384,6 +390,8 @@ model Customer {
 model Supplier {
   id              String      @id @default(cuid())
   organizationId  String
+  /// See `Customer.externalId`.
+  externalId      String?
   name            String
   companyName     String?
   email           String?
@@ -409,6 +417,7 @@ model Supplier {
   payments       Payment[]
   expenses       Expense[]
 
+  @@unique([organizationId, externalId])
   @@index([organizationId, status])
   @@index([organizationId, name])
   @@map("suppliers")
@@ -419,6 +428,8 @@ model Supplier {
 model ProductCategory {
   id             String    @id @default(cuid())
   organizationId String
+  /// See `Customer.externalId`.
+  externalId     String?
   name           String
   description    String?
   color          String?
@@ -433,6 +444,7 @@ model ProductCategory {
   products     Product[]
 
   @@unique([organizationId, name])
+  @@unique([organizationId, externalId])
   @@index([organizationId])
   @@map("product_categories")
 }
@@ -445,6 +457,8 @@ enum ProductType {
 model Product {
   id             String      @id @default(cuid())
   organizationId String
+  /// See `Customer.externalId`.
+  externalId     String?
   name           String
   sku            String
   barcode        String?
@@ -475,6 +489,7 @@ model Product {
   inventoryTx    InventoryTransaction[]
 
   @@unique([organizationId, sku])
+  @@unique([organizationId, externalId])
   @@index([organizationId, status])
   @@index([organizationId, categoryId])
   @@map("products")
@@ -1305,6 +1320,47 @@ model Notification {
   @@index([organizationId, userId, readAt])
   @@index([createdAt])
   @@map("notifications")
+}
+
+/// One run of the data importer, kept whether it worked or not.
+///
+/// A migration is the most frightening thing a business does with new software,
+/// and "did that go in?" is the question they ask afterwards. This answers it:
+/// what was loaded, from which file, how the columns were read, how many rows
+/// landed and which ones did not, with the reasons. Nothing here is deleted by
+/// a later run.
+model ImportRun {
+  id             String  @id @default(cuid())
+  organizationId String
+  /// Who ran it. Null once that account is gone; the run stays.
+  userId         String?
+  /// Which dataset: customers, suppliers, product-categories, products, invoices.
+  dataset        String
+  fileName       String
+  /// `create` skips rows that already exist; `update` overwrites them.
+  mode           String  @default("create")
+  /// Which column of theirs was read into which field of ours, as confirmed by
+  /// the person. Kept so a run can be explained months later.
+  mapping        Json?
+
+  totalRows Int @default(0)
+  created   Int @default(0)
+  updated   Int @default(0)
+  skipped   Int @default(0)
+  failed    Int @default(0)
+
+  /// The rows that did not go in, with the row number and the reason, so they
+  /// can be fixed in the original file and the file re-run. Capped, because a
+  /// wrongly mapped file fails every row and the list is then worth nothing.
+  errors Json?
+
+  startedAt  DateTime  @default(now())
+  finishedAt DateTime?
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, startedAt])
+  @@map("import_runs")
 }
 
 /// What Adwuma360 has charged a workspace, and what the provider said about it.

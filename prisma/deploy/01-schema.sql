@@ -1476,6 +1476,58 @@ CREATE INDEX "billing_events_type_idx" ON "billing_events"("type");
 -- AddForeignKey
 ALTER TABLE "billing_events" ADD CONSTRAINT "billing_events_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- ===== migration: 20260916065240_data_import =====
+-- AlterTable
+ALTER TABLE "customers" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "product_categories" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "products" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "suppliers" ADD COLUMN     "externalId" TEXT;
+
+-- CreateTable
+CREATE TABLE "import_runs" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "userId" TEXT,
+    "dataset" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "mode" TEXT NOT NULL DEFAULT 'create',
+    "mapping" JSONB,
+    "totalRows" INTEGER NOT NULL DEFAULT 0,
+    "created" INTEGER NOT NULL DEFAULT 0,
+    "updated" INTEGER NOT NULL DEFAULT 0,
+    "skipped" INTEGER NOT NULL DEFAULT 0,
+    "failed" INTEGER NOT NULL DEFAULT 0,
+    "errors" JSONB,
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "finishedAt" TIMESTAMP(3),
+
+    CONSTRAINT "import_runs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "import_runs_organizationId_startedAt_idx" ON "import_runs"("organizationId", "startedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customers_organizationId_externalId_key" ON "customers"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "product_categories_organizationId_externalId_key" ON "product_categories"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "products_organizationId_externalId_key" ON "products"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "suppliers_organizationId_externalId_key" ON "suppliers"("organizationId", "externalId");
+
+-- AddForeignKey
+ALTER TABLE "import_runs" ADD CONSTRAINT "import_runs_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1494,5 +1546,6 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '6582b5b3a17f2c15c17aa5b26edf7e58f4f6c6201f94176619c43fab1ee37e8b', now(), '20260915020536_ghana_defaults', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'f3c124c9589ca4dc8b46ff6825fa796f5c239cfe9b1cb6a5d0708278684d4c29', now(), '20260915112928_platform_admin', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '961af8efdd69fc547ec35762c420b49b3d90d95b2a11b3ebba3ee9f5b32dc826', now(), '20260915152416_paystack_billing', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'c30c4872513a37778f1e0caceb302fbd2e16bed63f6c1d8a1bcb5ca9efa7c1e2', now(), '20260916065240_data_import', now(), 1);
 
 COMMIT;

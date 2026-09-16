@@ -118,6 +118,24 @@ properties; every brand-coloured token in `globals.css` derives from them via
 `color-mix`, so re-theming touches no components. Organizations can override the
 hues in company settings.
 
+## Importing
+
+`lib/import/datasets.ts` declares what can be loaded and, per field, the names
+other systems give it; `lib/import/mapping.ts` matches those names to columns
+and reads cells into types; `server/services/import.ts` plans every row against
+the database before writing any of it. The layering is the point: the first two
+are pure and testable without a database, and the third is the only one that
+writes.
+
+A dataset with `groupBy` describes a file with one row per line — ERPNext writes
+a document's own fields on the first of its rows and blanks on the rest — so a
+row whose grouping cell is empty joins the record above it.
+
+Nothing about a row's fate is decided while writing. The plan is built first
+(`create`, `update`, `skip`, `error`), which is what lets the preview show
+exactly what the import will do and the import do exactly what the preview
+showed. See [MIGRATING.md](MIGRATING.md).
+
 ## Lists
 
 List pages keep their state in the URL (`q`, `page`, `perPage`, `sort`, `dir`,

@@ -320,6 +320,60 @@ arrived, failures included — plus the subscription state and Paystack customer
 code. Setting a plan from the console charges nobody and does not touch a
 Paystack subscription.
 
+## Migrating in
+
+A business already running on something else — ERPNext, in the case this was
+built for — can load what it has. **Settings → Import data**, and
+[MIGRATING.md](MIGRATING.md) for the whole of it.
+
+**The importer knows their column headings.** Every field carries the names
+other systems give it, matched on a normalised form, so `Customer Name`,
+`customer_name` and `customername` are one entry and an ERPNext export maps
+itself. ERPNext's child-table headings (`Rate (Items)`) are recognised too,
+which is what makes an invoice with three lines arrive as one invoice with
+three lines rather than three invoices, two of them nameless.
+
+**Nothing is written until it has been shown.** The file is read, every row is
+judged, and the plan — the mapping, the first rows as they will land, the rows
+that will not go in — is on screen before the button that writes appears.
+Changing a column re-reads the file rather than guessing.
+
+**Errors and warnings are different things.** An error means the row did not go
+in and says why, by the row number the person's own spreadsheet shows. A warning
+means it did, but something in it could not be used — an unreadable email
+address, a supplier we have never heard of. Rolling the second into the first
+has people chasing rows that are already safely in; leaving it out loses data
+quietly.
+
+**Running the same file twice is safe.** Records match on their ERPNext id
+first, then email, then name — product code for items, invoice number for
+invoices. A second run reports them as already there, or overwrites them if
+that is what was asked for. Two rows of the same file claiming the same record
+is an error on the second, naming the first.
+
+**Five things load:** customers, suppliers, product categories, products and
+sales invoices, in that order, because each can point at the ones above it by
+name. A category a product names but does not have is created; a supplier it
+names and we do not have is a warning, not a failure.
+
+Three decisions worth keeping:
+
+- **Invoices keep their numbers and are never rewritten.** An invoice is a
+  statement of what was owed on a day. `nextDocumentNumber` already advances
+  past numbers introduced from outside, so the workspace's own series heals
+  itself around them.
+- **Imported invoices do not move stock.** The opening quantity on the products
+  file is what is on the shelf today, after those sales. Taking them off again
+  would count them twice.
+- **Opening stock arrives with the movement that explains it**, as a stock
+  adjustment labelled "Opening balance, imported", so the history reconciles
+  rather than starting from a number with nothing behind it.
+
+`ImportRun` keeps every run and its refused rows, downloadable as a CSV to work
+through beside the original file. The page is reachable by anyone who may create
+in one of those five modules, not by owners alone — the person who knows the
+data is rarely the person who pays the bill.
+
 ## Known gaps, deliberately left
 
 - **No trial-ending reminder.** The trial email says days remaining are on the
@@ -337,6 +391,15 @@ Paystack subscription.
   nothing further and take nothing away.
 - **No invoice or receipt of our own.** Paystack emails the receipt. Adwuma360
   keeps the ledger but does not issue a document for it.
+- **The importer does not read Excel.** A workbook has to be saved as CSV first.
+  It recognises one that has not been and says so, which is most of the value,
+  but it is a step somebody has to take.
+- **Purchase orders, bills, expenses and employees cannot be imported.** The
+  five that can are what a migration needs to trade the next day; the rest are
+  the same pattern again when they are wanted.
+- **An imported invoice's paid amount is not a payment record.** The balance
+  owing and every figure derived from it are right; there is nothing in the
+  payments ledger behind it, because we do not know when or how it was paid.
 - **`hero.jpg`'s licence is unverified.** The watermark noted here earlier is
   gone, so the file has been replaced at some point, but nobody has recorded
   where it came from or under what terms. Worth establishing before it is
