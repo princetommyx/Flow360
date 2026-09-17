@@ -275,6 +275,157 @@ does not make them rank, which is content and links over months.
   renderer refuses any element with more than one child and no explicit
   `display`, so text and expressions are composed into a string first.
 
+## Payments
+
+Paystack subscriptions, wired end to end. See [PAYMENTS.md](PAYMENTS.md) for the
+setup, which is four Plans in the Paystack dashboard, five environment variables
+and a webhook URL.
+
+**The webhook is the authority**, not the page the customer comes back to. A
+browser gets closed on the way back from a checkout, and a renewal twelve months
+from now involves no browser at all. `/settings/billing/complete` verifies the
+reference so it can tell the person what happened, and writes nothing.
+
+**Two prices, one figure.** The price on the screen lives in
+`lib/config/plans.ts`; Paystack holds its own copy on each Plan. Before anybody
+reaches a checkout the server reads the live plan and refuses if the two
+disagree, so a misconfiguration stops a sale rather than charging a number
+nobody was shown. `PLATFORM_CURRENCY` is `GHS` and a plan in any other currency
+is refused rather than converted.
+
+**Every event is idempotent.** `billing_events.reference` is unique, so a
+redelivery — Paystack retries — collides and is answered as a duplicate before
+any handler runs. Only that collision counts as "seen before": every other
+database failure answers 500 so the retry is a real retry. Anything
+unrecognised is recorded and acknowledged, because a 4xx would have Paystack
+resend an event we will never understand, forever.
+
+**Nothing is a dead control.** A plan is purchasable only when a Paystack plan
+code is configured for that plan and period; the server works that out and the
+chooser renders "Subscribe" or falls back to the request route accordingly.
+With no secret key at all the billing page behaves exactly as it did before
+payments existed. Enterprise stays on the request route by design.
+
+**Cancelling** stops the renewal and cuts nothing short: the period already paid
+for is kept, which is Paystack's behaviour and the fair one. It is offered while
+a renewal is failing too, so somebody past due can stop it rather than waiting
+out the retries.
+
+**A subscription ends the trial.** `trialState` returns "none" for any workspace
+that has been through one, so the sidebar countdown and the banner stop
+counting down a trial at somebody whose card was just declined.
+
+**The operator console** shows the ledger per workspace — every event as it
+arrived, failures included — plus the subscription state and Paystack customer
+code. Setting a plan from the console charges nobody and does not touch a
+Paystack subscription.
+
+## Migrating in
+
+A business already running on something else — ERPNext, in the case this was
+built for — can load what it has. **Settings → Import data**, and
+[MIGRATING.md](MIGRATING.md) for the whole of it.
+
+**The importer knows their column headings.** Every field carries the names
+other systems give it, matched on a normalised form, so `Customer Name`,
+`customer_name` and `customername` are one entry and an ERPNext export maps
+itself. ERPNext's child-table headings (`Rate (Items)`) are recognised too,
+which is what makes an invoice with three lines arrive as one invoice with
+three lines rather than three invoices, two of them nameless.
+
+**Nothing is written until it has been shown.** The file is read, every row is
+judged, and the plan — the mapping, the first rows as they will land, the rows
+that will not go in — is on screen before the button that writes appears.
+Changing a column re-reads the file rather than guessing.
+
+**Errors and warnings are different things.** An error means the row did not go
+in and says why, by the row number the person's own spreadsheet shows. A warning
+means it did, but something in it could not be used — an unreadable email
+address, a supplier we have never heard of. Rolling the second into the first
+has people chasing rows that are already safely in; leaving it out loses data
+quietly.
+
+**Running the same file twice is safe.** Records match on their ERPNext id
+first, then email, then name — product code for items, invoice number for
+invoices. A second run reports them as already there, or overwrites them if
+that is what was asked for. Two rows of the same file claiming the same record
+is an error on the second, naming the first.
+
+**Five things load:** customers, suppliers, product categories, products and
+sales invoices, in that order, because each can point at the ones above it by
+name. A category a product names but does not have is created; a supplier it
+names and we do not have is a warning, not a failure.
+
+Three decisions worth keeping:
+
+- **Invoices keep their numbers and are never rewritten.** An invoice is a
+  statement of what was owed on a day. `nextDocumentNumber` already advances
+  past numbers introduced from outside, so the workspace's own series heals
+  itself around them.
+- **Imported invoices do not move stock.** The opening quantity on the products
+  file is what is on the shelf today, after those sales. Taking them off again
+  would count them twice.
+- **Opening stock arrives with the movement that explains it**, as a stock
+  adjustment labelled "Opening balance, imported", so the history reconciles
+  rather than starting from a number with nothing behind it.
+
+`ImportRun` keeps every run and its refused rows, downloadable as a CSV to work
+through beside the original file. The page is reachable by anyone who may create
+in one of those five modules, not by owners alone — the person who knows the
+data is rarely the person who pays the bill.
+
+## The assistant
+
+Chat that reads the workspace and drafts the work. See
+[ASSISTANT.md](ASSISTANT.md); the shape of it is worth repeating here.
+
+**It cannot write.** A drafting tool resolves the names, fills in what was left
+out, runs the same Zod schema the form runs and totals the document with the
+same function the invoice page uses — then stops, with the filled-in form on
+screen and a button under it. Confirming runs the ordinary server action, so the
+permission check, the stock check, the numbering, the notification and the
+activity log are not reimplemented and cannot drift. `assistant_proposals` holds
+the staged input server-side, where the browser cannot edit it, and only the
+person it was drafted for can confirm one.
+
+**It never sees an identifier.** No tool takes or returns a database id; the
+model works in names, and a resolver turns a name into a row or into a question
+("which Ama?"). A model that has never seen an id cannot invent one, and the
+workspace's identifiers never reach a provider's logs.
+
+**The permission gate is real.** Which of the fifteen tools the model is offered
+is narrowed to what the person holds, and every call is checked again on the way
+in — a tool list is a hint to a language model, and a hint is not access
+control. An employee is offered four tools; calling a fifth by name is refused.
+
+**Everything is stored as it was sent.** `chat_messages` holds the provider's
+own content blocks verbatim, because the next turn replays them and a summary
+would not replay. The screen renders something else entirely from the same rows.
+
+Smaller decisions that earn their place:
+
+- **Opus 5, adaptive thinking, summarised.** The reasoning appears in grey above
+  the answer, so a turn that takes twenty seconds looks like work rather than a
+  hang. Tool calls announce themselves in the same words the finished trace uses.
+- **Server-side refusal fallbacks** are on, so a safety decline on a business
+  question is answered by a second model rather than stopping.
+- **The system prompt and the tool list are cached.** They are identical on every
+  turn and together are most of what is sent; the tool list is sorted by name so
+  a reshuffle cannot invalidate the prefix.
+- **A route handler, not a server action**, because it streams. One JSON object
+  per line — not Server-Sent Events, whose reconnection semantics are exactly
+  what a half-finished answer should not have.
+- **No `eager_input_streaming`.** It exists so a large tool input streams as it
+  is generated; the largest thing here is an invoice with a few lines, so there
+  is no latency to win and the tolerant parser it turns on can hand back a
+  silently truncated input.
+- **A 200-line Markdown renderer** rather than a Markdown library: a reply is a
+  few sentences and a small table, and it builds React elements, so nothing the
+  model writes — or a customer's own notes quoted back through it — can become
+  markup that runs.
+- **Off unless configured.** No key, no menu item, no page. Not a page that
+  apologises.
+
 ## Known gaps, deliberately left
 
 - **No trial-ending reminder.** The trial email says days remaining are on the
@@ -283,10 +434,38 @@ does not make them rank, which is content and links over months.
 - **Ownership cannot be transferred.** The owner row is immovable from
   `settings/users`, which is safe but means a departing founder needs a hand at
   the database.
-- **Payment provider is not wired up.** Plan requests are recorded and a person
-  follows up; nothing charges anyone. The billing page says so.
-- **`hero.jpg` carries a rawpixel watermark** and needs a licensed replacement
-  before commercial use.
+- **Plan prices are placeholders.** `lib/config/plans.ts` still carries the
+  figures used while building (Starter 1/3, Business 2/7). They are now in GHS
+  and must be set to the real numbers before the Paystack plans are created,
+  because the two have to match exactly.
+- **No dunning beyond the first notice.** A failed renewal marks the workspace
+  past due and notifies the owner once. Paystack's own retries continue; we send
+  nothing further and take nothing away.
+- **No invoice or receipt of our own.** Paystack emails the receipt. Adwuma360
+  keeps the ledger but does not issue a document for it.
+- **The importer does not read Excel.** A workbook has to be saved as CSV first.
+  It recognises one that has not been and says so, which is most of the value,
+  but it is a step somebody has to take.
+- **Purchase orders, bills, expenses and employees cannot be imported.** The
+  five that can are what a migration needs to trade the next day; the rest are
+  the same pattern again when they are wanted.
+- **An imported invoice's paid amount is not a payment record.** The balance
+  owing and every figure derived from it are right; there is nothing in the
+  payments ledger behind it, because we do not know when or how it was paid.
+- **The assistant has never spoken to the real API.** It was built and verified
+  against a local stand-in that speaks the streaming wire format — the loop, the
+  tools, the permission gate, the drafts and the confirmations are all proven
+  end to end, and the request shape itself is not. The first live conversation
+  is the test that has not been run.
+- **Assistant usage is not metered per workspace.** Every message is billed to
+  whoever holds the API key, for every tenant, with no cap. The tokens are
+  recorded per message, so the sum is there to be read; nothing acts on it.
+- **The assistant cannot edit or cancel anything.** It drafts new records only.
+  Changing an invoice or voiding a payment is done on the page, deliberately.
+- **`hero.jpg`'s licence is unverified.** The watermark noted here earlier is
+  gone, so the file has been replaced at some point, but nobody has recorded
+  where it came from or under what terms. Worth establishing before it is
+  relied on commercially.
 - **No content beyond the landing page and pricing.** Nothing ranks for a
   competitive term on four pages of marketing copy, however well marked up.
 - **Company details in `lib/config/brand.ts` are placeholders** — registered

@@ -1439,6 +1439,161 @@ CREATE INDEX "platform_audit_logs_targetType_targetId_idx" ON "platform_audit_lo
 -- AddForeignKey
 ALTER TABLE "platform_audit_logs" ADD CONSTRAINT "platform_audit_logs_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
+-- ===== migration: 20260915152416_paystack_billing =====
+-- AlterTable
+ALTER TABLE "organizations" ADD COLUMN     "paystackCustomer" TEXT,
+ADD COLUMN     "paystackEmailToken" TEXT,
+ADD COLUMN     "paystackSubscription" TEXT,
+ADD COLUMN     "subscriptionEndsAt" TIMESTAMP(3);
+
+-- CreateTable
+CREATE TABLE "billing_events" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "reference" TEXT NOT NULL,
+    "status" TEXT NOT NULL,
+    "amount" DECIMAL(18,2) NOT NULL DEFAULT 0,
+    "currency" TEXT NOT NULL DEFAULT 'GHS',
+    "plan" TEXT,
+    "period" TEXT,
+    "payload" JSONB,
+    "occurredAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "billing_events_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "billing_events_reference_key" ON "billing_events"("reference");
+
+-- CreateIndex
+CREATE INDEX "billing_events_organizationId_occurredAt_idx" ON "billing_events"("organizationId", "occurredAt");
+
+-- CreateIndex
+CREATE INDEX "billing_events_type_idx" ON "billing_events"("type");
+
+-- AddForeignKey
+ALTER TABLE "billing_events" ADD CONSTRAINT "billing_events_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ===== migration: 20260916065240_data_import =====
+-- AlterTable
+ALTER TABLE "customers" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "product_categories" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "products" ADD COLUMN     "externalId" TEXT;
+
+-- AlterTable
+ALTER TABLE "suppliers" ADD COLUMN     "externalId" TEXT;
+
+-- CreateTable
+CREATE TABLE "import_runs" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "userId" TEXT,
+    "dataset" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
+    "mode" TEXT NOT NULL DEFAULT 'create',
+    "mapping" JSONB,
+    "totalRows" INTEGER NOT NULL DEFAULT 0,
+    "created" INTEGER NOT NULL DEFAULT 0,
+    "updated" INTEGER NOT NULL DEFAULT 0,
+    "skipped" INTEGER NOT NULL DEFAULT 0,
+    "failed" INTEGER NOT NULL DEFAULT 0,
+    "errors" JSONB,
+    "startedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "finishedAt" TIMESTAMP(3),
+
+    CONSTRAINT "import_runs_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "import_runs_organizationId_startedAt_idx" ON "import_runs"("organizationId", "startedAt");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "customers_organizationId_externalId_key" ON "customers"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "product_categories_organizationId_externalId_key" ON "product_categories"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "products_organizationId_externalId_key" ON "products"("organizationId", "externalId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "suppliers_organizationId_externalId_key" ON "suppliers"("organizationId", "externalId");
+
+-- AddForeignKey
+ALTER TABLE "import_runs" ADD CONSTRAINT "import_runs_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ===== migration: 20260917004211_assistant =====
+-- CreateTable
+CREATE TABLE "conversations" (
+    "id" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "conversations_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chat_messages" (
+    "id" TEXT NOT NULL,
+    "conversationId" TEXT NOT NULL,
+    "role" TEXT NOT NULL,
+    "content" JSONB NOT NULL,
+    "inputTokens" INTEGER NOT NULL DEFAULT 0,
+    "outputTokens" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "chat_messages_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "assistant_proposals" (
+    "id" TEXT NOT NULL,
+    "conversationId" TEXT NOT NULL,
+    "organizationId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "kind" TEXT NOT NULL,
+    "input" JSONB NOT NULL,
+    "preview" JSONB NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "resultLabel" TEXT,
+    "resultHref" TEXT,
+    "error" TEXT,
+    "confirmedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "assistant_proposals_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "conversations_organizationId_userId_updatedAt_idx" ON "conversations"("organizationId", "userId", "updatedAt");
+
+-- CreateIndex
+CREATE INDEX "chat_messages_conversationId_createdAt_idx" ON "chat_messages"("conversationId", "createdAt");
+
+-- CreateIndex
+CREATE INDEX "assistant_proposals_conversationId_idx" ON "assistant_proposals"("conversationId");
+
+-- CreateIndex
+CREATE INDEX "assistant_proposals_organizationId_status_idx" ON "assistant_proposals"("organizationId", "status");
+
+-- AddForeignKey
+ALTER TABLE "conversations" ADD CONSTRAINT "conversations_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "assistant_proposals" ADD CONSTRAINT "assistant_proposals_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1456,5 +1611,8 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'fe1cf463d627d8e7193c2d3e585a3db9e0b65aa700dfed34eeb263c1089de5f3', now(), '20260914203552_requested_billing_period', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '6582b5b3a17f2c15c17aa5b26edf7e58f4f6c6201f94176619c43fab1ee37e8b', now(), '20260915020536_ghana_defaults', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'f3c124c9589ca4dc8b46ff6825fa796f5c239cfe9b1cb6a5d0708278684d4c29', now(), '20260915112928_platform_admin', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '961af8efdd69fc547ec35762c420b49b3d90d95b2a11b3ebba3ee9f5b32dc826', now(), '20260915152416_paystack_billing', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'c30c4872513a37778f1e0caceb302fbd2e16bed63f6c1d8a1bcb5ca9efa7c1e2', now(), '20260916065240_data_import', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '820c8854d792512f581291f1031d86a64ecfd2065f440162ada479293081fb06', now(), '20260917004211_assistant', now(), 1);
 
 COMMIT;

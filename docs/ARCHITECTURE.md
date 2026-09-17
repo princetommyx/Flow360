@@ -118,6 +118,41 @@ properties; every brand-coloured token in `globals.css` derives from them via
 `color-mix`, so re-theming touches no components. Organizations can override the
 hues in company settings.
 
+## Importing
+
+`lib/import/datasets.ts` declares what can be loaded and, per field, the names
+other systems give it; `lib/import/mapping.ts` matches those names to columns
+and reads cells into types; `server/services/import.ts` plans every row against
+the database before writing any of it. The layering is the point: the first two
+are pure and testable without a database, and the third is the only one that
+writes.
+
+A dataset with `groupBy` describes a file with one row per line — ERPNext writes
+a document's own fields on the first of its rows and blanks on the rest — so a
+row whose grouping cell is empty joins the record above it.
+
+Nothing about a row's fate is decided while writing. The plan is built first
+(`create`, `update`, `skip`, `error`), which is what lets the preview show
+exactly what the import will do and the import do exactly what the preview
+showed. See [MIGRATING.md](MIGRATING.md).
+
+## The assistant
+
+`server/assistant/` is layered so that only two files know about the business.
+`tools-read.ts` and `tools-write.ts` hold the tools; `tools.ts` is the registry
+and the permission gate; `run.ts` drives the streamed loop and knows nothing
+about invoices.
+
+The rule that shapes all of it: **a tool cannot write**. One that would change
+something stages an `AssistantProposal` — the exact input one of our server
+actions takes, already through that action's schema — and `actions/assistant.ts`
+is the single place a proposal becomes a record, by calling that action. Business
+rules are therefore never reimplemented for the assistant.
+
+No tool takes or returns an id. The model works in names, and the resolvers in
+`assistant/context.ts` turn a name into a row or into a question. See
+[ASSISTANT.md](ASSISTANT.md).
+
 ## Lists
 
 List pages keep their state in the URL (`q`, `page`, `perPage`, `sort`, `dir`,

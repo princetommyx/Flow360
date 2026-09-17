@@ -6,7 +6,8 @@ import { AppSidebar } from '@/components/layout/app-sidebar';
 import { BrandStyle } from '@/components/brand/brand-style';
 import { TrialBanner } from '@/components/billing/trial-banner';
 import { NAV_GROUPS, filterNavByPermissions } from '@/lib/navigation';
-import { hasPermission, type PermissionKey } from '@/lib/permissions';
+import { assistantEnabled } from '@/lib/config/assistant';
+import { hasAnyPermission, hasPermission, type PermissionKey } from '@/lib/permissions';
 import { requireTenant } from '@/server/tenant';
 import { getPlatformContext } from '@/server/platform';
 
@@ -40,8 +41,16 @@ export default async function AppLayout({
   const platform = await getPlatformContext();
   const isPlatformAdmin = platform !== null;
 
-  const navGroups = filterNavByPermissions(NAV_GROUPS, (permission?: PermissionKey) =>
-    permission ? hasPermission(context.permissions, permission) : true,
+  const navGroups = filterNavByPermissions(
+    NAV_GROUPS,
+    (permission?: PermissionKey | PermissionKey[]) => {
+      if (!permission) return true;
+      // An array is "any of these", for an item that serves several modules.
+      return Array.isArray(permission)
+        ? hasAnyPermission(context.permissions, permission)
+        : hasPermission(context.permissions, permission);
+    },
+    (capability) => capability !== 'assistant' || assistantEnabled(),
   );
 
   const [notifications, unreadCount, settings] = await Promise.all([

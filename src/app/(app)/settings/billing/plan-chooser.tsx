@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ArrowRight, Check, Mail } from 'lucide-react';
+import { ArrowRight, Check, CreditCard, Mail } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -18,24 +18,44 @@ import {
 import { brand } from '@/lib/config/brand';
 import { formatCurrency } from '@/lib/money';
 import { cn } from '@/lib/utils';
-import { cancelPlanRequestAction, requestPlanAction } from '@/server/actions/billing';
+import {
+  cancelPlanRequestAction,
+  requestPlanAction,
+  startCheckoutAction,
+} from '@/server/actions/billing';
 
 /**
  * Plan selection for the workspace owner.
  *
- * There is no checkout to send anyone to yet, so the button does the honest
- * thing: it records the request, says so, and can be undone.
+ * Two routes out of the same set of buttons. A plan with a Paystack plan code
+ * behind it opens a real checkout; anything else — Enterprise, or a plan not
+ * set up in the dashboard yet — records the request and says so. The page never
+ * offers a checkout it cannot complete, and never pretends a request is a
+ * payment.
+ *
+ * `purchasable` decides which is which, and comes from the server: the
+ * browser has no way to know whether a plan code is configured, and a button
+ * that finds out by failing is exactly the dead control this product does not
+ * ship.
  */
 export function PlanChooser({
   currentPlan,
   requestedPlan,
   requestedPeriod,
   isOwner,
+  purchasable,
+  subscriptionStatus,
+  renews,
 }: {
   currentPlan: PlanId;
   requestedPlan: PlanId | null;
   requestedPeriod: BillingPeriod | null;
   isOwner: boolean;
+  /** `plan:period` pairs that can be bought outright, e.g. `business:annual`. */
+  purchasable: string[];
+  subscriptionStatus: string;
+  /** True while a live subscription will charge again on its own. */
+  renews: boolean;
 }) {
   const router = useRouter();
   // Open on the period they last asked for, so the prices on screen match the
@@ -46,12 +66,40 @@ export function PlanChooser({
 
   const requested = PLANS.find((plan) => plan.id === requestedPlan);
 
+  const period: BillingPeriod = annual ? 'annual' : 'monthly';
+
+  function canBuy(planId: PlanId) {
+    return purchasable.includes(`${planId}:${period}`);
+  }
+
+  const anythingPurchasable = PLANS.some((plan) => canBuy(plan.id));
+
+  // Past the trial conversation: this workspace has been through a
+  // subscription, so the heading should stop talking about what happens next.
+  const hasPaid =
+    subscriptionStatus === 'active' ||
+    subscriptionStatus === 'past_due' ||
+    subscriptionStatus === 'cancelled';
+
   async function choose(planId: PlanId, planName: string) {
     setPending(planId);
-    const result = await requestPlanAction({
-      plan: planId,
-      period: annual ? 'annual' : 'monthly',
-    });
+
+    if (canBuy(planId)) {
+      const result = await startCheckoutAction({ plan: planId, period });
+
+      if (!result.ok) {
+        setPending(null);
+        toast.error(result.error);
+        return;
+      }
+
+      // Deliberately still pending. The browser is on its way to Paystack and
+      // a button that springs back to life first invites a second checkout.
+      window.location.assign(result.data.url);
+      return;
+    }
+
+    const result = await requestPlanAction({ plan: planId, period });
     setPending(null);
 
     if (!result.ok) {
@@ -84,12 +132,14 @@ export function PlanChooser({
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="plans-heading" className="text-[15px] font-semibold tracking-[-0.01em]">
-            Choose what happens after the trial
+            {hasPaid ? 'Change your plan' : 'Choose what happens after the trial'}
           </h2>
           <p className="mt-1 text-[13px] text-muted-foreground">
-            {isOwner
-              ? 'Pick a plan and we will take it from there. You can change your mind until it is set up.'
-              : 'Only the workspace owner can change the plan.'}
+            {!isOwner
+              ? 'Only the workspace owner can change the plan.'
+              : anythingPurchasable
+                ? 'Pay by card, mobile money or bank transfer. The subscription renews on its own and you can stop it whenever you like.'
+                : 'Pick a plan and we will take it from there. You can change your mind until it is set up.'}
           </p>
         </div>
 
@@ -152,6 +202,10 @@ export function PlanChooser({
           const price = annual ? plan.annual : plan.monthly;
           const isCurrent = plan.id === currentPlan;
           const isRequested = plan.id === requestedPlan;
+          const buyable = canBuy(plan.id);
+          // Already paying for this one, on this period, with a renewal to come.
+          const isSubscribed =
+            isCurrent && renews && (requestedPeriod === null || requestedPeriod === period);
 
           return (
             <Card
@@ -214,12 +268,28 @@ export function PlanChooser({
               ) : (
                 <Button
                   className="mt-4 w-full"
-                  variant={isRequested ? 'secondary' : 'default'}
-                  disabled={!isOwner || isRequested || pending !== null}
+                  variant={isSubscribed || (isRequested && !buyable) ? 'secondary' : 'default'}
+                  disabled={
+                    !isOwner ||
+                    isSubscribed ||
+                    (isRequested && !buyable) ||
+                    pending !== null
+                  }
                   loading={pending === plan.id}
                   onClick={() => choose(plan.id, plan.name)}
                 >
-                  {isRequested ? (
+                  {isSubscribed ? (
+                    <>
+                      <Check /> Your plan
+                    </>
+                  ) : buyable ? (
+                    <>
+                      <CreditCard />
+                      {isCurrent && subscriptionStatus === 'past_due'
+                        ? 'Pay now'
+                        : `Subscribe to ${plan.name}`}
+                    </>
+                  ) : isRequested ? (
                     <>
                       <Check /> Requested
                     </>
@@ -246,6 +316,13 @@ export function PlanChooser({
           );
         })}
       </div>
+
+      {anythingPurchasable ? (
+        <p className="text-center text-[12px] text-muted-foreground">
+          Payments are taken by Paystack. Your card details are entered on their
+          page and never reach {brand.name}.
+        </p>
+      ) : null}
     </section>
   );
 }

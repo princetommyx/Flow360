@@ -93,8 +93,8 @@ export function WorkspaceActions({
           <CardTitle className="text-[14px]">Plan</CardTitle>
           <CardDescription>
             {requestedPlan
-              ? `${name} has asked to move to ${requestedPlan}. Nothing charges anyone, so this is a decision and a record of it.`
-              : 'Set the plan this workspace is on. Nothing charges anyone.'}
+              ? `${name} has asked to move to ${requestedPlan}. Applying it here charges nobody and does not touch a Paystack subscription — it is a decision and a record of it.`
+              : 'Set the plan this workspace is on. It charges nobody and leaves any Paystack subscription exactly as it is.'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

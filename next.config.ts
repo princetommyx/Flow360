@@ -6,6 +6,16 @@ const nextConfig: NextConfig = {
 
   typedRoutes: false,
 
+  experimental: {
+    serverActions: {
+      // The data importer posts a CSV through a server action, and the default
+      // ceiling of 1 MB is about eight thousand customers. Five is the limit
+      // the importer itself enforces, with room over it so an oversized file
+      // gets that explanation rather than a bare network failure.
+      bodySizeLimit: '6mb',
+    },
+  },
+
   // The floating dev badge overlaps the sidebar and ends up in captured
   // product screenshots; the route overlay adds nothing we rely on.
   devIndicators: false,

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CalendarClock, Check, Download, ShieldCheck } from 'lucide-react';
+import { CalendarClock, Check } from 'lucide-react';
 
 import { PageHeader } from '@/components/shared/page-header';
 import { Badge } from '@/components/ui/badge';
@@ -8,11 +8,19 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { db } from '@/lib/db';
 import { formatDate } from '@/lib/date';
-import { PLANS, TRIAL_DAYS, findPlan, trialState } from '@/lib/config/plans';
+import {
+  BILLING_PERIODS,
+  PLANS,
+  TRIAL_DAYS,
+  findPlan,
+  trialState,
+} from '@/lib/config/plans';
+import { isPurchasable, paystackEnabled } from '@/lib/config/paystack';
 import { brand } from '@/lib/config/brand';
 import { requirePermission } from '@/server/tenant';
 
 import { PlanChooser } from './plan-chooser';
+import { SubscriptionCard } from './subscription-card';
 
 export const metadata: Metadata = { title: 'Plan & billing' };
 
@@ -27,6 +35,8 @@ export default async function BillingPage() {
       subscriptionStatus: true,
       requestedPlan: true,
       requestedBilling: true,
+      subscriptionEndsAt: true,
+      paystackSubscription: true,
       createdAt: true,
     },
   });
@@ -34,6 +44,38 @@ export default async function BillingPage() {
   const trial = trialState(organization);
   const current = findPlan(organization.plan) ?? PLANS[1];
   const requested = findPlan(organization.requestedPlan);
+
+  /*
+    Which plan-and-period pairs can actually be bought, worked out here because
+    it depends on server-only configuration: a Paystack secret key and a plan
+    code per pair. Sent over as flat `plan:period` strings so the client
+    component receives plain values and not a shape it has to trust.
+  */
+  const purchasable = PLANS.flatMap((plan) =>
+    BILLING_PERIODS.filter((period) => isPurchasable(plan.id, period)).map(
+      (period) => `${plan.id}:${period}`,
+    ),
+  );
+
+  // A subscription that will charge again, as opposed to one that has been
+  // cancelled and is running out its paid period.
+  const hasSubscription = organization.paystackSubscription !== null;
+  const renews = organization.subscriptionStatus === 'active' && hasSubscription;
+
+  // Whether the period they have paid for is still running, decided here
+  // against the server's clock rather than the reader's.
+  const periodEndsInFuture =
+    organization.subscriptionEndsAt !== null &&
+    organization.subscriptionEndsAt > new Date();
+
+  /*
+    The trial bar is for workspaces that have never paid. Once one has, the
+    trial date is just a leftover, and a progress bar counting down a trial
+    underneath a live subscription reads as a threat rather than information.
+  */
+  const showTrial =
+    organization.subscriptionEndsAt === null &&
+    (trial.status === 'trialing' || trial.status === 'expired');
 
   // How much of the trial has been used, for the bar. Clamped so a workspace
   // created before the trial fields existed cannot push it past full.
@@ -48,7 +90,17 @@ export default async function BillingPage() {
         title="Plan & billing"
         description={`What ${context.organization.name} is on today, and what it would cost to carry on.`}
         meta={
-          trial.status === 'trialing' ? (
+          /*
+            The subscription has the last word. A workspace whose renewal was
+            declined still has a trial date on it somewhere, and "Trial · 18
+            days left" is the wrong thing to tell somebody whose card has just
+            been refused.
+          */
+          organization.subscriptionStatus === 'past_due' ? (
+            <Badge variant="warning">Payment failed</Badge>
+          ) : organization.subscriptionStatus === 'cancelled' ? (
+            <Badge variant="neutral">Cancelled</Badge>
+          ) : trial.status === 'trialing' ? (
             <Badge variant={trial.endingSoon ? 'warning' : 'default'}>
               Trial · {trial.daysRemaining} {trial.daysRemaining === 1 ? 'day' : 'days'} left
             </Badge>
@@ -69,7 +121,7 @@ export default async function BillingPage() {
             </div>
           </CardHeader>
           <CardContent className="space-y-5">
-            {trial.status === 'trialing' || trial.status === 'expired' ? (
+            {showTrial ? (
               <div>
                 <div className="flex items-center justify-between text-[13px]">
                   <span className="flex items-center gap-1.5 text-muted-foreground">
@@ -117,38 +169,21 @@ export default async function BillingPage() {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nothing is charged yet</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-[13px] leading-relaxed text-muted-foreground">
-            <p className="flex items-start gap-2">
-              <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
-              <span>
-                No card is stored against this workspace, so no payment can be taken.
-                Choosing a plan below records the request and we follow up by email.
-              </span>
-            </p>
-            <p className="flex items-start gap-2">
-              <Download className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
-              <span>
-                Your data stays yours either way. Every list and report exports to
-                CSV, and invoices print to PDF.
-              </span>
-            </p>
-            <p className="border-t border-border pt-3">
-              Workspace opened {formatDate(organization.createdAt)}. Questions about
-              billing go to{' '}
-              <a
-                href={`mailto:${brand.supportEmail}`}
-                className="font-medium text-primary hover:underline"
-              >
-                {brand.supportEmail}
-              </a>
-              .
-            </p>
-          </CardContent>
-        </Card>
+        <SubscriptionCard
+          status={organization.subscriptionStatus}
+          renews={renews}
+          hasSubscription={hasSubscription}
+          periodEndLabel={
+            organization.subscriptionEndsAt
+              ? formatDate(organization.subscriptionEndsAt)
+              : null
+          }
+          periodEndsInFuture={periodEndsInFuture}
+          openedAtLabel={formatDate(organization.createdAt)}
+          supportEmail={brand.supportEmail}
+          isOwner={context.membership.isOwner}
+          payable={paystackEnabled()}
+        />
       </div>
 
       <PlanChooser
@@ -161,6 +196,9 @@ export default async function BillingPage() {
             : null
         }
         isOwner={context.membership.isOwner}
+        purchasable={purchasable}
+        subscriptionStatus={organization.subscriptionStatus}
+        renews={renews}
       />
 
       <p className="text-center text-[12.5px] text-muted-foreground">
