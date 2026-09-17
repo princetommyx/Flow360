@@ -12,6 +12,8 @@
  * shown. Changing a price therefore means changing it in both places.
  */
 
+import { templateCountForPlan } from '@/lib/config/invoice-templates';
+
 export const TRIAL_DAYS = 30;
 
 /**
@@ -55,6 +57,18 @@ export type Plan = {
   limits: { users: string; invoices: string; companies: string };
 };
 
+/**
+ * The invoice-design line in a plan's feature list, counted from the design
+ * registry rather than typed out, so adding a template cannot leave the
+ * pricing page promising a number that is no longer true.
+ */
+function designs(plan: PlanId): string {
+  const count = templateCountForPlan(plan);
+  return plan === 'enterprise'
+    ? `All ${count} invoice designs`
+    : `${count} invoice designs to print with`;
+}
+
 export const PLANS: Plan[] = [
   {
     id: 'starter',
@@ -71,6 +85,7 @@ export const PLANS: Plan[] = [
       'Expenses and bank accounts',
       'Dashboard and standard reports',
       'CSV export and printable invoices',
+      designs('starter'),
     ],
   },
   {
@@ -90,6 +105,7 @@ export const PLANS: Plan[] = [
       'Projects, tasks and timesheets',
       'Roles and per-module permissions',
       'Multiple companies under one login',
+      designs('business'),
     ],
   },
   {
@@ -107,6 +123,7 @@ export const PLANS: Plan[] = [
       'Priority support with a named contact',
       'Onboarding and data migration',
       'Single sign-on',
+      designs('enterprise'),
     ],
   },
 ];
@@ -213,4 +230,29 @@ export function trialState(
 
   const daysRemaining = Math.ceil(millis / 86_400_000);
   return { status: 'trialing', daysRemaining, endsAt, endingSoon: daysRemaining <= 7 };
+}
+
+/**
+ * The feature set a workspace actually has right now.
+ *
+ * Not the same question as which plan it is on. A trial runs on the Business
+ * feature set — that is the whole point of the trial — so a workspace on day
+ * three can use a Business invoice design without having bought anything, and
+ * loses it if the trial ends without a subscription. Every gate should ask this
+ * rather than reading `organization.plan`, so they all agree about the trial.
+ */
+export function entitledPlan(
+  organization: {
+    plan: string;
+    trialEndsAt: Date | string | null;
+    subscriptionStatus: string;
+  },
+  now: Date = new Date(),
+): PlanId {
+  const own = findPlan(organization.plan)?.id ?? 'starter';
+  const trial = trialState(organization, now);
+
+  if (trial.status !== 'trialing') return own;
+  // A trial never takes anything away from a workspace already above Business.
+  return own === 'enterprise' ? 'enterprise' : 'business';
 }

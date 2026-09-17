@@ -8,19 +8,38 @@
  */
 
 /**
- * Opus 5. The assistant reads a workspace's books and drafts documents against
- * them, and the cost of getting a customer or a figure wrong is higher than the
- * difference in price per token. Override it per deployment if that trade looks
- * different to you.
+ * Gemini Flash by the moving alias rather than a pinned version.
+ *
+ * The alias is what Google keeps pointing at the current Flash model, and a
+ * version pinned here would need a code change every time that moved. Pin it
+ * with `GEMINI_MODEL` on a deployment that would rather decide for itself when
+ * to take a new one.
  */
-export const ASSISTANT_MODEL = process.env.ANTHROPIC_MODEL?.trim() || 'claude-opus-5';
+export const ASSISTANT_MODEL = process.env.GEMINI_MODEL?.trim() || 'gemini-flash-latest';
 
+/**
+ * `GEMINI_API_KEY` is the name Google's own tooling uses; `GOOGLE_API_KEY` is
+ * accepted because half the documentation says that instead and a key that
+ * silently does nothing is a bad hour.
+ */
 export function assistantKey(): string {
-  return (process.env.ANTHROPIC_API_KEY ?? '').trim();
+  return (process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '').trim();
 }
 
 export function assistantEnabled(): boolean {
   return assistantKey().length > 0;
+}
+
+/**
+ * Where the model lives, when it is not where Google keeps it.
+ *
+ * Unset in normal use. It exists so the assistant can be driven end to end
+ * against a stand-in that speaks the same wire format — which is how the loop,
+ * the tools and the drafts get tested without spending anything — and it is the
+ * escape hatch for a deployment that has to route through a proxy of its own.
+ */
+export function assistantBaseUrl(): string | undefined {
+  return process.env.GEMINI_BASE_URL?.trim() || undefined;
 }
 
 /** Turns of tool use inside one reply before we stop and say so. */

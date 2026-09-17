@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ArrowUp, Check, Loader2, Sparkles, Square, TriangleAlert } from 'lucide-react';
 
@@ -65,8 +64,6 @@ export function AssistantChat({
   turns: Turn[];
   suggestions: string[];
 }) {
-  const router = useRouter();
-
   const [items, setItems] = React.useState<Item[]>(() => toItems(turns));
   const [conversation, setConversation] = React.useState(conversationId);
   const [draft, setDraft] = React.useState('');
@@ -119,7 +116,6 @@ export function AssistantChat({
     let answer = '';
     const drafted: Item[] = [];
     const used: string[] = [];
-    let startedNew = false;
 
     try {
       const response = await fetch('/api/assistant', {
@@ -160,7 +156,6 @@ export function AssistantChat({
           switch (event.type) {
             case 'conversation':
               if (event.id !== conversation) {
-                startedNew = true;
                 setConversation(event.id as string);
                 /*
                   Put the new conversation in the address bar without going
@@ -229,8 +224,17 @@ export function AssistantChat({
         ...drafted,
       ]);
 
-      // Only when the conversation is new: the sidebar has to learn about it.
-      if (startedNew) router.refresh();
+      /*
+        No `router.refresh()` here, though the sidebar would like one.
+
+        The page keys this component on the conversation in the URL, so that
+        switching conversations resets it. A refresh re-runs the server
+        component, which now sees the id this turn just put in the address bar,
+        which changes the key — and the reply the person is reading is thrown
+        away and rebuilt from the server mid-sentence. The sidebar catches up on
+        the next navigation instead; a list being one entry behind is worth less
+        than an answer that stays put.
+      */
     }
   }
 

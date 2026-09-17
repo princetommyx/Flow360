@@ -2,6 +2,7 @@ import 'server-only';
 
 import { db } from '@/lib/db';
 import { toNumber } from '@/lib/money';
+import { DEFAULT_INVOICE_TEMPLATE } from '@/lib/config/invoice-templates';
 
 /**
  * Reads behind the settings pages.
@@ -23,6 +24,7 @@ const DEFAULTS = {
   defaultInvoiceNotes: '',
   paymentInstructions: '',
   invoiceFooter: '',
+  invoiceTemplate: DEFAULT_INVOICE_TEMPLATE as string,
   taxLabel: 'VAT',
   defaultTaxRate: 0,
   pricesIncludeTax: false,
@@ -49,6 +51,7 @@ export async function settingsFor(organizationId: string): Promise<WorkspaceSett
       defaultInvoiceNotes: true,
       paymentInstructions: true,
       invoiceFooter: true,
+      invoiceTemplate: true,
       taxLabel: true,
       defaultTaxRate: true,
       pricesIncludeTax: true,

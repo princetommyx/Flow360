@@ -285,6 +285,13 @@ export const NAV_GROUPS: NavGroup[] = [
         keywords: ['numbering', 'terms'],
       },
       {
+        label: 'Invoice design',
+        href: '/settings/invoice-design',
+        icon: 'invoiceDesign',
+        permission: 'settings.view',
+        keywords: ['template', 'layout', 'letterhead', 'print'],
+      },
+      {
         label: 'Tax',
         href: '/settings/tax',
         icon: 'tax',

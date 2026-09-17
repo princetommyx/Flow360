@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { INVOICE_TEMPLATE_IDS } from '@/lib/config/invoice-templates';
+
 /**
  * Workspace settings.
  *
@@ -38,6 +40,21 @@ export const invoicingSchema = z.object({
 });
 
 export type InvoicingInput = z.infer<typeof invoicingSchema>;
+
+/**
+ * Choosing the printed design.
+ *
+ * It is one field and its own schema, saved from its own page, because the
+ * invoicing form must not be able to reset it and this must not be able to
+ * reset the numbering. The id has to name a real design; whether this
+ * workspace's plan includes it is a question only the server can answer, and
+ * the action asks it after this.
+ */
+export const invoiceTemplateSchema = z.object({
+  invoiceTemplate: z.enum(INVOICE_TEMPLATE_IDS, { message: 'Choose a design' }),
+});
+
+export type InvoiceTemplateInput = z.infer<typeof invoiceTemplateSchema>;
 
 export const taxSettingsSchema = z.object({
   taxLabel: z.string().trim().min(1, 'Give the tax a name').max(40),

@@ -277,6 +277,8 @@ model CompanySettings {
   defaultInvoiceNotes    String?
   paymentInstructions    String?
   invoiceFooter          String?
+  /// Which printed design invoices use. Gated by plan in lib/config/invoice-templates.
+  invoiceTemplate        String  @default("classic")
 
   // Tax
   taxLabel         String  @default("VAT")

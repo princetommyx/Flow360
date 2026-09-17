@@ -5,6 +5,7 @@ import { compare, hash } from 'bcryptjs';
 
 import { db } from '@/lib/db';
 import {
+  invoiceTemplateSchema,
   inviteMemberSchema,
   invoicingSchema,
   memberRoleSchema,
@@ -23,6 +24,11 @@ import { absoluteUrl } from '@/lib/url';
 import { createToken, expiryFor, TOKEN_TTL_MINUTES } from '@/lib/tokens';
 import { teamInviteEmail } from '@/lib/email/templates';
 import { slugify } from '@/lib/utils';
+import {
+  findInvoiceTemplate,
+  isTemplateAllowed,
+} from '@/lib/config/invoice-templates';
+import { entitledPlan, findPlan } from '@/lib/config/plans';
 
 /* ── Invoicing ────────────────────────────────────────────────────────────── */
 
@@ -55,6 +61,73 @@ export async function updateInvoicingAction(input: unknown): Promise<ActionResul
     });
 
     revalidatePath('/settings/invoicing');
+    return actionOk();
+  } catch (error) {
+    if (error instanceof AuthorizationError) return actionError(error.message);
+    throw error;
+  }
+}
+
+/* ── Invoice design ───────────────────────────────────────────────────────── */
+
+/**
+ * Choosing the printed design.
+ *
+ * Two checks, in this order: the id has to name a design, and the workspace's
+ * plan has to include it. The second one is the point. The picker already
+ * shows the designs above the plan as locked, but a locked card is a hint, not
+ * a gate — the gate is here, where a hand-made request lands too.
+ *
+ * The plan asked for is the *entitled* plan, so a workspace on trial can pick a
+ * Business design and keep it if it subscribes. If the trial lapses instead,
+ * the choice stays on the row and the print route quietly falls back to the
+ * default, rather than the save failing at somebody who chose it fairly.
+ */
+export async function updateInvoiceTemplateAction(input: unknown): Promise<ActionResult> {
+  try {
+    const { organization, user } = await requirePermission('settings.edit');
+
+    const parsed = invoiceTemplateSchema.safeParse(input);
+    if (!parsed.success) {
+      return actionError(
+        parsed.error.issues[0]?.message ?? 'Choose a design.',
+        parsed.error.issues[0]?.path.join('.'),
+      );
+    }
+    const { invoiceTemplate } = parsed.data;
+
+    const row = await db.organization.findUniqueOrThrow({
+      where: { id: organization.id },
+      select: { plan: true, trialEndsAt: true, subscriptionStatus: true },
+    });
+
+    const plan = entitledPlan(row);
+    if (!isTemplateAllowed(plan, invoiceTemplate)) {
+      const design = findInvoiceTemplate(invoiceTemplate);
+      return actionError(
+        `${design?.name ?? 'That design'} comes with the ${
+          findPlan(design?.plan)?.name ?? 'a higher'
+        } plan. Upgrade and it is yours.`,
+        'invoiceTemplate',
+      );
+    }
+
+    await db.companySettings.upsert({
+      where: { organizationId: organization.id },
+      create: { organizationId: organization.id, invoiceTemplate },
+      update: { invoiceTemplate },
+    });
+
+    await logActivity({
+      organizationId: organization.id,
+      userId: user.id,
+      action: 'update',
+      entityType: 'organization',
+      entityId: organization.id,
+      summary: `Changed the invoice design to ${findInvoiceTemplate(invoiceTemplate)?.name ?? invoiceTemplate}`,
+    });
+
+    revalidatePath('/settings/invoice-design');
     return actionOk();
   } catch (error) {
     if (error instanceof AuthorizationError) return actionError(error.message);
