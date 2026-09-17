@@ -13,6 +13,13 @@ export type NavItem = {
   permission?: PermissionKey | PermissionKey[];
   /** Extra keywords surfaced by the command palette. */
   keywords?: string[];
+  /**
+   * A capability the deployment has to have, beyond anything the member holds.
+   * The assistant is off unless an API key is configured, and a link to a page
+   * that can only say "not switched on" is exactly the dead control this
+   * product does not ship.
+   */
+  requires?: 'assistant';
 };
 
 export type NavGroup = {
@@ -30,6 +37,13 @@ export const NAV_GROUPS: NavGroup[] = [
         icon: 'dashboard',
         permission: 'dashboard.view',
         keywords: ['home', 'overview', 'metrics'],
+      },
+      {
+        label: 'Assistant',
+        href: '/assistant',
+        icon: 'assistant',
+        requires: 'assistant',
+        keywords: ['ask', 'chat', 'ai', 'draft an invoice', 'help'],
       },
     ],
   },
@@ -314,9 +328,13 @@ export const EXTRA_SEARCH_TARGETS: NavItem[] = [
 export function filterNavByPermissions(
   groups: NavGroup[],
   can: (permission?: PermissionKey | PermissionKey[]) => boolean,
+  has: (capability?: NavItem['requires']) => boolean = () => true,
 ): NavGroup[] {
   return groups
-    .map((group) => ({ ...group, items: group.items.filter((item) => can(item.permission)) }))
+    .map((group) => ({
+      ...group,
+      items: group.items.filter((item) => can(item.permission) && has(item.requires)),
+    }))
     .filter((group) => group.items.length > 0);
 }
 

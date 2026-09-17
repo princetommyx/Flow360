@@ -374,6 +374,58 @@ through beside the original file. The page is reachable by anyone who may create
 in one of those five modules, not by owners alone — the person who knows the
 data is rarely the person who pays the bill.
 
+## The assistant
+
+Chat that reads the workspace and drafts the work. See
+[ASSISTANT.md](ASSISTANT.md); the shape of it is worth repeating here.
+
+**It cannot write.** A drafting tool resolves the names, fills in what was left
+out, runs the same Zod schema the form runs and totals the document with the
+same function the invoice page uses — then stops, with the filled-in form on
+screen and a button under it. Confirming runs the ordinary server action, so the
+permission check, the stock check, the numbering, the notification and the
+activity log are not reimplemented and cannot drift. `assistant_proposals` holds
+the staged input server-side, where the browser cannot edit it, and only the
+person it was drafted for can confirm one.
+
+**It never sees an identifier.** No tool takes or returns a database id; the
+model works in names, and a resolver turns a name into a row or into a question
+("which Ama?"). A model that has never seen an id cannot invent one, and the
+workspace's identifiers never reach a provider's logs.
+
+**The permission gate is real.** Which of the fifteen tools the model is offered
+is narrowed to what the person holds, and every call is checked again on the way
+in — a tool list is a hint to a language model, and a hint is not access
+control. An employee is offered four tools; calling a fifth by name is refused.
+
+**Everything is stored as it was sent.** `chat_messages` holds the provider's
+own content blocks verbatim, because the next turn replays them and a summary
+would not replay. The screen renders something else entirely from the same rows.
+
+Smaller decisions that earn their place:
+
+- **Opus 5, adaptive thinking, summarised.** The reasoning appears in grey above
+  the answer, so a turn that takes twenty seconds looks like work rather than a
+  hang. Tool calls announce themselves in the same words the finished trace uses.
+- **Server-side refusal fallbacks** are on, so a safety decline on a business
+  question is answered by a second model rather than stopping.
+- **The system prompt and the tool list are cached.** They are identical on every
+  turn and together are most of what is sent; the tool list is sorted by name so
+  a reshuffle cannot invalidate the prefix.
+- **A route handler, not a server action**, because it streams. One JSON object
+  per line — not Server-Sent Events, whose reconnection semantics are exactly
+  what a half-finished answer should not have.
+- **No `eager_input_streaming`.** It exists so a large tool input streams as it
+  is generated; the largest thing here is an invoice with a few lines, so there
+  is no latency to win and the tolerant parser it turns on can hand back a
+  silently truncated input.
+- **A 200-line Markdown renderer** rather than a Markdown library: a reply is a
+  few sentences and a small table, and it builds React elements, so nothing the
+  model writes — or a customer's own notes quoted back through it — can become
+  markup that runs.
+- **Off unless configured.** No key, no menu item, no page. Not a page that
+  apologises.
+
 ## Known gaps, deliberately left
 
 - **No trial-ending reminder.** The trial email says days remaining are on the
@@ -400,6 +452,16 @@ data is rarely the person who pays the bill.
 - **An imported invoice's paid amount is not a payment record.** The balance
   owing and every figure derived from it are right; there is nothing in the
   payments ledger behind it, because we do not know when or how it was paid.
+- **The assistant has never spoken to the real API.** It was built and verified
+  against a local stand-in that speaks the streaming wire format — the loop, the
+  tools, the permission gate, the drafts and the confirmations are all proven
+  end to end, and the request shape itself is not. The first live conversation
+  is the test that has not been run.
+- **Assistant usage is not metered per workspace.** Every message is billed to
+  whoever holds the API key, for every tenant, with no cap. The tokens are
+  recorded per message, so the sum is there to be read; nothing acts on it.
+- **The assistant cannot edit or cancel anything.** It drafts new records only.
+  Changing an invoice or voiding a payment is done on the page, deliberately.
 - **`hero.jpg`'s licence is unverified.** The watermark noted here earlier is
   gone, so the file has been replaced at some point, but nobody has recorded
   where it came from or under what terms. Worth establishing before it is
