@@ -9,7 +9,7 @@ import { locale } from '@/lib/config/brand';
  * decimals at each step so totals always reconcile with the stored values.
  */
 
-type DecimalLike = { toString(): string };
+export type DecimalLike = { toString(): string };
 
 export function toNumber(value: DecimalLike | number | null | undefined): number {
   if (value === null || value === undefined) return 0;

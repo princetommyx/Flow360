@@ -1594,6 +1594,10 @@ ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_conversationId_fkey" F
 -- AddForeignKey
 ALTER TABLE "assistant_proposals" ADD CONSTRAINT "assistant_proposals_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "conversations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+-- ===== migration: 20260917160149_invoice_template =====
+-- AlterTable
+ALTER TABLE "company_settings" ADD COLUMN     "invoiceTemplate" TEXT NOT NULL DEFAULT 'classic';
+
 -- ===== migration history =====
 CREATE TABLE IF NOT EXISTS "_prisma_migrations" (
     id                      VARCHAR(36) PRIMARY KEY NOT NULL,
@@ -1614,5 +1618,6 @@ INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, sta
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '961af8efdd69fc547ec35762c420b49b3d90d95b2a11b3ebba3ee9f5b32dc826', now(), '20260915152416_paystack_billing', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, 'c30c4872513a37778f1e0caceb302fbd2e16bed63f6c1d8a1bcb5ca9efa7c1e2', now(), '20260916065240_data_import', now(), 1);
 INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '820c8854d792512f581291f1031d86a64ecfd2065f440162ada479293081fb06', now(), '20260917004211_assistant', now(), 1);
+INSERT INTO "_prisma_migrations" (id, checksum, finished_at, migration_name, started_at, applied_steps_count) VALUES (gen_random_uuid()::text, '0787c77ff628367e8af57f59e9f2a5a92c41d25533713498b99d3f803dff1ec2', now(), '20260917160149_invoice_template', now(), 1);
 
 COMMIT;
