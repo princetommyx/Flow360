@@ -1,5 +1,4 @@
 import { db } from '@/lib/db';
-import { appUrl } from '@/lib/url';
 import { MAX_MESSAGE_CHARS, assistantEnabled } from '@/lib/config/assistant';
 import { AuthorizationError, requireTenant } from '@/server/tenant';
 import { runAssistant, type AssistantEvent } from '@/server/assistant/run';
@@ -27,11 +26,19 @@ export async function POST(request: Request) {
 
   /*
     A server action gets an origin check from the framework; a route handler
-    does not. Cookies are `SameSite=Lax`, which already stops a cross-site
-    form post, and this is the second lock on the same door.
+    does not. Cookies are `SameSite=Lax`, which already stops a cross-site form
+    post, and this is the second lock on the same door.
+
+    The comparison is against the host the request actually arrived on, not
+    against `NEXT_PUBLIC_APP_URL`. That variable is set by hand and is
+    routinely wrong — `lib/url.ts` says so itself — and a custom domain, a
+    preview deployment or a `www.` the configured value does not mention would
+    each turn this lock on the people who live here. The host cannot be got
+    wrong that way: it is what the browser connected to, and a page on another
+    site cannot forge it while also claiming its own origin, which is the
+    attack this is for.
   */
-  const origin = request.headers.get('origin');
-  if (origin && origin !== appUrl().origin) {
+  if (!sameOrigin(request)) {
     return Response.json({ error: 'Bad origin' }, { status: 403 });
   }
 
@@ -137,6 +144,33 @@ export async function POST(request: Request) {
       'X-Accel-Buffering': 'no',
     },
   });
+}
+
+/**
+ * Whether this request came from a page on this deployment.
+ *
+ * A browser sets `Origin` on a cross-site POST and cannot be made to lie about
+ * it, so an origin that disagrees with the host being addressed is the
+ * signature of a request made from somewhere else. A missing `Origin` is not
+ * that signature — same-origin requests from older clients omit it — and the
+ * session cookie is `SameSite=Lax`, so it is let through rather than being a
+ * second way to lock somebody out.
+ *
+ * `x-forwarded-host` is what a proxy that terminated TLS puts the real host in;
+ * on Vercel the platform sets it, not the caller.
+ */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get('origin');
+  if (!origin) return true;
+
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  if (!host) return false;
+
+  try {
+    return new URL(origin).host === host;
+  } catch {
+    return false;
+  }
 }
 
 /** The opening question, trimmed, so the list reads as a list of questions. */
