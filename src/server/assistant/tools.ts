@@ -1,6 +1,6 @@
 import 'server-only';
 
-import type Anthropic from '@anthropic-ai/sdk';
+import type { FunctionDeclaration } from '@google/genai';
 import { z } from 'zod';
 
 import { mayUse, toolError, type AssistantTool, type ToolContext, type ToolResult } from '@/server/assistant/context';
@@ -23,16 +23,16 @@ const BY_NAME = new Map(ALL_TOOLS.map((tool) => [tool.name, tool]));
 /**
  * The tool list as the API wants it, narrowed to this person.
  *
- * Sorted by name, because the tool block is the first thing in the cached
- * prefix and a set that reshuffles between requests would invalidate the cache
- * on every turn.
+ * Sorted by name so the same set of tools is declared in the same order on
+ * every turn of a conversation, which is what lets anything downstream treat
+ * the declaration block as unchanging.
  *
- * `eager_input_streaming` is deliberately off. It exists so a large tool input
- * streams as it is generated, and the largest thing here is an invoice with a
- * few lines — no latency to win, and the tolerant parser it turns on can hand
- * back a silently truncated input.
+ * Declared with `parametersJsonSchema` rather than `parameters`: the first
+ * takes plain JSON Schema, which is what Zod already produces, while the second
+ * wants Google's own OpenAPI-flavoured `Schema` object and would mean
+ * maintaining a converter between the two.
  */
-export function toolsFor(permissions: readonly string[]): Anthropic.Tool[] {
+export function toolsFor(permissions: readonly string[]): FunctionDeclaration[] {
   return ALL_TOOLS.filter((tool) => mayUse(tool, permissions))
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((tool) => {
@@ -40,12 +40,13 @@ export function toolsFor(permissions: readonly string[]): Anthropic.Tool[] {
         string,
         unknown
       >;
+      // `$schema` is metadata about the document, not about the parameters.
       delete schema.$schema;
 
       return {
         name: tool.name,
         description: tool.description,
-        input_schema: schema as Anthropic.Tool.InputSchema,
+        parametersJsonSchema: schema,
       };
     });
 }

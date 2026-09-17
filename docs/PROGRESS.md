@@ -404,21 +404,25 @@ would not replay. The screen renders something else entirely from the same rows.
 
 Smaller decisions that earn their place:
 
-- **Opus 5, adaptive thinking, summarised.** The reasoning appears in grey above
-  the answer, so a turn that takes twenty seconds looks like work rather than a
-  hang. Tool calls announce themselves in the same words the finished trace uses.
-- **Server-side refusal fallbacks** are on, so a safety decline on a business
-  question is answered by a second model rather than stopping.
-- **The system prompt and the tool list are cached.** They are identical on every
-  turn and together are most of what is sent; the tool list is sorted by name so
-  a reshuffle cannot invalidate the prefix.
+- **Gemini Flash, thoughts included.** The reasoning appears in grey above the
+  answer, so a turn that takes twenty seconds looks like work rather than a
+  hang. Tool calls announce themselves in the same words the finished trace
+  uses. The model is `gemini-flash-latest` — the moving alias, so Google's
+  current Flash is picked up without a code change; `GEMINI_MODEL` pins it.
+- **Tools are declared with `parametersJsonSchema`.** Zod already produces JSON
+  Schema; the alternative field wants Google's OpenAPI-flavoured `Schema`
+  object and would mean maintaining a converter between two dialects.
+- **A turn is stored as its parts, verbatim.** Not only because the next turn
+  replays it: a function call can carry a `thoughtSignature` the model expects
+  back unchanged, and a turn rebuilt from its text would drop it.
 - **A route handler, not a server action**, because it streams. One JSON object
   per line — not Server-Sent Events, whose reconnection semantics are exactly
   what a half-finished answer should not have.
-- **No `eager_input_streaming`.** It exists so a large tool input streams as it
-  is generated; the largest thing here is an invoice with a few lines, so there
-  is no latency to win and the tolerant parser it turns on can hand back a
-  silently truncated input.
+- **`router.refresh()` after a reply was a bug, not a feature.** The page keys
+  the chat on the conversation in the URL so that switching resets it; a
+  refresh made the server see the id the turn had just put in the address bar,
+  changed the key, and rebuilt the reply from the server mid-sentence. The
+  sidebar catches up on the next navigation instead.
 - **A 200-line Markdown renderer** rather than a Markdown library: a reply is a
   few sentences and a small table, and it builds React elements, so nothing the
   model writes — or a customer's own notes quoted back through it — can become
@@ -453,10 +457,14 @@ Smaller decisions that earn their place:
   owing and every figure derived from it are right; there is nothing in the
   payments ledger behind it, because we do not know when or how it was paid.
 - **The assistant has never spoken to the real API.** It was built and verified
-  against a local stand-in that speaks the streaming wire format — the loop, the
-  tools, the permission gate, the drafts and the confirmations are all proven
-  end to end, and the request shape itself is not. The first live conversation
-  is the test that has not been run.
+  against a local stand-in that speaks Gemini's streaming wire format — the
+  loop, the tools, the permission gate, the drafts and the confirmations are
+  all proven end to end, and the request shape itself is not. The first live
+  conversation is the test that has not been run.
+- **A conversation cannot survive a change of model provider.** `chat_messages`
+  holds one provider's part format, and replaying it to another would fail.
+  Nothing was ever stored against the previous provider, so nothing was lost
+  this time; a future switch would need the old conversations retired.
 - **Assistant usage is not metered per workspace.** Every message is billed to
   whoever holds the API key, for every tenant, with no cap. The tokens are
   recorded per message, so the sum is there to be read; nothing acts on it.

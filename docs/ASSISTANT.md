@@ -34,31 +34,37 @@ A misheard name costs a second, not an invoice sent to the wrong customer.
 One environment variable:
 
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=AIza...
 ```
 
-From [console.anthropic.com](https://console.anthropic.com). On Vercel:
-**Project → Settings → Environment Variables**, then redeploy.
+From [aistudio.google.com/apikey](https://aistudio.google.com/apikey). On
+Vercel: **Project → Settings → Environment Variables**, then redeploy.
 
 Without it the feature is absent — no menu item, no page. That is deliberate: a
 link to a page that can only say "not configured" is a dead control.
 
-Optionally, `ANTHROPIC_MODEL` picks a different model. The default is
-`claude-opus-5`, which is the right default for something reading a company's
-books and drafting documents against them; a cheaper model is a real trade and
-not a free saving.
+Two optional variables:
+
+- `GEMINI_MODEL` picks the model. The default is `gemini-flash-latest`, the
+  moving alias for Google's current Flash model, so a new one is picked up
+  without a code change. Pin a version here to decide that for yourself.
+- `GEMINI_BASE_URL` points the client somewhere other than Google. Unset in
+  normal use; it is how the assistant gets exercised against a stand-in without
+  a key, and the escape hatch for a deployment behind its own proxy.
 
 ## What it costs, and who pays
 
-**You do.** Every message is billed to your Anthropic account, for every
-workspace on the deployment. There is no per-tenant metering and no cap. Before
-switching it on for paying customers, work out what you are willing to spend and
-watch it in the Anthropic console for the first weeks.
+**You do**, past the free tier. Google's free tier is rate limited but costs
+nothing, which is enough to find out whether the assistant earns its place.
+After that every message is billed to your key, for every workspace on the
+deployment. There is no per-tenant metering and no cap.
 
-Two things that keep it down are already in place: the system prompt and the tool
-list are cached between turns of a conversation (they are identical every time,
-and together they are most of what is sent), and every turn is capped — eight
-rounds of tool use, forty messages of history, eight thousand output tokens.
+That matters at your prices. Starter is GH₵35 a year; a customer who talks to
+the assistant all afternoon can cost more than that in a sitting. Decide who
+gets it — and whether it needs a cap — before you tell customers it exists.
+
+One thing that keeps it down is already in place: every turn is capped at eight
+rounds of tool use, forty messages of history and eight thousand output tokens.
 
 Each message row records `inputTokens` and `outputTokens`, so
 `select sum("inputTokens"), sum("outputTokens") from chat_messages` tells you
@@ -124,14 +130,16 @@ by a person.
 
 ## When it goes wrong
 
-**"The assistant is not switched on here"** — no `ANTHROPIC_API_KEY` on that
+**"The assistant is not switched on here"** — no `GEMINI_API_KEY` on that
 deployment, or it was added without redeploying.
 
 **"The assistant is not configured correctly"** — the key is there and was
-rejected. Check it has not been revoked, and that it is a key rather than an
-admin key.
+rejected. Check it has not been revoked, and that the Gemini API is enabled for
+the project it belongs to.
 
-**"The assistant is busy"** — rate limited at the provider. It will pass.
+**"The assistant is busy, or the free allowance for today is used up"** — rate
+limited at Google. On the free tier that is a daily quota; on a billed key it
+passes in a moment.
 
 **It refuses something the person can clearly do** — check their role. The
 assistant is narrower than the person only if the permission is missing; if the
@@ -152,11 +160,15 @@ src/server/assistant/
   tools-read.ts                 the eight that only look
   tools-write.ts                the seven that draft
   tools.ts                      the registry and the permission gate
-  run.ts                        the streamed loop
+  run.ts                        the streamed loop — the only file that knows
+                                which model provider is behind it
 src/app/api/assistant/route.ts  one JSON object per line, to the browser
 src/server/actions/assistant.ts confirm, discard, delete — the only door out
 ```
 
-The split is the point. `tools-read` and `tools-write` are the only places that
-know about the business; `run.ts` knows nothing about invoices; and
-`actions/assistant.ts` is the single place a draft can become a record.
+The split is the point, and it has been paid off once already: moving from one
+model provider to another was a rewrite of `run.ts` and two lines of
+`tools.ts`, and nothing else in the list changed. `tools-read` and `tools-write`
+are the only places that know about the business; `run.ts` knows nothing about
+invoices; and `actions/assistant.ts` is the single place a draft can become a
+record.

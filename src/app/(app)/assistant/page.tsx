@@ -58,7 +58,7 @@ export default async function AssistantPage({
           <EmptyState
             icon={PlugZap}
             title="The assistant is not switched on here"
-            description={`It needs an Anthropic API key on this deployment before it can answer anything. Until there is one it stays quiet rather than pretending to work. Whoever set ${brand.name} up can add it — see docs/ASSISTANT.md.`}
+            description={`It needs a Gemini API key on this deployment before it can answer anything. Until there is one it stays quiet rather than pretending to work. Whoever set ${brand.name} up can add it — see docs/ASSISTANT.md.`}
             action={
               <Button asChild size="sm" variant="secondary">
                 <Link href="/dashboard">Back to the dashboard</Link>
